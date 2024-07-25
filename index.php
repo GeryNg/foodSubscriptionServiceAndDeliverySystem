@@ -1,8 +1,7 @@
 <?php
 $page_title = "User Authentication - Homepage";
 include_once 'resource/session.php';
-include_once 'partials/headers.php';
-echo 'hello world';
+include_once 'partials/headers.php';#
 ?>
 
 <div class="container">

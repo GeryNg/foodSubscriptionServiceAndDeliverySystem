@@ -2,6 +2,7 @@
 $page_title = "User Authentication - Homepage";
 include_once 'resource/session.php';
 include_once 'partials/headers.php';
+echo 'hello world';
 ?>
 
 <div class="container">

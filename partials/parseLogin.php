@@ -19,7 +19,6 @@ if (isset($_POST['loginBtn'])) {
 
         isset($_POST['remember']) ? $remember = $_POST['remember'] : $remember = "";
 
-        //check is user exist in the database
         $sqlQuery = "SELECT * FROM users WHERE username = :username";
         $statement = $db->prepare($sqlQuery);
         $statement->execute(array(':username' => $user));
@@ -34,6 +33,11 @@ if (isset($_POST['loginBtn'])) {
                 $_SESSION['id'] = $id;
                 $_SESSION['username'] = $username;
                 $_SESSION['role'] = $role;
+                $_SESSION['Status'] = 'Online';
+                
+                $sqlUpdate = "UPDATE users SET Status = 'Online' WHERE id = :id";
+                $statement = $db->prepare($sqlUpdate);
+                $statement->execute(array(':id' => $id));
 
                 //guard
                 $fingerprint = md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']);
@@ -45,7 +49,6 @@ if (isset($_POST['loginBtn'])) {
                     rememberMe($id);
                 }
 
-                // If the user is a seller, get the seller status
                 if ($role === 'seller') {
                     $sqlQuerySeller = "SELECT id AS seller_id, status FROM seller WHERE user_id = :user_id";
                     $statementSeller = $db->prepare($sqlQuerySeller);
@@ -69,7 +72,6 @@ if (isset($_POST['loginBtn'])) {
                     $redirect_url = '../index.php';
                 }
 
-                //call sweet alert
                 echo "<script>
                 swal({
                   title: \"Welcome back, $username!\",

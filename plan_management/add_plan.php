@@ -6,7 +6,7 @@ include_once '../resource/updatePlanStatus.php';
 include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
-$seller_status = $_SESSION['seller_status'] ?? '';
+$seller_status = $_SESSION['status'] ?? '';
 
 if (empty($seller_status) || $seller_status !== 'verify') {
     echo '<p>You do not have permission to access this page.</p>';

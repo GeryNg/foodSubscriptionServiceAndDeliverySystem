@@ -1,4 +1,5 @@
 <?php
+ob_start();
 use MongoDB\BSON\Javascript;
 include_once '../resource/session.php';
 include_once '../resource/Database.php';
@@ -32,6 +33,7 @@ if (isset($_POST['loginBtn'])) {
             if (password_verify($password, $hashed_password)) {
                 $_SESSION['id'] = $id;
                 $_SESSION['username'] = $username;
+                $_SESSION['role'] = $role;
 
                 //guard
                 $fingerprint = md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']);
@@ -96,5 +98,5 @@ if (isset($_POST['loginBtn'])) {
     }
 }
 
-
+ob_end_flush();
 ?>

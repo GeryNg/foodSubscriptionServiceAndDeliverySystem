@@ -45,10 +45,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto my-2 my-lg-0">
                     <li class="nav-item"><a class="nav-link <?php echo $current_page == 'index.php' ? 'active' : ''; ?>" href="../index.php">Home</a></li>
-                    <li class="nav-item"><a class="nav-link <?php echo $current_page == 'add_plan.php' ? 'active' : ''; ?>" href="../plan_management/add_plan.php">Plan</a></li>
-                    <li class="nav-item"><a class="nav-link <?php echo $current_page == 'about_us.php' ? 'active' : ''; ?>" href="../about_us.php">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link <?php echo $current_page == 'delivery_area.php' ? 'active' : ''; ?>" href="../delivery_area.php">Delivery Area</a></li>
-                    <li class="nav-item"><a class="nav-link <?php echo $current_page == 'customer_service.php' ? 'active' : ''; ?>" href="../customer_service.php">Customer Service</a></li>
+                    <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="#">Plan</a></li>
+                    <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="#">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="#">Delivery Area</a></li>
+                    <li class="nav-item"><a class="nav-link <?php echo $current_page == 'add_plan.php' ? 'active' : ''; ?>" href="../plan_management/add_plan.php">SellerPage(temporary)</a></li>
+                    <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="#">Customer Service</a></li>
                 </ul>
                 <div class="dtext-end">
                     <a href="../profile_management/profile.php" class="d-block link-body-emphasis text-decoration-none icon-link">

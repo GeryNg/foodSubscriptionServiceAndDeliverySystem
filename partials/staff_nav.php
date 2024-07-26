@@ -3,6 +3,13 @@
     include_once '../resource/Database.php';
     include_once '../resource/utilities.php';
     include_once '../resource/updatePlanStatus.php';
+
+
+    // Check if user is logged in and has the role of 'seller'
+    if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'seller') {
+        header("Location: ../partials/error.php");
+        exit;
+    }
 ?>
 
 <!DOCTYPE html>
@@ -259,13 +266,6 @@
     </div>
 
     <?php
-
-    // Check if user is logged in
-    if (!isset($_SESSION['username']) && $_SESSION['role'] !== 'seller') {
-        echo '<p class="lead">You are not authorized to view this page. <a href="../login_management/login.php">Login</a> or <a href="../login_management/signup.php">Signup</a></p>';
-        exit;
-    }
-
     if (isset($_SESSION['id'])) {
         $id = $_SESSION['id'];
         $username = $_SESSION['username'];

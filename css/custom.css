@@ -1,0 +1,9 @@
+﻿body {
+}
+.flag {
+    padding: 80px 15px;
+    text-align: center;
+}
+.hide {
+    display: none;
+}

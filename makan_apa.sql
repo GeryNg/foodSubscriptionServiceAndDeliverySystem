@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 23, 2024 at 04:18 PM
+-- Generation Time: Jul 28, 2024 at 04:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -28,14 +28,40 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `customer` (
-  `id` int(11) NOT NULL,
-  `address_book` text DEFAULT NULL,
-  `gender` enum('male','female') DEFAULT NULL,
-  `phone_number` varchar(15) DEFAULT NULL,
-  `user_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `Cust_ID` int(10) NOT NULL,
+  `Name` varchar(40) NOT NULL,
+  `Username` varchar(15) DEFAULT NULL,
+  `Gender` enum('M','F','O','') DEFAULT NULL,
+  `Address` varchar(50) DEFAULT NULL,
+  `Email` varchar(30) DEFAULT NULL,
+  `Password` varchar(40) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
--- --------------------------------------------------------
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `customer`
+--
+ALTER TABLE `customer`
+  ADD PRIMARY KEY (`Cust_ID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `customer`
+--
+ALTER TABLE `customer`
+  MODIFY `Cust_ID` int(10) NOT NULL AUTO_INCREMENT;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
 
 --
 -- Table structure for table `plan`
@@ -157,6 +183,83 @@ ALTER TABLE `customer`
 --
 ALTER TABLE `seller`
   ADD CONSTRAINT `seller_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Jul 28, 2024 at 05:14 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `makan_apa`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_cust`
+--
+
+CREATE TABLE `order_cust` (
+  `Order_ID` int(20) NOT NULL,
+  `OrderDate` date NOT NULL,
+  `GrandTotal` decimal(8,2) NOT NULL,
+  `SST` decimal(8,2) NOT NULL,
+  `Status` enum('Active','Finished','Cancelled','') NOT NULL,
+  `Duration` int(30) NOT NULL,
+  `StartDate` date NOT NULL,
+  `EndDate` date NOT NULL,
+  `Cust_ID` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `order_cust`
+--
+ALTER TABLE `order_cust`
+  ADD PRIMARY KEY (`Order_ID`),
+  ADD KEY `Cust_ID` (`Cust_ID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `order_cust`
+--
+ALTER TABLE `order_cust`
+  MODIFY `Order_ID` int(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `order_cust`
+--
+ALTER TABLE `order_cust`
+  ADD CONSTRAINT `order_cust_ibfk_1` FOREIGN KEY (`Cust_ID`) REFERENCES `customer` (`Cust_ID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

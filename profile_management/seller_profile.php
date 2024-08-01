@@ -25,6 +25,25 @@
     include_once '../resource/session.php';
     include_once '../partials/staff_nav.php';
     include_once '../partials/parseSellerProfile.php';
+
+    if (isset($_SESSION['id'])) {
+        $id = $_SESSION['id'];
+    
+        $sqlQuery = "SELECT * FROM users WHERE id = :id";
+        $statement = $db->prepare($sqlQuery);
+        $statement->execute(array(':id' => $id));
+    
+        while ($rs = $statement->fetch()) {
+            $username = $rs['username'];
+            $email = $rs['email'];
+            $date_joined = (new DateTime($rs["join_date"]))->format('M d, Y');
+            $avatar = $rs['avatar'];
+        }
+    
+        $user_pic = !empty($avatar) ? $avatar : "../uploads/default.jpg";
+    } else {
+
+    }
     ?>
 
     <div class="container" style="margin-top:20px;">
@@ -35,10 +54,8 @@
                 Not yet a member? <a href="../login_management/singup.php">Signup</a></p>
             <?php else: ?>
                 <section class="col col-lg-7">
-
-                    <div class="row col-lg-3" style="margin-bottom:10px;">
-                        <img src="<?php if (isset($profile_picture))
-                            echo $profile_picture; ?>" class="img img_rounded" width="200" alt="profile_picture"/>
+                    <div class="row col-lg-3"  style="margin-bottom:10px;">
+                        <img src="<?php echo $user_pic; ?>" alt="User Avatar" class="" width="200" >
                     </div>
                     <table class="table table-bordered table-condens">
                         <tr><th style="width:20%">Username: </th><td><?php if (isset($username))

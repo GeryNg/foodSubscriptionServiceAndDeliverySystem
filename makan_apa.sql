@@ -37,7 +37,7 @@ CREATE TABLE `customer` (
   `Password` varchar(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
---cat 
+--
 -- Indexes for dumped tables
 --
 

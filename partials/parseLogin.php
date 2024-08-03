@@ -50,13 +50,13 @@ if (isset($_POST['loginBtn'])) {
                 }
 
                 if ($role === 'seller') {
-                    $sqlQuerySeller = "SELECT id AS seller_id, status FROM seller WHERE user_id = :user_id";
+                    $sqlQuerySeller = "SELECT id AS seller_id, access FROM seller WHERE user_id = :user_id";
                     $statementSeller = $db->prepare($sqlQuerySeller);
                     $statementSeller->execute(array(':user_id' => $id));
                     $sellerRow = $statementSeller->fetch();
 
                     if ($sellerRow) {
-                        $_SESSION['status'] = $sellerRow['status'];
+                        $_SESSION['access'] = $sellerRow['access'];
                         $_SESSION['seller_id'] = $sellerRow['seller_id'];
                     }
                 }

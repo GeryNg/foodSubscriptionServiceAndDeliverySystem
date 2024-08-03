@@ -32,6 +32,7 @@
     include_once '../partials/headers.php';
     include_once '../partials/parseProfile.php';
 
+    //fetch data
     if (isset($_SESSION['id'])) {
         $id = $_SESSION['id'];
     

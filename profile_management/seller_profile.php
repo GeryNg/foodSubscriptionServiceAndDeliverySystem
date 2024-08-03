@@ -75,7 +75,7 @@
                 </section>
 
             <?php
-            if (isset($status) && ($status === 'pending' || $status === 'verify')) {
+            if (isset($access) && ($access === 'pending' || $access === 'verify')) {
                 $sqlQuerySeller = "SELECT * FROM seller WHERE user_id = :user_id";
                 $statementSeller = $db->prepare($sqlQuerySeller);
                 $statementSeller->execute(array(':user_id' => $id));
@@ -89,11 +89,11 @@
                         <div style="display: flex; align-items: center;">
                             <h1>Basic Information</h1>
                                 <span class="badge badge-status ' .
-                                    ($status === 'pending' ? 'badge-warning' :
-                                    ($status === 'inactive' ? 'badge-info' :
-                                    ($status === 'rejected' ? 'badge-danger' :
-                                    ($status === 'verify' ? 'badge-success' : '')))) .
-                                '">' . ucfirst($status) . '</span>
+                                    ($access === 'pending' ? 'badge-warning' :
+                                    ($accesss === 'inactive' ? 'badge-info' :
+                                    ($access === 'rejected' ? 'badge-danger' :
+                                    ($access === 'verify' ? 'badge-success' : '')))) .
+                                '">' . ucfirst($access) . '</span>
                         </div>
                         <table class="table table-bordered">
                     <tbody>';

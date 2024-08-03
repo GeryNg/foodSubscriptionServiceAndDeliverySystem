@@ -16,7 +16,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.css" rel="stylesheet" />
     <link href="../css/styles.css" rel="stylesheet" />
-    <link href="../css/custom.css" rel="stylesheet" />
+    <!--<link href="../css/custom.css" rel="stylesheet" />-->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <title>
         <?php echo isset($page_title) ? htmlspecialchars($page_title) : 'Default Title'; ?>
@@ -49,20 +49,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="#">About Us</a></li>
                     <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="#">Delivery Area</a></li>
                     <li class="nav-item"><a class="nav-link <?php echo $current_page == 'add_plan.php' ? 'active' : ''; ?>" href="../plan_management/add_plan.php">SellerPage(temporary)</a></li>
-                    <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="#">Customer Service</a></li>
+                    <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="../customer_support/live_chat.php">Customer Service</a></li>
                 </ul>
                 <div class="dtext-end">
                     <a href="../profile_management/profile.php" class="d-block link-body-emphasis text-decoration-none icon-link">
                         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16" style="font-size: 30px;">
                             <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"></path>
                             <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"></path>
-                        </svg>
-                    </a>
-                </div>
-                <div class="dtext-end">
-                    <a href="#" class="d-block link-body-emphasis text-decoration-none icon-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-bag" viewBox="0 0 16 16" style="font-size: 30px;">
-                            <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="0.5"></path>
                         </svg>
                     </a>
                 </div>

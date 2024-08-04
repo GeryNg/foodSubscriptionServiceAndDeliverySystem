@@ -147,3 +147,69 @@ article {
     white-space: nowrap; 
     width: 1px;
   }
+
+  /* Add these styles to your existing CSS file */
+
+/* Container styles */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header styles */
+h1, h2 {
+    text-align: center;
+}
+
+/* Avatar image styles */
+.avatar_image {
+    display: block;
+    max-width: 150px; /* Set maximum width for avatar */
+    max-height: 150px; /* Set maximum height for avatar */
+    width: auto;
+    height: auto;
+    margin: 20px auto;
+    border-radius: 50%; /* Optional: make the avatar circular */
+}
+
+/* Plan image styles */
+.plan_image {
+    display: block;
+    max-width: 100%; /* Ensure the image does not exceed the container width */
+    height: auto;
+    margin: 0 auto;
+}
+
+/* Article wrapper styles */
+.article-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Article body styles */
+.article-body {
+    text-align: center;
+}
+
+/* Read more link styles */
+.read-more {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #007BFF;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
+/* SVG icon styles */
+.icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-left: 5px;
+}

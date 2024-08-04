@@ -82,6 +82,8 @@ include_once '../partials/parseActiveAccount.php';
 
                 <label>Name: <input type="text" name="seller_name" value="<?php if (isset($_POST['seller_name']))
                     echo htmlspecialchars($_POST['seller_name']); ?>"></label><br>
+                <label>Restaurant Profile Picture: </label>
+                    <input type="file" name="profile_pic" accept=".jpg, .jpeg, .png" multiple><br><br>
                 <label>Describe your restaurant: <textarea name="description"><?php if (isset($_POST['description']))
                     echo htmlspecialchars($_POST['description']); ?></textarea></label><br>
                 <label>Contact Number: <input type="text" name="contact_num" value="<?php if (isset($_POST['contact_num']))

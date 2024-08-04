@@ -6,9 +6,9 @@ include_once '../resource/updatePlanStatus.php';
 include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
-$seller_status = $_SESSION['status'] ?? '';
+$seller_access = $_SESSION['access'] ?? '';
 
-if (empty($seller_status) || $seller_status !== 'verify') {
+if (empty($seller_access) || $seller_access !== 'verify') {
     echo '<p>You do not have permission to access this page.</p>';
     exit;
 }
@@ -79,7 +79,7 @@ if (empty($seller_status) || $seller_status !== 'verify') {
 <body>
     <div class="main-content">
         <div class="container">
-            <?php if ($seller_status === 'verify'): ?>
+            <?php if ($seller_access === 'verify'): ?>
                 <h1>Add New Plan</h1>
                 <form action="" method="post" enctype="multipart/form-data">
                     <br />

@@ -5,15 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         .pull-right {
             float: right !important;
         }
         .btn {
-            margin-top:10px
+            margin-top: 10px;
         }
         .document-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin-bottom: 10px;
+        }
+        .profile-picture {
             max-width: 200px;
             max-height: 200px;
             margin-bottom: 10px;
@@ -36,6 +40,8 @@
     $address = '';
     $bank_account = '';
     $documents = '';
+    $profile_pic = '';
+    $seller = []; // Initialize $seller as an empty array
 
     $user_id = $_SESSION['id'];
 
@@ -53,6 +59,7 @@
                 $address = $seller['address'];
                 $bank_account = $seller['bank_account'];
                 $documents = $seller['image_urls'];
+                $profile_pic = $seller['profile_pic'];
                 $id = $seller['id'];
             } else {
                 echo '<p>No seller data found.</p>';
@@ -71,8 +78,10 @@
         $hidden_id = $_POST['hidden_id'];
 
         $existing_documents = $_POST['existing_documents'];
+        $existing_profile_pic = $_POST['existing_profile_pic'];
 
         $uploaded_files = isset($_FILES['document_image']['name']) ? $_FILES['document_image']['name'] : [];
+        $profile_pic_file = isset($_FILES['profile_pic']['name']) ? $_FILES['profile_pic']['name'] : '';
 
         if (!empty($uploaded_files[0])) {
             $upload_paths = [];
@@ -93,12 +102,26 @@
             $documents = $existing_documents;
         }
 
+        if (!empty($profile_pic_file)) {
+            $file_ext = pathinfo($profile_pic_file, PATHINFO_EXTENSION);
+            $unique_file_name = uniqid('profile_', true) . '.' . $file_ext;
+            $profile_pic_path = '../seller_profile_pic/' . $unique_file_name;
+            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $profile_pic_path)) {
+                $profile_pic = $profile_pic_path;
+            } else {
+                $form_errors[] = "Failed to upload profile picture.";
+            }
+        } else {
+            $profile_pic = $existing_profile_pic;
+        }
+
         if (empty($form_errors)) {
             try {
-                $query = "UPDATE seller SET name = :name, detail = :detail, contact_number = :contact_number, address = :address, bank_account = :bank_account, image_urls = :documents WHERE id = :id";
+                $query = "UPDATE seller SET name = :name, detail = :detail, contact_number = :contact_number, address = :address, bank_account = :bank_account, image_urls = :documents, profile_pic = :profile_pic WHERE id = :id";
                 $stmt = $db->prepare($query);
                 $stmt->execute([
                     ':name' => $name,
+                    ':profile_pic' => $profile_pic,
                     ':detail' => $detail,
                     ':contact_number' => $contact_number,
                     ':address' => $address,
@@ -124,6 +147,8 @@
                             title: \"Nothing Happened\",
                             text: \"You have not made any changes\",
                             icon: \"info\"
+                        }).then(function() {
+                            window.location.href = 'seller_profile.php';
                         });
                     </script>";
                 }
@@ -137,7 +162,6 @@
     }
 ?>
 
-
     <div class="container" style="margin-top:20px;">
         <section class="col col-lg-7">
             <h2>Edit Profile</h2>
@@ -148,13 +172,24 @@
                 </div>
             <?php endif; ?>
 
-            <?php if ($seller): ?>
+            <?php if (!empty($seller)): ?>
                 <form method="post" action="" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="nameField">Name</label>
                         <input type="text" name="name" class="form-control" id="nameField" value="<?php echo htmlspecialchars($name); ?>" />
                     </div>
 
+                    <div class="form-group">
+                        <label for="profilePicField">Profile Picture</label>
+                        <?php if ($profile_pic): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo htmlspecialchars($profile_pic); ?>" alt="Profile Picture" class="profile-picture" />
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" name="profile_pic" class="form-control" id="profilePicField" />
+                        <input type="hidden" name="existing_profile_pic" value="<?php echo htmlspecialchars($profile_pic); ?>" />
+                    </div>
+                    
                     <div class="form-group">
                         <label for="detailField">Detail</label>
                         <input type="text" name="detail" class="form-control" id="detailField" value="<?php echo htmlspecialchars($detail); ?>" />
@@ -183,7 +218,7 @@
                                 $images = explode(',', $documents);
                                 foreach ($images as $image): ?>
                                     <div class="p-2">
-                                        <img src="<?php echo htmlspecialchars($image); ?>" alt="Document Image" class="document-image" />
+                                        <img src="<?php echo htmlspecialchars($image); ?>" alt="Document" class="document-image" />
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -191,21 +226,16 @@
                         <input type="file" name="document_image[]" class="form-control" id="documentImageField" multiple />
                         <input type="hidden" name="existing_documents" value="<?php echo htmlspecialchars($documents); ?>" />
                     </div>
-                    <input type="hidden" name="hidden_id" value="<?php echo htmlspecialchars($id); ?>"/>
-                    <button type="submit" name="updateSellerInformation" class="btn btn-primary pull-right">Update Information</button>
+
+                    <input type="hidden" name="hidden_id" value="<?php if (isset($id)) echo $id; ?>" />
+                    <button type="submit" name="updateSellerInformation" class="btn btn-primary pull-right">Update Profile</button>
                 </form>
-            <?php else: ?>
-                <p>Your data had been updated!</p>
             <?php endif; ?>
         </section>
-        <br />
-        <br />
-        <br />
-        <br />
-        <p><a href="seller_profile.php">Back</a></p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-q/gThh3Fv0LVQNADnE8wrfFHTX9pSR4xD6oJ/bh1SvQOgavPaOvInlK0UrrXkgx4" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-ym9WY18K7F4+DA8BZBQ8nK7K5bGyQXTKBRUjog9pa7BrpprAP+KEKWDDYV9oHBB8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.all.min.js"></script>
 </body>
 </html>

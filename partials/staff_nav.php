@@ -21,6 +21,10 @@
         <?php echo isset($page_title) ? htmlspecialchars($page_title) : 'Default Title'; ?>
     </title>
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
@@ -33,7 +37,7 @@
     </style>
 </head>
 
-<body>
+<body style="background-color: #f5f5f5;">
     <div id="wrapper">
          <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -80,10 +84,10 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Tables -->
-            <li class="nav-item <?php echo $current_page == 'list_plan.php' ? 'active' : ''; ?>" href="#"">
-                <a class="nav-link">
+            <li class="nav-item <?php echo $current_page == 'seller_live_chat.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="../customer_support/seller_live_chat.php">
                     <i class="fas fa-fw fa-table"></i>
-                    <span>Tables</span></a>
+                    <span>Customer Support</span></a>
             </li>
 
             <!-- Divider -->
@@ -270,23 +274,23 @@
     if (isset($_SESSION['id'])) {
         $id = $_SESSION['id'];
         $username = $_SESSION['username'];
-        $status = $_SESSION['status'];
+        $access = $_SESSION['access'];
 
-        if ($status === 'inactive') {
+        if ($access === 'inactive') {
             echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>Account Inactive!</strong> Your account is currently inactive. 
             <a href="../profile_management/active_account.php" class="btn btn-primary btn-sm">Activate Account</a>
           </div>';
-        } elseif ($status === 'pending') {
+        } elseif ($access === 'pending') {
             echo '<div class="alert alert-info alert-dismissible fade show" role="alert">
             <strong>Account Pending!</strong> Your account is under review. Please wait for up to 3 working days.
           </div>';
-        } elseif ($status === 'rejected') {
+        } elseif ($access === 'rejected') {
             echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>Account Rejected!</strong> Your account request has been rejected. 
             <a href="active_account.php" class="btn btn-primary btn-sm">Submit New Request</a>
           </div>';
-        } elseif ($status === 'verify') {
+        } elseif ($access === 'verify') {
 
         }
     } else {

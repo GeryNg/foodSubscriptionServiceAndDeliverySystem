@@ -8,7 +8,7 @@ if (isset($_POST['signupBtn'])) {
     $form_errors = array();
 
     // Required fields
-    $required_fields = array('email', 'username', 'password1', 'password2');
+    $required_fields = array('email', 'username', 'password1', 'password2','name', 'gender', 'phoneNumber', 'securityQuestion1', 'securityAnswer1', 'securityQuestion2', 'securityAnswer2');
     $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
 
     // Fields to check length
@@ -20,9 +20,23 @@ if (isset($_POST['signupBtn'])) {
 
     // Collect form data
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+    $username = filter_var($_POST['username']);
     $password1 = $_POST['password1'];
     $password2 = $_POST['password2'];
+    $name = filter_var($_POST['name']);
+    $gender = filter_var($_POST['gender']);
+    $phoneNumber = filter_var($_POST['phoneNumber']);
+    $securityQuestion1 = filter_var($_POST['securityQuestion1']);
+    $securityAnswer1 = filter_var($_POST['securityAnswer1']);
+    $securityQuestion2 = filter_var($_POST['securityQuestion2']);
+    $securityAnswer2 = filter_var($_POST['securityAnswer2']);
+    $securityQuestions = array(
+        "1" => "What was your first pet's name?",
+        "2" => "What is your mother's maiden name?",
+        "3" => "What was the name of your first school?",
+        "4" => "What is your favorite food?",
+        "5" => "What city were you born in?"
+    );
 
     // Check for duplicate entries
     if ($password1 != $password2) {
@@ -36,19 +50,34 @@ if (isset($_POST['signupBtn'])) {
         $hashed_password = password_hash($password1, PASSWORD_DEFAULT);
 
         try {
-            $sqlInsert = "INSERT INTO users (username, email, password, role, join_date) 
-                          VALUES (:username, :email, :password, :role, now())";
-            $statement = $db->prepare($sqlInsert);
+            $sqlInsertUser = "INSERT INTO users (username, email, password, role, join_date, security_question1, security_answer1, security_question2, security_answer2) 
+                              VALUES (:username, :email, :password, :role, now(), :security_question1, :security_answer1, :security_question2, :security_answer2)";
+            $statement = $db->prepare($sqlInsertUser);
             $statement->execute(
                 array(
                     ':username' => $username,
                     ':email' => $email,
                     ':password' => $hashed_password,
-                    ':role' => 'customer'
+                    ':role' => 'customer',
+                    ':security_question1' => $securityQuestions[$securityQuestion1],
+                    ':security_answer1' => $securityAnswer1,
+                    ':security_question2' => $securityQuestions[$securityQuestion2],
+                    ':security_answer2' => $securityAnswer2
                 )
             );
 
             if ($statement->rowCount() == 1) {
+                $user_id = $db->lastInsertId();
+            
+                $sqlInsertCustomer = "INSERT INTO customer (user_id, Name, Gender, Phone_num) VALUES (:user_id, :name, :gender, :phone_num)";
+                $statementCustomer = $db->prepare($sqlInsertCustomer);
+                $statementCustomer->execute(array(
+                    ':user_id' => $user_id,
+                    ':name' => $name,
+                    ':gender' => $gender,
+                    ':phone_num' => $phoneNumber
+                ));
+
                 echo "<script>
                 swal({
                   title: \"Registration Successful!\",

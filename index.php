@@ -20,7 +20,6 @@ include_once 'partials/headers.php';
 </div>
 
 <<<<<<< HEAD
-<?php include_once 'partials/footer.php';?>    <!--add footer for the future-->
 =======
 <section class="hero-section">
         <div class="hero-container">
@@ -51,3 +50,4 @@ include_once 'partials/headers.php';
 
     <!--add footer for the future-->
 >>>>>>> 84149511000bf35883a70367543dfe3b88d01b53
+<?php include_once 'partials/footer.php';?>    <!--add footer for the future-->

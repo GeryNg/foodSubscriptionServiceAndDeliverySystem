@@ -15,40 +15,55 @@ body {
     padding: 20px;
 }
 
-h1 {
+h1, h2 {
     margin-bottom: 20px;
     font-size: 2rem;
 }
 
-/* Search form styles */
-form {
-    margin-bottom: 20px;
+.avatar_image {
+    display: block;
+    max-width: 150px;
+    max-height: 150px;
+    width: auto;
+    height: auto;
+    margin: 20px auto;
+    border-radius: 50%;
+}
+
+.plan_image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+}
+
+.article-wrapper {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    margin-bottom: 20px;
 }
 
-form input[type="text"] {
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-right: 10px;
+.article-body {
+    text-align: center;
 }
 
-form button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+.read-more {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #007BFF;
 }
 
-form button:hover {
-    background-color: #0056b3;
+.read-more:hover {
+    text-decoration: underline;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-left: 5px;
 }
 
 /* Articles Styles */
@@ -60,7 +75,7 @@ form button:hover {
 }
 
 /* Individual article styling */
-article.restaurant-card {
+article.restaurant-card, article.plan-card {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background: #fff;
@@ -68,7 +83,7 @@ article.restaurant-card {
     transition: transform 0.3s;
 }
 
-article.restaurant-card:hover {
+article.restaurant-card:hover, article.plan-card:hover {
     transform: translateY(-5px);
 }
 
@@ -80,11 +95,11 @@ article.restaurant-card:hover {
 figure {
     margin: 0;
     padding: 0;
-    height: 200px;
+    height: 250px; 
     overflow: hidden;
 }
 
-.avatar_image {
+figure img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -96,19 +111,19 @@ figure {
 }
 
 .article-body h2 {
-    font-size: 1.2rem;
+    font-size: 1rem; 
     margin-bottom: 8px;
 }
 
 .article-body p {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 0.8rem; 
     color: #555;
 }
 
 .article-body .detail,
 .article-body .address {
-    margin-bottom: 3px;
+    margin-bottom: 4px;
 }
 
 .read-more {
@@ -135,17 +150,6 @@ figure {
     transform: translateX(5px);
 }
 
-/************************ 
-Generic layout (demo looks)
-**************************/
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-/* Media Query for Responsiveness */
 @media screen and (max-width: 960px) {
     article {
         container: card/inline-size;
@@ -176,7 +180,6 @@ Generic layout (demo looks)
     }
 }
 
-/* Hide screen reader only elements */
 .sr-only:not(:focus):not(:active) {
     clip: rect(0 0 0 0); 
     clip-path: inset(50%);

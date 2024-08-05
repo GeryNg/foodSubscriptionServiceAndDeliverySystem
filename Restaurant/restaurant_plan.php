@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Plan</title>
-    <link rel="stylesheet" href="../css/restaurant.css">
+    <link rel="stylesheet" href="../css/restaurant_plan.css">
 </head>
 <body>
     <?php include '../partials/headers.php'; ?>

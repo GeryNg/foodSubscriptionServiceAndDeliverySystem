@@ -1,5 +1,4 @@
 <?php
-ob_start();
 use MongoDB\BSON\Javascript;
 include_once '../resource/session.php';
 include_once '../resource/Database.php';
@@ -100,5 +99,4 @@ if (isset($_POST['loginBtn'])) {
     }
 }
 
-ob_end_flush();
 ?>

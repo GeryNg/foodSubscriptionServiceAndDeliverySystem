@@ -79,6 +79,15 @@
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>List Plan</span></a>
             </li>
+            
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <li class="nav-item  <?php echo $current_page == 'list_plan2.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="../plan_management/list_plan2.php">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>List Plan2</span></a>
+            </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">

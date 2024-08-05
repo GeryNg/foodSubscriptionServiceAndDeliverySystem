@@ -152,6 +152,5 @@
         document.addEventListener('DOMContentLoaded', updateSecurityQuestions);
         document.getElementById('securityQuestion1').addEventListener('change', updateSecurityQuestions);
     </script>
-
 </body>
 </html>

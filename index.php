@@ -19,4 +19,4 @@ include_once 'partials/headers.php';
     </div>
 </div>
 
-    <!--add footer for the future-->
+<?php include_once 'partials/footer.php';?>    <!--add footer for the future-->

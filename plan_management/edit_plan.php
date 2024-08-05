@@ -36,6 +36,7 @@ $date_from = '';
 $date_to = '';
 $section = '';
 $documents = '';
+$plan = null;
 
 $seller_id = $_SESSION['seller_id'];
 
@@ -117,23 +118,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updatePlan'])) {
 
             if ($stmt->rowCount() == 1) {
                 echo "<script type=\"text/javascript\">
-                        Swal.fire({
-                            title: \"Good job!\",
-                            text: \"Plan updated successfully!\",
-                            icon: \"success\",
-                            confirmButtonText: \"OK\"
-                        }).then(function() {
-                            window.location.href = 'list_plan.php';
-                        });
-                    </script>";
+                                swal({
+                                title: \"Good job!\",
+                                text: \"Plan updated successfully!\",
+                                icon: 'success',
+                                button: \"OK\",
+                                }).then(function() {
+                                window.location.href = 'list_plan.php';
+                                });
+                </script>";
             } else {
                 echo "<script type=\"text/javascript\">
-                        Swal.fire({
-                            title: \"Nothing Changed\",
-                            text: \"You have not made any changes\",
-                            icon: \"info\"
-                        });
-                    </script>";
+                                swal({
+                                    title: \"Nothing Changed\",
+                                    text: \"You have not made any changes\",
+                                    icon: \"info\",
+                                    button: \"OK\"
+                                }).then(function() {
+                                    window.location.href = 'list_plan.php';
+                                });
+                </script>";
             }
         } catch (PDOException $ex) {
             $result = flashMessage("An error occurred: " . $ex->getMessage());

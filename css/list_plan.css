@@ -1,11 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;600&display=swap');
 
 /*card*/
-body {
-    font-family: "Oxygen", sans-serif;
-    color: #050505;
-}
-
 *,
 *::before,
 *::after {

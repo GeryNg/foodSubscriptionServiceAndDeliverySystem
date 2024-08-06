@@ -16,11 +16,73 @@
             max-width: 200px;
             max-height: 200px;
             margin-bottom: 10px;
+            margin: 10px;
         }
         .profile-picture {
             max-width: 200px;
             max-height: 200px;
             margin-bottom: 10px;
+        }
+        .documents-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 60px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 500px;
+        }
+        .modal-content, #caption {
+            animation-name: zoom;
+            animation-duration: 0.6s;
+        }
+        @keyframes zoom {
+            from {transform: scale(0)}
+            to {transform: scale(1)}
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #fff !important;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #caption {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            height: 150px;
+        }
+        @media only screen and (max-width: 700px) {
+            .modal-content {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -41,7 +103,7 @@
     $bank_account = '';
     $documents = '';
     $profile_pic = '';
-    $seller = []; // Initialize $seller as an empty array
+    $seller = [];
 
     $user_id = $_SESSION['id'];
 
@@ -211,19 +273,18 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="documentImageField">Documents</label>
-                        <?php if ($documents): ?>
-                            <div class="d-flex flex-wrap">
-                                <?php
-                                $images = explode(',', $documents);
-                                foreach ($images as $image): ?>
-                                    <div class="p-2">
-                                        <img src="<?php echo htmlspecialchars($image); ?>" alt="Document" class="document-image" />
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                        <input type="file" name="document_image[]" class="form-control" id="documentImageField" multiple />
+                        <label for="documentImagesField">Documents</label>
+                        <div id="documentImagesField" class="documents-container">
+                            <?php
+                                if (!empty($documents)) {
+                                    $document_urls = explode(',', $documents);
+                                    foreach ($document_urls as $document_url) {
+                                        echo '<div class="mb-2"><img src="' . htmlspecialchars($document_url) . '" alt="Document Image" class="document-image" onclick="openModal(this)" /></div>';
+                                    }
+                                }
+                            ?>
+                        </div>
+                        <input type="file" name="document_image[]" class="form-control" id="documentImagesField" multiple />
                         <input type="hidden" name="existing_documents" value="<?php echo htmlspecialchars($documents); ?>" />
                     </div>
 
@@ -233,6 +294,30 @@
             <?php endif; ?>
         </section>
     </div>
+
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="img01">
+        <div id="caption"></div>
+    </div>
+
+    <script>
+        var modal = document.getElementById("myModal");
+        var modalImg = document.getElementById("img01");
+        var captionText = document.getElementById("caption");
+
+        function openModal(element) {
+            modal.style.display = "block";
+            modalImg.src = element.src;
+            captionText.innerHTML = element.alt;
+        }
+
+        var span = document.getElementsByClassName("close")[0];
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>

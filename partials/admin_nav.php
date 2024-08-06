@@ -4,25 +4,9 @@
     include_once '../resource/utilities.php';
     include_once '../resource/updatePlanStatus.php';
 
-    if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'seller') {
+    if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
         header("Location: ../partials/error.php");
         exit;
-    }
-
-    $user_id = $_SESSION['id']; 
-    try {
-        $query = "SELECT username, avatar FROM users WHERE id = :id";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':id', $user_id);
-        $stmt->execute();
-        
-        if ($stmt->rowCount() == 1) {
-            $row = $stmt->fetch();
-            $username = $row['username'];
-            $avatar = $row['avatar'];
-        }
-    } catch (PDOException $ex) {
-        echo "An error occurred: " . $ex->getMessage();
     }
 ?>
 
@@ -74,50 +58,15 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                Plan
+                Admin Function
             </div>
-            <li class="nav-item  <?php echo $current_page == 'add_plan.php' ? 'active' : ''; ?>">
-                <a class="nav-link" href="../plan_management/add_plan.php">
+            <li class="nav-item  <?php echo $current_page == 'assign.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="../admin/assign.php">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Add Plan</span></a>
+                    <span>Assign</span></a>
             </li>
              <!-- Divider -->
             <hr class="sidebar-divider my-0">
-            <li class="nav-item  <?php echo $current_page == 'list_plan.php' ? 'active' : ''; ?>">
-                <a class="nav-link" href="../plan_management/list_plan.php">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>List Plan</span></a>
-            </li>
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-            <li class="nav-item  <?php echo $current_page == 'list_plan2.php' ? 'active' : ''; ?>">
-                <a class="nav-link" href="../plan_management/list_plan2.php">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>List Plan2</span></a>
-            </li>
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Customer Support
-            </div>
-            <li class="nav-item  <?php echo $current_page == 'seller_order_list.php' ? 'active' : ''; ?>">
-                <a class="nav-link" href="../order/seller_order_list.php">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Order list</span></a>
-            </li>
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Customer Support
-            </div>
-            <!-- Nav Item - Tables -->
-                        <li class="nav-item <?php echo $current_page == 'seller_list_feeback.php' ? 'active' : ''; ?>">
-                <a class="nav-link" href="../feeback/seller_list_feeback.php">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Feeback</span></a>
-            </li>
-            <!-- Divider -->
-                <hr class="sidebar-divider my-0">
             <!-- Nav Item - Tables -->
             <li class="nav-item <?php echo $current_page == 'seller_live_chat.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="../customer_support/seller_live_chat.php">
@@ -179,34 +128,6 @@
                     <i class="fas fa-angle-up"></i>
                 </a>
     </div>
-
-    <?php
-    if (isset($_SESSION['id'])) {
-        $id = $_SESSION['id'];
-        $username = $_SESSION['username'];
-        $access = $_SESSION['access'];
-
-        if ($access === 'inactive') {
-            echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>Account Inactive!</strong> Your account is currently inactive. 
-            <a href="../profile_management/active_account.php" class="btn btn-primary btn-sm">Activate Account</a>
-          </div>';
-        } elseif ($access === 'pending') {
-            echo '<div class="alert alert-info alert-dismissible fade show" role="alert">
-            <strong>Account Pending!</strong> Your account is under review. Please wait for up to 3 working days.
-          </div>';
-        } elseif ($access === 'rejected') {
-            echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Account Rejected!</strong> Your account request has been rejected. 
-            <a href="active_account.php" class="btn btn-primary btn-sm">Submit New Request</a>
-          </div>';
-        } elseif ($access === 'verify') {
-
-        }
-    } else {
-        echo '<div class="alert alert-danger" role="alert">Unauthorized access.</div>';
-    }
-    ?>
 
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

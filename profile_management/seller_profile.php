@@ -90,7 +90,7 @@
                             <h1>Basic Information</h1>
                                 <span class="badge badge-status ' .
                                     ($access === 'pending' ? 'badge-warning' :
-                                    ($accesss === 'inactive' ? 'badge-info' :
+                                    ($access === 'inactive' ? 'badge-info' :
                                     ($access === 'rejected' ? 'badge-danger' :
                                     ($access === 'verify' ? 'badge-success' : '')))) .
                                 '">' . ucfirst($access) . '</span>

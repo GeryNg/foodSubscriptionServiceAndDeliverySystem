@@ -4,11 +4,6 @@ include_once '../resource/Database.php';
 include_once '../resource/session.php';
 include_once '../partials/staff_nav.php';
 
-if (!isset($_SESSION['id']) || !isset($_GET['user_id'])) {
-    header("Location: ../login_management/login.php");
-    exit;
-}
-
 $chat_partner_id = $_GET['user_id'];
 $user_id = $_SESSION['id'];
 

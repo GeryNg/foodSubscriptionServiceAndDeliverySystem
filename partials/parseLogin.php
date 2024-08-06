@@ -65,8 +65,8 @@ if (isset($_POST['loginBtn'])) {
                     $redirect_url = '../index.php';
                 } elseif ($role === 'seller') {
                     $redirect_url = '../plan_management/add_plan.php';
-                } elseif ($role === 'seller') {
-                    $redirect_url = '#';
+                } elseif ($role === 'admin') {
+                    $redirect_url = '../admin/assign.php';
                 }else {
                     $redirect_url = '../index.php';
                 }

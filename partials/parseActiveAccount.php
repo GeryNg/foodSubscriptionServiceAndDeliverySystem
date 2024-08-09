@@ -18,6 +18,36 @@ if (isset($_POST['activeAccountBtn'])) {
     $numeric_fields = ['bank_account_number'];
     $form_errors = array_merge($form_errors, check_numeric($numeric_fields));
 
+    // Validate and process profile picture upload
+    $profilePicUrl = '';
+    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === 0) {
+        $allowedFormats = ['jpg', 'jpeg', 'png'];
+        $fileName = $_FILES['profile_pic']['name'];
+        $fileTmpName = $_FILES['profile_pic']['tmp_name'];
+        $fileSize = $_FILES['profile_pic']['size'];
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        if (in_array($fileExtension, $allowedFormats)) {
+            if ($fileSize <= 2 * 1024 * 1024) { // Check for file size (e.g., 2MB limit)
+                $newFileName = uniqid('', true) . "." . $fileExtension;
+                $targetDir = "../seller_profile_pic/";
+                $targetPath = $targetDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpName, $targetPath)) {
+                    $profilePicUrl = $targetPath;
+                } else {
+                    $form_errors[] = "Failed to move uploaded file: $fileName";
+                }
+            } else {
+                $form_errors[] = "File size exceeds the limit: $fileName";
+            }
+        } else {
+            $form_errors[] = "Invalid file format for: $fileName";
+        }
+    } else {
+        $form_errors[] = "Profile picture is required.";
+    }
+    
     // Validate and process image uploads
     $imageUrls = [];
     if (!empty(array_filter($_FILES['images']['name']))) {
@@ -59,42 +89,42 @@ if (isset($_POST['activeAccountBtn'])) {
 
     if (empty($form_errors)) {
         try {
-            $status = 'pending';
-            $user_id = $_SESSION['id']; // Fetching the user ID from the session
+            $access = 'pending';
+            $user_id = $_SESSION['id'];
 
-            $stmt = $db->prepare("UPDATE seller SET name = ?, detail = ?, contact_number = ?, address = ?, bank_company = ?, bank_account = ?, status = ?, image_urls = ? WHERE user_id = ?");
+            $stmt = $db->prepare("UPDATE seller SET name = ?, profile_pic = ?, detail = ?, contact_number = ?, address = ?, bank_company = ?, bank_account = ?, access = ?, image_urls = ? WHERE user_id = ?");
 
             $stmt->execute([
                 htmlspecialchars($_POST['seller_name']),
+                htmlspecialchars($profilePicUrl),
                 htmlspecialchars($_POST['description']),
                 htmlspecialchars($_POST['contact_num']),
                 htmlspecialchars($_POST['address']),
                 htmlspecialchars($_POST['bank']),
                 htmlspecialchars($_POST['bank_account_number']),
-                $status,
+                $access,
                 implode(',', $imageUrls),
-                $user_id // Update the row with the corresponding user_id
+                $user_id
             ]);
 
-            // Fetch updated seller row to get id and status
-            $stmt = $db->prepare("SELECT id, status FROM seller WHERE user_id = ?");
+            // Fetch updated seller row to getsta id and access
+            $stmt = $db->prepare("SELECT id, access FROM seller WHERE user_id = ?");
             $stmt->execute([$user_id]);
             $sellerRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($sellerRow) {
-                $_SESSION['status'] = $sellerRow['status'];
+                $_SESSION['access'] = $sellerRow['access'];
                 $_SESSION['seller_id'] = $sellerRow['id'];
-
                 echo "<script>
-                Swal.fire({
-                  title: 'Account Activated!',
-                  text: 'Your account has been activated successfully.',
+                swal({
+                  title: \"Account Activated!\",
+                  text: \"Your account has been activated successfully.\",
                   icon: 'success',
-                  button: 'OK'
+                  button: \"OK\",
                 });
                 setTimeout(function(){
-                  window.location.href = '../profile_management/seller_profile.php';
-                }, 1000);
+                window.location.href = '../profile_management/seller_profile.php';
+                }, 3000);
                 </script>";
                 exit;
             } else {

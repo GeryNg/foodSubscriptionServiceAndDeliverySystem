@@ -21,6 +21,10 @@
         .form-floating > .form-control, .form-floating > .form-control-plaintext {
             margin: 5px;
         }
+        .form-floating > .form-select {
+            margin: 5px;
+            height: calc(3.5rem + 2px);
+        }
         p {
             margin-bottom: 5px !important;
         }
@@ -62,6 +66,32 @@
                     <input type="password" class="form-control" id="floatingPassword" name="password2" value="" placeholder="Comfirm Password">
                     <label for="floatingPassword">Comfirm Password</label>
                 </div>
+                <div class="form-floating">
+                    <select class="form-select" id="securityQuestion1" name="securityQuestion1" onchange="updateSecurityQuestions()">
+                        <option value="" selected>Select a Security Question</option>
+                        <option value="1">What was your first pet's name?</option>
+                        <option value="2">What is your mother's maiden name?</option>
+                        <option value="3">What was the name of your first school?</option>
+                        <option value="4">What is your favorite food?</option>
+                        <option value="5">What city were you born in?</option>
+                    </select>
+                    <label for="securityQuestion1">Security Question 1</label>
+                </div>
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="securityAnswer1" name="securityAnswer1" placeholder="Answer">
+                    <label for="securityAnswer1">Answer</label>
+                </div>
+
+                <div class="form-floating">
+                    <select class="form-select" id="securityQuestion2" name="securityQuestion2" onchange="updateSecurityQuestions()" required>
+                        <option value="" selected>Select a Security Question</option>
+                    </select>
+                    <label for="securityQuestion2">Security Question 2</label>
+                </div>
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="securityAnswer2" name="securityAnswer2" placeholder="Answer" required>
+                    <label for="securityAnswer2">Answer</label>
+                </div>
                 <br />
                 <button class="btn btn-primary w-100 py-2" type="submit" name="signupBtn" value="Signup">Sign Up</button>
                 <br />
@@ -76,6 +106,35 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-q/gThh3Fv0LVQNADnE8wrfFHTX9pSR4xD6oJ/bh1SvQOgavPaOvInlK0UrrXkgx4" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-ym9WY18K7F4+DA8BZBQ8nK7K5bGyQXTKBRUjog9pa7BrpprAP+KEKWDDYV9oHBB8" crossorigin="anonymous"></script>
-</body>
+    <script>
+        const allQuestions = {
+            1: "What was your first pet's name?",
+            2: "What is your mother's maiden name?",
+            3: "What was the name of your first school?",
+            4: "What is your favorite food?",
+            5: "What city were you born in?"
+        };
 
+        function updateSecurityQuestions() {
+            const question1 = document.getElementById('securityQuestion1').value;
+            const question2 = document.getElementById('securityQuestion2');
+            const selectedValue = question2.value; 
+
+            question2.innerHTML = '<option value="" selected>Select a Security Question</option>';
+
+            Object.keys(allQuestions).forEach(key => {
+                if (key != question1) {
+                    question2.innerHTML += `<option value="${key}">${allQuestions[key]}</option>`;
+                }
+            });
+
+            if (selectedValue && selectedValue != question1) {
+                question2.value = selectedValue;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', updateSecurityQuestions);
+        document.getElementById('securityQuestion1').addEventListener('change', updateSecurityQuestions);
+    </script>
+</body>
 </html>

@@ -2,13 +2,12 @@
 $page_title = "Add Plan";
 include_once '../partials/staff_nav.php';
 include_once '../partials/parsePlan.php';
-include_once '../resource/updatePlanStatus.php';
 include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
-$seller_status = $_SESSION['seller_status'] ?? '';
+$seller_access = $_SESSION['access'] ?? '';
 
-if (empty($seller_status) || $seller_status !== 'verify') {
+if (empty($seller_access) || $seller_access !== 'verify') {
     echo '<p>You do not have permission to access this page.</p>';
     exit;
 }
@@ -19,16 +18,7 @@ if (empty($seller_status) || $seller_status !== 'verify') {
 <head lang="en">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f3f3f3;
-        }
         .main-content {
             padding: 20px;
             background-color: #f3f3f3;
@@ -58,7 +48,7 @@ if (empty($seller_status) || $seller_status !== 'verify') {
             margin-bottom: 20px;
             box-sizing: border-box;
         }
-        button {
+        .button1 {
             background-color: #5C67F2;
             color: white;
             border: none;
@@ -68,7 +58,7 @@ if (empty($seller_status) || $seller_status !== 'verify') {
             float: right;
             margin-top: 10px;
         }
-        button:hover {
+        .button1:hover {
             background-color: #7a85ff;
         }
         form {
@@ -79,7 +69,7 @@ if (empty($seller_status) || $seller_status !== 'verify') {
 <body>
     <div class="main-content">
         <div class="container">
-            <?php if ($seller_status === 'verify'): ?>
+            <?php if ($seller_access === 'verify'): ?>
                 <h1>Add New Plan</h1>
                 <form action="" method="post" enctype="multipart/form-data">
                     <br />
@@ -101,7 +91,7 @@ if (empty($seller_status) || $seller_status !== 'verify') {
                         <input type="checkbox" name="sections[]" value="Dinner"> Dinner<br><br>
                     <label>Images (up to 6, format: jpg/jpeg/png):</label><br>
                     <input type="file" name="images[]" accept=".jpg, .jpeg, .png" multiple><br><br>
-                    <button type="submit" name="AddPlanBtn" value="AddPlan">Add Plan</button>
+                    <button type="submit" name="AddPlanBtn" value="AddPlan" class="button1">Add Plan</button>
                 </form>
             <?php else: ?>
                 <p>You do not have permission to add a plan at this time.</p>

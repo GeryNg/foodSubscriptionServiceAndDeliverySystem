@@ -25,6 +25,25 @@
     include_once '../resource/session.php';
     include_once '../partials/staff_nav.php';
     include_once '../partials/parseSellerProfile.php';
+
+    if (isset($_SESSION['id'])) {
+        $id = $_SESSION['id'];
+    
+        $sqlQuery = "SELECT * FROM users WHERE id = :id";
+        $statement = $db->prepare($sqlQuery);
+        $statement->execute(array(':id' => $id));
+    
+        while ($rs = $statement->fetch()) {
+            $username = $rs['username'];
+            $email = $rs['email'];
+            $date_joined = (new DateTime($rs["join_date"]))->format('M d, Y');
+            $avatar = $rs['avatar'];
+        }
+    
+        $user_pic = !empty($avatar) ? $avatar : "../uploads/default.jpg";
+    } else {
+
+    }
     ?>
 
     <div class="container" style="margin-top:20px;">
@@ -35,10 +54,8 @@
                 Not yet a member? <a href="../login_management/singup.php">Signup</a></p>
             <?php else: ?>
                 <section class="col col-lg-7">
-
-                    <div class="row col-lg-3" style="margin-bottom:10px;">
-                        <img src="<?php if (isset($profile_picture))
-                            echo $profile_picture; ?>" class="img img_rounded" width="200" alt="profile_picture"/>
+                    <div class="row col-lg-3"  style="margin-bottom:10px;">
+                        <img src="<?php echo $user_pic; ?>" alt="User Avatar" class="" width="200" >
                     </div>
                     <table class="table table-bordered table-condens">
                         <tr><th style="width:20%">Username: </th><td><?php if (isset($username))
@@ -58,7 +75,7 @@
                 </section>
 
             <?php
-            if (isset($status) && ($status === 'pending' || $status === 'verify')) {
+            if (isset($access) && ($access === 'pending' || $access === 'verify')) {
                 $sqlQuerySeller = "SELECT * FROM seller WHERE user_id = :user_id";
                 $statementSeller = $db->prepare($sqlQuerySeller);
                 $statementSeller->execute(array(':user_id' => $id));
@@ -72,11 +89,11 @@
                         <div style="display: flex; align-items: center;">
                             <h1>Basic Information</h1>
                                 <span class="badge badge-status ' .
-                                    ($status === 'pending' ? 'badge-warning' :
-                                    ($status === 'inactive' ? 'badge-info' :
-                                    ($status === 'rejected' ? 'badge-danger' :
-                                    ($status === 'verify' ? 'badge-success' : '')))) .
-                                '">' . ucfirst($status) . '</span>
+                                    ($access === 'pending' ? 'badge-warning' :
+                                    ($access === 'inactive' ? 'badge-info' :
+                                    ($access === 'rejected' ? 'badge-danger' :
+                                    ($access === 'verify' ? 'badge-success' : '')))) .
+                                '">' . ucfirst($access) . '</span>
                         </div>
                         <table class="table table-bordered">
                     <tbody>';

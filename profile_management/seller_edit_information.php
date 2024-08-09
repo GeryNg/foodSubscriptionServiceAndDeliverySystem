@@ -5,18 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         .pull-right {
             float: right !important;
         }
         .btn {
-            margin-top:10px
+            margin-top: 10px;
         }
         .document-image {
             max-width: 200px;
             max-height: 200px;
             margin-bottom: 10px;
+            margin: 10px;
+        }
+        .profile-picture {
+            max-width: 200px;
+            max-height: 200px;
+            margin-bottom: 10px;
+        }
+        .documents-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 60px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 500px;
+        }
+        .modal-content, #caption {
+            animation-name: zoom;
+            animation-duration: 0.6s;
+        }
+        @keyframes zoom {
+            from {transform: scale(0)}
+            to {transform: scale(1)}
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #fff !important;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #caption {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            height: 150px;
+        }
+        @media only screen and (max-width: 700px) {
+            .modal-content {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -36,6 +102,8 @@
     $address = '';
     $bank_account = '';
     $documents = '';
+    $profile_pic = '';
+    $seller = [];
 
     $user_id = $_SESSION['id'];
 
@@ -53,6 +121,7 @@
                 $address = $seller['address'];
                 $bank_account = $seller['bank_account'];
                 $documents = $seller['image_urls'];
+                $profile_pic = $seller['profile_pic'];
                 $id = $seller['id'];
             } else {
                 echo '<p>No seller data found.</p>';
@@ -71,8 +140,10 @@
         $hidden_id = $_POST['hidden_id'];
 
         $existing_documents = $_POST['existing_documents'];
+        $existing_profile_pic = $_POST['existing_profile_pic'];
 
         $uploaded_files = isset($_FILES['document_image']['name']) ? $_FILES['document_image']['name'] : [];
+        $profile_pic_file = isset($_FILES['profile_pic']['name']) ? $_FILES['profile_pic']['name'] : '';
 
         if (!empty($uploaded_files[0])) {
             $upload_paths = [];
@@ -93,12 +164,26 @@
             $documents = $existing_documents;
         }
 
+        if (!empty($profile_pic_file)) {
+            $file_ext = pathinfo($profile_pic_file, PATHINFO_EXTENSION);
+            $unique_file_name = uniqid('profile_', true) . '.' . $file_ext;
+            $profile_pic_path = '../seller_profile_pic/' . $unique_file_name;
+            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $profile_pic_path)) {
+                $profile_pic = $profile_pic_path;
+            } else {
+                $form_errors[] = "Failed to upload profile picture.";
+            }
+        } else {
+            $profile_pic = $existing_profile_pic;
+        }
+
         if (empty($form_errors)) {
             try {
-                $query = "UPDATE seller SET name = :name, detail = :detail, contact_number = :contact_number, address = :address, bank_account = :bank_account, image_urls = :documents WHERE id = :id";
+                $query = "UPDATE seller SET name = :name, detail = :detail, contact_number = :contact_number, address = :address, bank_account = :bank_account, image_urls = :documents, profile_pic = :profile_pic WHERE id = :id";
                 $stmt = $db->prepare($query);
                 $stmt->execute([
                     ':name' => $name,
+                    ':profile_pic' => $profile_pic,
                     ':detail' => $detail,
                     ':contact_number' => $contact_number,
                     ':address' => $address,
@@ -124,6 +209,8 @@
                             title: \"Nothing Happened\",
                             text: \"You have not made any changes\",
                             icon: \"info\"
+                        }).then(function() {
+                            window.location.href = 'seller_profile.php';
                         });
                     </script>";
                 }
@@ -137,7 +224,6 @@
     }
 ?>
 
-
     <div class="container" style="margin-top:20px;">
         <section class="col col-lg-7">
             <h2>Edit Profile</h2>
@@ -148,13 +234,24 @@
                 </div>
             <?php endif; ?>
 
-            <?php if ($seller): ?>
+            <?php if (!empty($seller)): ?>
                 <form method="post" action="" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="nameField">Name</label>
                         <input type="text" name="name" class="form-control" id="nameField" value="<?php echo htmlspecialchars($name); ?>" />
                     </div>
 
+                    <div class="form-group">
+                        <label for="profilePicField">Profile Picture</label>
+                        <?php if ($profile_pic): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo htmlspecialchars($profile_pic); ?>" alt="Profile Picture" class="profile-picture" />
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" name="profile_pic" class="form-control" id="profilePicField" />
+                        <input type="hidden" name="existing_profile_pic" value="<?php echo htmlspecialchars($profile_pic); ?>" />
+                    </div>
+                    
                     <div class="form-group">
                         <label for="detailField">Detail</label>
                         <input type="text" name="detail" class="form-control" id="detailField" value="<?php echo htmlspecialchars($detail); ?>" />
@@ -176,36 +273,54 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="documentImageField">Documents</label>
-                        <?php if ($documents): ?>
-                            <div class="d-flex flex-wrap">
-                                <?php
-                                $images = explode(',', $documents);
-                                foreach ($images as $image): ?>
-                                    <div class="p-2">
-                                        <img src="<?php echo htmlspecialchars($image); ?>" alt="Document Image" class="document-image" />
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                        <input type="file" name="document_image[]" class="form-control" id="documentImageField" multiple />
+                        <label for="documentImagesField">Documents</label>
+                        <div id="documentImagesField" class="documents-container">
+                            <?php
+                                if (!empty($documents)) {
+                                    $document_urls = explode(',', $documents);
+                                    foreach ($document_urls as $document_url) {
+                                        echo '<div class="mb-2"><img src="' . htmlspecialchars($document_url) . '" alt="Document Image" class="document-image" onclick="openModal(this)" /></div>';
+                                    }
+                                }
+                            ?>
+                        </div>
+                        <input type="file" name="document_image[]" class="form-control" id="documentImagesField" multiple />
                         <input type="hidden" name="existing_documents" value="<?php echo htmlspecialchars($documents); ?>" />
                     </div>
-                    <input type="hidden" name="hidden_id" value="<?php echo htmlspecialchars($id); ?>"/>
-                    <button type="submit" name="updateSellerInformation" class="btn btn-primary pull-right">Update Information</button>
+
+                    <input type="hidden" name="hidden_id" value="<?php if (isset($id)) echo $id; ?>" />
+                    <button type="submit" name="updateSellerInformation" class="btn btn-primary pull-right">Update Profile</button>
                 </form>
-            <?php else: ?>
-                <p>Your data had been updated!</p>
             <?php endif; ?>
         </section>
-        <br />
-        <br />
-        <br />
-        <br />
-        <p><a href="seller_profile.php">Back</a></p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-q/gThh3Fv0LVQNADnE8wrfFHTX9pSR4xD6oJ/bh1SvQOgavPaOvInlK0UrrXkgx4" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-ym9WY18K7F4+DA8BZBQ8nK7K5bGyQXTKBRUjog9pa7BrpprAP+KEKWDDYV9oHBB8" crossorigin="anonymous"></script>
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="img01">
+        <div id="caption"></div>
+    </div>
+
+    <script>
+        var modal = document.getElementById("myModal");
+        var modalImg = document.getElementById("img01");
+        var captionText = document.getElementById("caption");
+
+        function openModal(element) {
+            modal.style.display = "block";
+            modalImg.src = element.src;
+            captionText.innerHTML = element.alt;
+        }
+
+        var span = document.getElementsByClassName("close")[0];
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.all.min.js"></script>
 </body>
 </html>

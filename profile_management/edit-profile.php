@@ -10,7 +10,7 @@
             float: right !important;
         }
         .btn {
-            margin-top:10px
+            margin-top:10px;
         }
     </style>
 </head>
@@ -34,42 +34,35 @@
             <div class="clearfix"></div>
 
             <?php if(!isset($_SESSION['username'])): ?>
-                <p class="lead">Your are not authorized to view this page<a href="login.php"></a>
-                    Not yet a member? <a href="../login_management/singup.php">Signup</a></p>
+                <p class="lead">You are not authorized to view this page. <a href="login.php">Login</a>
+                    Not yet a member? <a href="../login_management/signup.php">Signup</a></p>
             <?php else: ?>
                 <form method="post" action="" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="emailField">Email</label>
-                        <input type="text" name="email" class="form-control" id="emailField" value="<?php if(isset($email)) echo $email?>" />
+                        <input type="text" name="email" class="form-control" id="emailField" value="<?php if(isset($email)) echo $email; ?>" />
                     </div>
 
                     <div class="form-group">
                         <label for="usernameField">Username</label>
-                        <input type="text" name="username" value="<?php if(isset($username)) echo $username; ?>" class="form-control" id="usernameField"  />
+                        <input type="text" name="username" value="<?php if(isset($username)) echo $username; ?>" class="form-control" id="usernameField" />
                     </div>
 
                     <div class="form-group">
                         <label for="fileField">Avatar</label>
-                        <input type="file" name="avatar" id="filefield"  />
+                        <input type="file" name="avatar" class="form-control" id="fileField" />
                     </div>
 
-                    <input type="hidden" name="hidden_id" value="<?php if(isset($id)) echo $id; ?>"/>
-                    <button type="submit" name="updateProfileBtn" class="btn btn-primary pull-right">Update Profiles</button>
+                    <input type="hidden" name="hidden_id" value="<?php if(isset($id)) echo $id; ?>" />
+                    <button type="submit" name="updateProfileBtn" class="btn btn-primary pull-right">Update Profile</button>
                 </form>
-            <?php endif ?>
+            <?php endif; ?>
         </section>
-        <br />
-        <br />
-        <br />
-        <br />
+        <br /><br /><br /><br />
         <p><a href="profile.php">Back</a></p>
     </div>
-
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-q/gThh3Fv0LVQNADnE8wrfFHTX9pSR4xD6oJ/bh1SvQOgavPaOvInlK0UrrXkgx4" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-ym9WY18K7F4+DA8BZBQ8nK7K5bGyQXTKBRUjog9pa7BrpprAP+KEKWDDYV9oHBB8" crossorigin="anonymous"></script>
 </body>
-
-
 </html>
-

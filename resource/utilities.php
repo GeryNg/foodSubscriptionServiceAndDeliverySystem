@@ -1,7 +1,6 @@
 <?php
 use Ds\Set;
 use MongoDB\Driver\Session;
-
 function check_empty_fields($required_fields_array)
 {
     $form_errors = array();
@@ -90,12 +89,6 @@ function show_combined_messages($flashMessage, $form_errors_array)
     return $messages;
 }
 
-function redirectTo($page)
-{
-    header("Location: {$page}.php");
-    exit();
-}
-
 function checkDuplicateEntries($table, $column_name, $value, $db)
 {
     try {
@@ -108,7 +101,6 @@ function checkDuplicateEntries($table, $column_name, $value, $db)
         }
         return false;
     } catch (PDOException $ex) {
-        // Handle exception
         return false;
     }
 }
@@ -116,7 +108,7 @@ function checkDuplicateEntries($table, $column_name, $value, $db)
 function rememberMe($user_id)
 {
     $encryptCookieData = base64_encode("UaQteh5i4y3dntstemYODEC{$user_id}");
-    // Cookie set to expire in about 5 days
+    // Make sure there is no output before this point
     setcookie('rememberUserCookie', $encryptCookieData, time() + 60 * 60 * 24 * 5, "/");
 }
 
@@ -158,7 +150,8 @@ function signout()
     }
     session_destroy();
     session_regenerate_id(true);
-    redirectTo('../index');
+    header("Location: ../index.php");
+    exit();
 }
 
 // Guard from users using many browsers to run the website
@@ -222,4 +215,5 @@ function uploadAvatar($username)
     }
     return $isImagemoved;
 }
+
 ?>

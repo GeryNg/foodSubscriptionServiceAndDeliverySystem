@@ -45,25 +45,57 @@ if ((isset($_SESSION['id']) || isset($_GET['user_identify'])) && !isset($_POST['
 
     $form_errors = array_merge($form_errors, check_email($_POST));
 
-    // Validate if file has a valid extension
+    // Validate and process image upload
     $avatar = isset($_FILES['avatar']['name']) ? $_FILES['avatar']['name'] : null;
     if ($avatar != null) {
-        $form_errors = array_merge($form_errors, isValidImage($avatar));
+        $allowedFormats = ['jpg', 'jpeg', 'png'];
+        $fileTmpName = $_FILES['avatar']['tmp_name'];
+        $fileSize = $_FILES['avatar']['size'];
+        $fileError = $_FILES['avatar']['error'];
+        $fileExtension = strtolower(pathinfo($avatar, PATHINFO_EXTENSION));
+
+        if ($fileError === 0) {
+            if (in_array($fileExtension, $allowedFormats)) {
+                if ($fileSize <= 2 * 1024 * 1024) { // Check for file size (e.g., 2MB limit)
+                    $newFileName = uniqid('', true) . "." . $fileExtension;
+                    $targetDir = "../uploads/";
+                    $targetPath = $targetDir . $newFileName;
+
+                    if (move_uploaded_file($fileTmpName, $targetPath)) {
+                        $imageUrl = $targetPath;
+                    } else {
+                        $form_errors[] = "Failed to move uploaded file: $avatar";
+                    }
+                } else {
+                    $form_errors[] = "File size exceeds the limit: $avatar";
+                }
+            } else {
+                $form_errors[] = "Invalid file format for: $avatar";
+            }
+        } else {
+            $form_errors[] = "Error uploading file $avatar: " . uploadErrorToString($fileError);
+        }
     }
 
-    // Collect form data and store in variables
     $email = $_POST['email'];
     $username = $_POST['username'];
     $hiddenid = $_POST['hidden_id'];
 
     if (empty($form_errors)) {
         try {
-            // Create SQL update statement
-            $sqlUpdate = "UPDATE users SET username = :username, email = :email WHERE id = :id";
-            $statement = $db->prepare($sqlUpdate);
-            $statement->execute(array(':username' => $username, ':email' => $email, ':id' => $hiddenid));
+            $sqlUpdate = "UPDATE users SET username = :username, email = :email";
+            if (isset($imageUrl)) {
+                $sqlUpdate .= ", avatar = :avatar";
+            }
+            $sqlUpdate .= " WHERE id = :id";
 
-            // Check if one new row was updated
+            $statement = $db->prepare($sqlUpdate);
+            $params = array(':username' => $username, ':email' => $email, ':id' => $hiddenid);
+            if (isset($imageUrl)) {
+                $params[':avatar'] = $imageUrl;
+            }
+            $statement->execute($params);
+
             if ($statement->rowCount() == 1 || uploadAvatar($username)) {
                 echo "<script type=\"text/javascript\">
                     swal({

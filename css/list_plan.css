@@ -292,3 +292,41 @@ hr {
         grid-template-columns: 1fr;
     }
 }
+
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 1;
+    padding: 0px 10px 0px 10px;
+}
+
+.arrow-left {
+    left: 10px;
+}
+
+.arrow-right {
+    right: 10px;
+}
+
+.slideshow:hover .arrow {
+    opacity: 1;
+}
+
+.arrow {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+@media (max-width: 768px) {
+    .arrow {
+        font-size: 20px;
+        padding: 8px;
+    }
+}

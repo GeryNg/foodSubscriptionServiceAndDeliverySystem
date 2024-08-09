@@ -57,7 +57,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- logo -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../partials/seller_dashboard.php">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -66,8 +66,8 @@
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item <?php echo $current_page == '#' ? 'active' : ''; ?>">
-                <a class="nav-link" href="#">
+            <li class="nav-item <?php echo $current_page == 'seller_dashboard.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="../partials/seller_dashboard.php">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
@@ -98,12 +98,20 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                Customer Support
+                Order & Delivery
             </div>
             <li class="nav-item  <?php echo $current_page == 'seller_order_list.php' ? 'active' : ''; ?>">
-                <a class="nav-link" href="../order/seller_order_list.php">
+                <a class="nav-link" href="../order_delivery/seller_order_list.php">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Order list</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+            <li class="nav-item  <?php echo $current_page == 'seller_delivery_list.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="../order_delivery/seller_delivery_list.php">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Delivery List</span></a>
             </li>
 
             <!-- Heading -->

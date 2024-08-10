@@ -224,7 +224,7 @@
     }
 ?>
 
-    <div class="container" style="margin-top:20px;">
+    <div class="container" style="margin-top:50px; margin-bottom:80px;">
         <section class="col col-lg-7">
             <h2>Edit Profile</h2>
 

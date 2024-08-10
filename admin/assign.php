@@ -64,6 +64,7 @@ $pending_count = $stmt_pending->fetchColumn();
                 <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Seller Name</th>
                             <th>Contact Number</th>
                             <th>Address</th>
@@ -76,6 +77,7 @@ $pending_count = $stmt_pending->fetchColumn();
                     </thead>
                     <tfoot>
                         <tr>
+                            <th>ID</th>
                             <th>Seller Name</th>
                             <th>Contact Number</th>
                             <th>Address</th>
@@ -89,6 +91,7 @@ $pending_count = $stmt_pending->fetchColumn();
                     <tbody>
                         <?php foreach ($sellers as $seller): ?>
                             <tr>
+                                <td><?php echo htmlspecialchars($seller['id']); ?></td>
                                 <td><?php echo htmlspecialchars($seller['name']); ?></td>
                                 <td><?php echo htmlspecialchars($seller['contact_number']); ?></td>
                                 <td><?php echo htmlspecialchars($seller['address']); ?></td>
@@ -105,7 +108,7 @@ $pending_count = $stmt_pending->fetchColumn();
                                         </select>
                                     </form>
                                 </td>
-                                <td><button type="submit" class="btn btn-success btn-sm">View</button></td>
+                                <td><a href="assign_access.php?seller_id=<?php echo htmlspecialchars($seller['id']); ?>" class="btn btn-success btn-sm">View</a></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

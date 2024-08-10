@@ -38,7 +38,7 @@
     <div class="main-container">
         <main class="form-signin">
             <form method="post" action="">
-                <img class="mb-4" src="path/to/your/logo.png" alt="Logo" width="72" height="57">
+                <img class="mb-4" src="../image/logo-rounded.png" alt="Logo" width="80" height="80">
                 <h1 class="h3 mb-3 fw-normal">Login Form</h1>
 
                 <?php if (isset($result) || !empty($form_errors)): ?>

@@ -24,7 +24,7 @@
 
     <div class="container" style="margin-top:20px;">
         <section class="col col-lg-7">
-            <h2>Edit basic information</h2>
+            <h2>Edit information</h2>
 
             <?php if (isset($result) || !empty($form_errors)): ?>
                 <div>
@@ -62,7 +62,6 @@
         <br />
         <br />
         <br />
-        <p><a href="seller_profile.php">Back</a></p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-q/gThh3Fv0LVQNADnE8wrfFHTX9pSR4xD6oJ/bh1SvQOgavPaOvInlK0UrrXkgx4" crossorigin="anonymous"></script>

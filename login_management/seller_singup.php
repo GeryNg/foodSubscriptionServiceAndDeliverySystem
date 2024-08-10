@@ -40,7 +40,7 @@
     <div class="main-container">
         <main class="form-signin">
             <form method="post" action="">
-                <img class="mb-4" src="/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
+                <img class="mb-4" src="../image/logo-rounded.png" alt="Logo" width="80" height="80">
                 <h1 class="h3 mb-3 fw-normal">Come to Join Us</h1>
 
                 <?php if (isset($result) || !empty($form_errors)): ?>

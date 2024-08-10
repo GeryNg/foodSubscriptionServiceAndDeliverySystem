@@ -1,39 +1,41 @@
 <?php
-    include_once '../resource/session.php';
-    include_once '../resource/Database.php';
-    include_once '../resource/utilities.php';
-    include_once '../resource/updatePlanStatus.php';
+include_once '../resource/session.php';
+include_once '../resource/Database.php';
+include_once '../resource/utilities.php';
+include_once '../resource/updatePlanStatus.php';
 
-    if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
-        header("Location: ../partials/error.php");
-        exit;
+if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../partials/error.php");
+    exit;
+}
+
+$user_id = $_SESSION['id'];
+try {
+    $query = "SELECT username, avatar FROM users WHERE id = :id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':id', $user_id);
+    $stmt->execute();
+
+    if ($stmt->rowCount() == 1) {
+        $row = $stmt->fetch();
+        $username = $row['username'];
+        $avatar = $row['avatar'];
     }
-    
-    $user_id = $_SESSION['id']; 
-    try {
-        $query = "SELECT username, avatar FROM users WHERE id = :id";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':id', $user_id);
-        $stmt->execute();
-        
-        if ($stmt->rowCount() == 1) {
-            $row = $stmt->fetch();
-            $username = $row['username'];
-            $avatar = $row['avatar'];
-        }
-    } catch (PDOException $ex) {
-        echo "An error occurred: " . $ex->getMessage();
-    }
+} catch (PDOException $ex) {
+    echo "An error occurred: " . $ex->getMessage();
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>
         <?php echo isset($page_title) ? htmlspecialchars($page_title) : 'Default Title'; ?>
     </title>
+    <link rel="icon" type="image/x-icon" href="../image/logo-circle.png">
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
@@ -51,16 +53,14 @@
     </style>
 </head>
 
-<body style="background-color: #f5f5f5;">
+<body style="background-color: #f5f5f5;" id="page-top">
     <div id="wrapper">
-         <!-- Sidebar -->
+        <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- logo -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../admin/admin_dashboard.php">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-laugh-wink"></i>
-                </div>
+                <img src="../image/logo-circle.png" alt="logo" style="width: 50px;">
                 <div class="sidebar-brand-text mx-3">Makan Apa</div>
             </a>
             <!-- Divider -->
@@ -81,17 +81,17 @@
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Assign</span></a>
             </li>
-             <!-- Divider -->
+            <!-- Divider -->
             <hr class="sidebar-divider my-0">
             <!-- Nav Item - Tables -->
             <li class="nav-item <?php echo $current_page == 'seller_live_chat.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="../customer_support/seller_live_chat.php">
                     <i class="fas fa-fw fa-table"></i>
                     <span>Live chat</span></a>
-            </li> 
+            </li>
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline" style="margin-left: auto !important; margin-right: auto !important;">
-                <button class="rounded-circle border-0"id="sidebarToggle"></button>
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
         </ul>
         <!-- End of Sidebar -->
@@ -143,33 +143,34 @@
                 <a class="scroll-to-top rounded" href="#page-top">
                     <i class="fas fa-angle-up"></i>
                 </a>
-    </div>
+            </div>
 
-    <script src="../vendor/jquery/jquery.min.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-    <script src="../js/sb-admin-2.min.js"></script>
-    <script src="../vendor/chart.js/Chart.min.js"></script>
-    <script src="../js/demo/chart-area-demo.js"></script>
-    <script src="../js/demo/chart-pie-demo.js"></script>
+            <script src="../vendor/jquery/jquery.min.js"></script>
+            <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+            <script src="../js/sb-admin-2.min.js"></script>
+            <script src="../vendor/chart.js/Chart.min.js"></script>
+            <script src="../js/demo/chart-area-demo.js"></script>
+            <script src="../js/demo/chart-pie-demo.js"></script>
 
-    <script>
-        $(document).scroll(function() {
-            var scrollDistance = $(this).scrollTop();
-            if (scrollDistance > 100) {
-                $('.scroll-to-top').fadeIn();
-            } else {
-                $('.scroll-to-top').fadeOut();
-            }
-        });
+            <script>
+                $(document).scroll(function() {
+                    var scrollDistance = $(this).scrollTop();
+                    if (scrollDistance > 100) {
+                        $('.scroll-to-top').fadeIn();
+                    } else {
+                        $('.scroll-to-top').fadeOut();
+                    }
+                });
 
-        $(document).on('click', 'a.scroll-to-top', function(event) {
-            var $anchor = $(this);
-            $('html, body').stop().animate({
-                scrollTop: ($($anchor.attr('href')).offset().top)
-            }, 1000, 'easeInOutExpo');
-            event.preventDefault();
-        });
-    </script>
+                $(document).on('click', 'a.scroll-to-top', function(event) {
+                    var $anchor = $(this);
+                    $('html, body').stop().animate({
+                        scrollTop: ($($anchor.attr('href')).offset().top)
+                    }, 500, 'easeInOutExpo');
+                    event.preventDefault();
+                });
+            </script>
 </body>
+
 </html>

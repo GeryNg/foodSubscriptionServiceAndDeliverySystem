@@ -19,7 +19,7 @@
             <?php
             $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
 
-            $sql = "SELECT users.avatar, seller.name, seller.detail, seller.address, seller.id FROM seller JOIN users ON seller.user_id = users.id";
+            $sql = "SELECT seller.profile_pic, seller.name, seller.detail, seller.address, seller.id FROM seller";
             if (!empty($searchTerm)) {
                 $sql .= " WHERE seller.name LIKE :searchTerm";
             }
@@ -32,7 +32,7 @@
             $statement->execute();
 
             while ($row = $statement->fetch()) {
-                $avatar = htmlspecialchars($row['avatar'], ENT_QUOTES, 'UTF-8');
+                $profile_pic = htmlspecialchars($row['profile_pic'], ENT_QUOTES, 'UTF-8');
                 $name = htmlspecialchars($row["name"], ENT_QUOTES, 'UTF-8');
                 $detail = htmlspecialchars($row["detail"], ENT_QUOTES, 'UTF-8');
                 $address = htmlspecialchars($row["address"], ENT_QUOTES, 'UTF-8');
@@ -41,7 +41,7 @@
                 echo "<article class='restaurant-card'>";
                 echo "<div class='article-wrapper'>";
                 echo "<figure>"; 
-                echo "<img src='" . $avatar . "' alt='avatar_image' class='avatar_image'/>";
+                echo "<img src='" . $profile_pic . "' alt='profile_pic' class='profile-pic'/>";
                 echo "</figure>";
                 echo "<div class='article-body'>";
                 echo "<h2>" . $name . "</h2>";
@@ -59,5 +59,6 @@
             ?>
         </section>
     </div>
+    <?php include '../partials/footer.php'; ?>
 </body>
 </html>

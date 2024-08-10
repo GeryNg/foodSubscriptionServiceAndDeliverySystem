@@ -1,188 +1,78 @@
-/* General Styles */
-body {
-    margin: 0;
-    padding: 48px 0;
-    font-family: "Figtree", sans-serif;
-    font-size: 1.2rem;
-    line-height: 1.6rem;
-    background-image: linear-gradient(45deg, #7c9885, #b5b682);
-    min-height: 100vh;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-h1 {
-    margin-bottom: 20px;
-    font-size: 2rem;
-}
-
-/* Search form styles */
-form {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-form input[type="text"] {
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-right: 10px;
-}
-
-form button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-form button:hover {
-    background-color: #0056b3;
-}
-
-/* Articles Styles */
+/* General styles for restaurant cards */
 .articles {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-    padding-inline: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
 }
 
-/* Individual article styling */
-article.restaurant-card {
-    border-radius: 8px;
+.restaurant-card {
+    flex: 0 1 300px;
+    background-color: #fff;
+    border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background: #fff;
     overflow: hidden;
-    transition: transform 0.3s;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 450px; /* Set a minimum height to control the card length */
 }
 
-article.restaurant-card:hover {
-    transform: translateY(-5px);
+.restaurant-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .article-wrapper {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    padding: 20px;
 }
 
-figure {
-    margin: 0;
-    padding: 0;
-    height: 200px;
-    overflow: hidden;
-}
-
-.avatar_image {
+.profile-pic {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    object-fit: contain;
+    max-height: 150px; /* Adjusted to maintain a balanced layout */
+    padding: 10px;
 }
 
 .article-body {
-    padding: 16px;
-    text-align: left;
+    text-align: center;
+    margin-top: 20px;
 }
 
-.article-body h2 {
-    font-size: 1.2rem;
-    margin-bottom: 8px;
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #333;
 }
 
-.article-body p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #555;
-}
-
-.article-body .detail,
-.article-body .address {
-    margin-bottom: 3px;
+.detail, .address {
+    font-size: 1rem;
+    color: #777;
+    margin-bottom: 10px;
 }
 
 .read-more {
-    display: inline-flex;
-    align-items: center;
     text-decoration: none;
-    color: #007bff;
+    color: #007BFF;
     font-weight: bold;
-    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto; /* Aligns the link to the bottom */
+}
+
+.read-more svg {
+    margin-left: 5px;
+    width: 16px; /* Adjust the size of the arrow */
+    height: 16px;
 }
 
 .read-more:hover {
     color: #0056b3;
 }
 
-.read-more .icon {
-    width: 16px;
-    height: 16px;
-    margin-left: 5px;
-    transition: transform 0.3s;
-}
-
-.read-more:hover .icon {
-    transform: translateX(5px);
-}
-
-/************************ 
-Generic layout (demo looks)
-**************************/
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-/* Media Query for Responsiveness */
-@media screen and (max-width: 960px) {
-    article {
-        container: card/inline-size;
-    }
-    .article-body p {
-        display: none;
-    }
-}
-
-@container card (min-width: 380px) {
-    .article-wrapper {
-        display: grid;
-        grid-template-columns: 100px 1fr;
-        gap: 16px;
-    }
-    .article-body {
-        padding-left: 0;
-    }
-    figure {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-    }
-    figure img {
-        height: 100%;
-        aspect-ratio: 1;
-        object-fit: cover;
-    }
-}
-
-/* Hide screen reader only elements */
-.sr-only:not(:focus):not(:active) {
-    clip: rect(0 0 0 0); 
-    clip-path: inset(50%);
-    height: 1px;
-    overflow: hidden;
-    position: absolute;
-    white-space: nowrap; 
-    width: 1px;
+.sr-only {
+    display: none;
 }

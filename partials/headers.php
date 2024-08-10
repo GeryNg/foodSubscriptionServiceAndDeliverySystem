@@ -16,7 +16,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.css" rel="stylesheet" />
     <link href="../css/styles.css" rel="stylesheet" />
-    <!--<link href="../css/custom.css" rel="stylesheet" />-->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <title>
         <?php echo isset($page_title) ? htmlspecialchars($page_title) : 'Default Title'; ?>
@@ -52,12 +51,30 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="../customer_support/live_chat.php">Customer Service</a></li>
                 </ul>
                 <div class="dtext-end">
-                    <a href="../profile_management/profile.php" class="d-block link-body-emphasis text-decoration-none icon-link">
+                    <?php if (isset($_SESSION['username'])): ?>
+                    <div class="dropdown">
+                        <a href="#" class="d-block link-body-emphasis text-decoration-none icon-link dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16" style="font-size: 30px;">
+                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"></path>
+                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"></path>
+                            </svg>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="../profile_management/profile.php">Profile</a></li>
+                            <li><a class="dropdown-item" href="../Cust_Address/address_management.php">Manage Addresses</a></li>
+                            <li><a class="dropdown-item" href="../order_management/order_history.php">Order History</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="../login_management/logout.php">Logout</a></li>
+                        </ul>
+                    </div>
+                    <?php else: ?>
+                    <a href="../login_management/login.php" class="d-block link-body-emphasis text-decoration-none icon-link">
                         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16" style="font-size: 30px;">
                             <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"></path>
                             <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"></path>
                         </svg>
                     </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

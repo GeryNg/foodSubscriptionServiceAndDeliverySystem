@@ -48,6 +48,18 @@ if (isset($_POST['loginBtn'])) {
                     rememberMe($id);
                 }
 
+                if ($role === 'customer') {
+                    $sqlQueryCustomer = "SELECT Cust_ID FROM customer WHERE user_id = :user_id";
+                    $statementCustomer = $db->prepare($sqlQueryCustomer);
+                    $statementCustomer->execute(array(':user_id' => $id));
+                    $CustomerRow = $statementCustomer->fetch();
+
+                        if ($CustomerRow) {                       
+                        $_SESSION['Cust_ID'] = $CustomerRow['Cust_ID'];
+                    }
+
+                }    
+
                 if ($role === 'seller') {
                     $sqlQuerySeller = "SELECT id AS seller_id, access FROM seller WHERE user_id = :user_id";
                     $statementSeller = $db->prepare($sqlQuerySeller);

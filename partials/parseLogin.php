@@ -76,9 +76,9 @@ if (isset($_POST['loginBtn'])) {
                 if ($role === 'customer') {
                     $redirect_url = '../index.php';
                 } elseif ($role === 'seller') {
-                    $redirect_url = '../plan_management/add_plan.php';
+                    $redirect_url = '../partials/seller_dashboard.php';
                 } elseif ($role === 'admin') {
-                    $redirect_url = '../admin/assign.php';
+                    $redirect_url = '../admin/admin_dashboard.php';
                 }else {
                     $redirect_url = '../index.php';
                 }

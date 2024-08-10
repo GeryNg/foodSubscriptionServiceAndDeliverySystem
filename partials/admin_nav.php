@@ -8,6 +8,22 @@
         header("Location: ../partials/error.php");
         exit;
     }
+    
+    $user_id = $_SESSION['id']; 
+    try {
+        $query = "SELECT username, avatar FROM users WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':id', $user_id);
+        $stmt->execute();
+        
+        if ($stmt->rowCount() == 1) {
+            $row = $stmt->fetch();
+            $username = $row['username'];
+            $avatar = $row['avatar'];
+        }
+    } catch (PDOException $ex) {
+        echo "An error occurred: " . $ex->getMessage();
+    }
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +57,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- logo -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../admin/admin_dashboard.php">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -50,8 +66,8 @@
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item <?php echo $current_page == '#' ? 'active' : ''; ?>">
-                <a class="nav-link" href="#">
+            <li class="nav-item <?php echo $current_page == 'admin_dashboard.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="../admin/admin_dashboard.php">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>

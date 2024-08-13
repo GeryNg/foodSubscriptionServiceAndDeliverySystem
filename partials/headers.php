@@ -38,7 +38,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </style>
 </head>
 
-<body>
+<body style="background-color: #f5f5f5;" id="page-top">
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
         <div class="container px-4 px-lg-5">

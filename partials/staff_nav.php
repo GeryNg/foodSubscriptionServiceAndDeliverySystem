@@ -47,9 +47,21 @@ try {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
-
     <style>
+        .weather-widget {
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+        }
 
+        .weather-widget img {
+            width: 30px;
+            margin-right: 10px;
+        }
+
+        .weather-widget span {
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -149,6 +161,12 @@ try {
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
+                        <!-- Weather Widget -->
+                        <div class="weather-widget" id="weather">
+                            <img src="../image/weather-icon.png" alt="weather">
+                            <span>Loading...</span>
+                        </div>
+
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
@@ -232,6 +250,30 @@ try {
                         scrollTop: ($($anchor.attr('href')).offset().top)
                     }, 500, 'easeInOutExpo');
                     event.preventDefault();
+                });
+
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    const apiKey = '#apikey';
+                    const apiUrl = `https://api.stormglass.io/v2/weather/point?lat=${latitude}&lng=${longitude}&params=airTemperature`;
+
+                    $.ajax({
+                        url: apiUrl,
+                        headers: {
+                            'Authorization': apiKey
+                        },
+                        success: function(data) {
+                            const temperature = data.hours[0].airTemperature.sg;
+                            const weatherElement = $('#weather span');
+                            weatherElement.text(`${temperature}°C`);
+                        },
+                        error: function(error) {
+                            console.log(error);
+                            $('#weather span').text('Unable to fetch weather data');
+                        }
+                    });
                 });
             </script>
 </body>

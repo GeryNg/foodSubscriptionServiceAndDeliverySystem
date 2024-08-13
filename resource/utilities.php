@@ -1,6 +1,7 @@
 <?php
 use Ds\Set;
 use MongoDB\Driver\Session;
+
 function check_empty_fields($required_fields_array)
 {
     $form_errors = array();
@@ -69,7 +70,7 @@ function show_errors($form_errors_array)
 function flashMessage($message, $type = "error")
 {
     $class = ($type === "success") ? "alert-success" : "alert-danger";
-    return "<div class=' {$class}'>{$message}</div>";
+    return "<div class='{$class}'>{$message}</div>";
 }
 
 function show_combined_messages($flashMessage, $form_errors_array)
@@ -145,9 +146,10 @@ function signout()
     unset($_SESSION['id']);
 
     if (isset($_COOKIE['rememberUserCookie'])) {
-        unset($_COOKIE['rememberUserCookie']);
-        setcookie('rememberUserCookie', null, -1, '/');
+        unset($_COOKIE['rememberUserCookie']); // Remove the cookie from the $_COOKIE superglobal
+        setcookie('rememberUserCookie', '', time() - 3600, '/'); // Expire the cookie
     }
+
     session_destroy();
     session_regenerate_id(true);
     header("Location: ../index.php");
@@ -215,5 +217,4 @@ function uploadAvatar($username)
     }
     return $isImagemoved;
 }
-
 ?>

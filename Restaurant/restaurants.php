@@ -11,10 +11,15 @@
     <?php include '../partials/headers.php'; ?>
     <div class="container">
         <h1>All Restaurants</h1>
-        <form method="GET" action="">
-            <input type="text" name="search" placeholder="Search by name" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_QUOTES, 'UTF-8') : ''; ?>">
-            <button type="submit">Search</button>
+        <form method="GET" action="" class="search-bar">
+            <input type="text" name="search" placeholder="Search for restaurants, cuisines, and dishes" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+            <button type="submit">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M16.17 11A6.5 6.5 0 1111 16.17 6.5 6.5 0 0116.17 11z" />
+                </svg>
+            </button>
         </form>
+
         <section class="articles">
             <?php
             $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';

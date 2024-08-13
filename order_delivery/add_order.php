@@ -1,14 +1,16 @@
 <?php
 include '../resource/Database.php';
+include '../resource/session.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $plan_id = $_POST['plan_id'];
-    $pax = $_POST['pax'];
-    $delivery_time = $_POST['delivery_time'];
-    $delivery_date = $_POST['delivery_date'];
-    $remarks = $_POST['remarks'];
+    $plan_id = intval($_POST['plan_id']);
+    $quantity = intval($_POST['quantity']);
+    $delivery_address_id = intval($_POST['delivery_address_id']);
+    $instructions = $_POST['instructions'];
+    $start_date = $_POST['start_date'];
+    $end_date = $_POST['end_date']; // Assuming the end date is set somewhere in the form
 
-    // Fetch plan price
+    // Fetch the price of the plan
     $sql = "SELECT price FROM plan WHERE id = :plan_id";
     $statement = $db->prepare($sql);
     $statement->bindParam(':plan_id', $plan_id, PDO::PARAM_INT);
@@ -19,26 +21,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $price = $plan['price'];
 
         // Calculate the grand total
-        $grandTotal = $price * $pax;
+        $grandTotal = $price * $quantity;
 
-        // Insert order into order_cust table
+        // Insert the order into the order_cust table
         $sql = "INSERT INTO order_cust (OrderDate, GrandTotal, Status, Duration, StartDate, EndDate, Quantity, Cust_ID, Plan_ID, delivery_address_id, instructions) 
-                VALUES (NOW(), :grandTotal, 'Active', 5, :startDate, :endDate, :pax, 1, :plan_id, 1, :remarks)";
+                VALUES (NOW(), :grandTotal, 'Active', 5, :start_date, :end_date, :quantity, :cust_id, :plan_id, :delivery_address_id, :instructions)";
         $statement = $db->prepare($sql);
         $statement->bindParam(':grandTotal', $grandTotal, PDO::PARAM_STR);
-        $statement->bindParam(':startDate', $delivery_date, PDO::PARAM_STR);
-        $statement->bindParam(':endDate', $delivery_date, PDO::PARAM_STR);
-        $statement->bindParam(':pax', $pax, PDO::PARAM_INT);
+        $statement->bindParam(':start_date', $start_date, PDO::PARAM_STR);
+        $statement->bindParam(':end_date', $end_date, PDO::PARAM_STR);
+        $statement->bindParam(':quantity', $quantity, PDO::PARAM_INT);
+        $statement->bindParam(':cust_id', $_SESSION['Cust_ID'], PDO::PARAM_INT); // Assuming Cust_ID is stored in the session
         $statement->bindParam(':plan_id', $plan_id, PDO::PARAM_INT);
-        $statement->bindParam(':remarks', $remarks, PDO::PARAM_STR);
-        $statement->execute();
+        $statement->bindParam(':delivery_address_id', $delivery_address_id, PDO::PARAM_INT);
+        $statement->bindParam(':instructions', $instructions, PDO::PARAM_STR);
 
-        header('Location: success.php');
-        exit();
+        if ($statement->execute()) {
+            echo "<script>alert('Your order has been successfully placed!'); window.location.href = 'orders.php';</script>";
+            exit();
+        } else {
+            echo "<script>alert('Failed to place order. Please try again.'); window.location.href = 'orders.php';</script>";
+        }
     } else {
-        echo "Plan not found.";
+        echo "<script>alert('Plan not found. Please try again.'); window.location.href = 'orders.php';</script>";
     }
 } else {
-    echo "Invalid request.";
+    echo "<script>alert('Invalid request. Please try again.'); window.location.href = 'orders.php';</script>";
 }
-?>

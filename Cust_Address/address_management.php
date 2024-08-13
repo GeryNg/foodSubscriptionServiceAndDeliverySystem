@@ -9,13 +9,7 @@
     <link rel="stylesheet" href="../css/address_management.css">
 </head>
 <body>
-    <?php include '../partials/headers.php'; ?>
-    <?php echo '<pre>';
-print_r($_SESSION);
-echo '</pre>';
-?>
-    
-
+    <?php include '../partials/headers.php'; ?>   
     <div class="container">
         <h2>My Addresses</h2>
         <div class="address-container">
@@ -45,7 +39,7 @@ echo '</pre>';
 
                 echo "<div class='address-actions'>";
                 echo "<a href='edit_address.php?id=$address_id'>Edit</a>";
-                echo "<a href='delete_address.php?id=$address_id' class='delete-link'>Delete</a>";
+                echo "<a href='delete_address.php?address_id=$address_id' class='delete-link'>Delete</a>";
                 echo "<a href='set_default.php?id=$address_id' class='default-link'>Set as default</a>";
                 echo "</div>";
                 echo "</div>";

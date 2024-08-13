@@ -38,7 +38,7 @@
                 echo "</div>";
                 
                 // Fetch plans
-                $sql = "SELECT plan.image_urls, plan.plan_name, plan.description, plan.price 
+                $sql = "SELECT plan.id, plan.image_urls, plan.plan_name, plan.description, plan.price 
                         FROM plan 
                         WHERE plan.seller_id = :id;";
                 $statement = $db->prepare($sql);
@@ -49,6 +49,7 @@
                 echo "<section class='articles'>";
                 
                 while ($plan = $statement->fetch()) {
+                    $planId = htmlspecialchars($plan['id'], ENT_QUOTES, 'UTF-8');
                     $planImageUrls = htmlspecialchars($plan['image_urls'], ENT_QUOTES, 'UTF-8');
                     $planImages = explode(',', $planImageUrls); // Split the image URLs by comma
                     $firstPlanImage = trim($planImages[0]); // Get the first image URL and trim any extra whitespace
@@ -66,7 +67,7 @@
                     echo "<h2>" . $planName . "</h2>";
                     echo "<p>" . $planDescription . "</p>";
                     echo "<p>Price: $" . $planPrice . "</p>";
-                    echo "<a href='../Order/orders.php' class='read-more'>Read more <span class='sr-only'>about " . $planName . "</span>";
+                    echo "<a href='../order_delivery/orders.php?plan_id=" . $planId . "' class='read-more'>Read more <span class='sr-only'>about " . $planName . "</span>";
                     echo "<svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 20 20' fill='currentColor'>";
                     echo "<path fill-rule='evenodd' d='M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z' clip-rule='evenodd' />";
                     echo "</svg>";

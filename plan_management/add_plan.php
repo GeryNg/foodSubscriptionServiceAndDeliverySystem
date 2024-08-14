@@ -1,5 +1,6 @@
 <?php
 $page_title = "Add Plan";
+$current_page = basename(__FILE__);
 include_once '../partials/staff_nav.php';
 include_once '../partials/parsePlan.php';
 include_once '../resource/Database.php';

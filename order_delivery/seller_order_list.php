@@ -1,5 +1,6 @@
 <?php
 $page_title = "Order list";
+$current_page = basename(__FILE__);
 include_once '../partials/staff_nav.php';
 include_once '../resource/Database.php';
 ?>
@@ -37,7 +38,7 @@ include_once '../resource/Database.php';
 </head>
 <body>
 <div class="container-fluid" style="margin-top: 20px;">
-        <h1 class="h3 mb-2 text-gray-800">Order List Table</h1><hr/>
+        <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Order List Table</h1><hr/>
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h4 class="m-0 font-weight-bold text-primary"><strong>Plan 1</strong></h6>

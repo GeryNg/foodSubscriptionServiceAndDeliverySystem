@@ -1,5 +1,6 @@
     <?php
     $page_title = "Feedback List";
+    $current_page = basename(__FILE__);
     include_once '../partials/staff_nav.php';
     include_once '../resource/Database.php';
     include_once '../resource/session.php';
@@ -121,8 +122,8 @@
                 .container1,
                 .container2 {
                     height: 170px;
-                    width: 80%;
                     margin: 1em auto;
+                    width: 95%;
                 }
 
                 .container1 .product-details,
@@ -172,7 +173,7 @@
 
     <body>
         <div class="container-fluid" style="margin-top: 20px;">
-            <h1 class="h3 mb-2 text-gray-800">View Feeback</h1>
+            <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Feedback</h1>
             <br />
             <div class="container1">
                 <div class="product-details">

@@ -27,7 +27,7 @@ include_once '../partials/headers.php';
     <br />
 
     <div id="wrapper">
-        <div id="content-wrapper" class="d-flex flex-column" style="background-color: #fff;">
+        <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
                 <div class="text-center">
                     <div class="error mx-auto" data-text="404">404</div>

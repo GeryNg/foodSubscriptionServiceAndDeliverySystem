@@ -1,0 +1,15 @@
+Microsoft Azure:
+Email: makanapa@outlook.my
+Password: Eatwhat12345678+
+
+Google Account:
+Email: makanapa024@gmail.com
+Password: Eatwhat12345678+
+
+google app password(Google SMTP):
+yclm fcdy xumw gkgw
+
+Stormglass.io
+Email: makanapa024@gmail.com
+password: 12345678
+apikey: b5f8acec-5981-11ef-8a8f-0242ac130004-b5f8ad46-5981-11ef-8a8f-0242ac130004 (staff_nac.php line 259)

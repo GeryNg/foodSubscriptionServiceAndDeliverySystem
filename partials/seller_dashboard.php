@@ -1,5 +1,6 @@
 <?php
 $page_title = "Dashboard";
+$current_page = basename(__FILE__);
 include_once 'staff_nav.php';
 include_once '../resource/Database.php';
 include_once '../resource/session.php';
@@ -87,7 +88,7 @@ $activeOrderCount = $stmt->fetch(PDO::FETCH_ASSOC)['active_orders'];
 <body>
     <div class="container-fluid" style="margin:20px;">
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+            <h1 class="h1 mb-0 text-gray-800" style="font-weight: 600;">Dashboard</h1>
         </div>
 
         <div class="row">

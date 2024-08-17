@@ -6,6 +6,7 @@ include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
 $seller_access = $_SESSION['access'] ?? '';
+$seller_id = $_SESSION['seller_id'] ?? '';
 
 if (empty($seller_access) || $seller_access !== 'verify') {
     echo '<p>You do not have permission to access this page.</p>';
@@ -16,8 +17,8 @@ try {
     $stmt = $db->prepare("SELECT users.*, seller.name AS seller_name, seller.profile_pic 
                           FROM users 
                           JOIN seller ON users.id = seller.user_id 
-                          WHERE users.id = :id");
-    $stmt->bindParam(':id', $_SESSION['id'], PDO::PARAM_INT);
+                          WHERE seller.id = :seller_id");
+    $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 

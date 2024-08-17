@@ -76,9 +76,10 @@
 
             <?php
             if (isset($access) && ($access === 'pending' || $access === 'verify')) {
-                $sqlQuerySeller = "SELECT * FROM seller WHERE user_id = :user_id";
+                $seller_id = $_SESSION['seller_id'];
+                $sqlQuerySeller = "SELECT * FROM seller WHERE id = :seller_id";
                 $statementSeller = $db->prepare($sqlQuerySeller);
-                $statementSeller->execute(array(':user_id' => $id));
+                $statementSeller->execute(array(':seller_id' => $seller_id));
                 $sellers = $statementSeller->fetchAll();
 
                 if ($sellers) {

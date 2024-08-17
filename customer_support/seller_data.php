@@ -2,10 +2,18 @@
 include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
-$outgoing_id = $_SESSION['id'];
+$seller_id = $_SESSION['seller_id'];
 $searchTerm = $_POST['searchTerm'];
 
 try {
+    $sqlSeller = "SELECT user_id FROM seller WHERE id = :seller_id";
+    $stmtSeller = $db->prepare($sqlSeller);
+    $stmtSeller->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
+    $stmtSeller->execute();
+
+    $sellerData = $stmtSeller->fetch(PDO::FETCH_ASSOC);
+    $outgoing_id = $sellerData['user_id'];
+
     $sql = "SELECT DISTINCT u.id AS user_id, c.Name AS customer_name, u.avatar 
             FROM customer c
             JOIN users u ON c.user_id = u.id

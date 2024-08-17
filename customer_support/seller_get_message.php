@@ -84,12 +84,20 @@ include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
 if (isset($_SESSION['id'])) {
-    $outgoing_id = $_SESSION['id'];
+    $seller_id = $_SESSION['seller_id'];
     $incoming_id = $_POST['incoming_id'];
 
     $output = "";
 
     try {
+        $sqlSeller = "SELECT user_id FROM seller WHERE id = :seller_id";
+        $stmtSeller = $db->prepare($sqlSeller);
+        $stmtSeller->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
+        $stmtSeller->execute();
+    
+        $sellerData = $stmtSeller->fetch(PDO::FETCH_ASSOC);
+        $outgoing_id = $sellerData['user_id'];
+        
         $sql = "SELECT messages.msg, messages.outgoing_msg_id, users.avatar 
                 FROM messages 
                 LEFT JOIN users ON users.id = messages.outgoing_msg_id 
@@ -112,10 +120,10 @@ if (isset($_SESSION['id'])) {
                                 </div>';
                 } else {
                     $profilePicPath = !empty($row['avatar']) ? $row['avatar'] : 'default.jpg';
-                    $avatar = '../uploads/' . $profilePicPath;
+                    $avatar = '../uploads/' . htmlspecialchars($profilePicPath);
 
                     $output .= '<div class="chat incoming">
-                                    <img src="' . htmlspecialchars($avatar) . '" alt="">
+                                    <img src="' . $avatar . '" alt="">
                                     <div class="details">
                                         <p>' . htmlspecialchars($row['msg']) . '</p>
                                     </div>
@@ -125,6 +133,7 @@ if (isset($_SESSION['id'])) {
         } else {
             $output .= '<div class="text">No messages are available. Once you send a message, they will appear here.</div>';
         }
+
         echo $output;
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();

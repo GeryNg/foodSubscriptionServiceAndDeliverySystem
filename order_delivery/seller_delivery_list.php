@@ -3,6 +3,13 @@ $page_title = "Delivery List";
 $current_page = basename(__FILE__);
 include_once '../partials/staff_nav.php';
 include_once '../resource/Database.php';
+
+$seller_access = $_SESSION['access'];
+
+if (empty($seller_access) || $seller_access !== 'verify') {
+    echo '<p>You do not have permission to access this page.</p>';
+    exit;
+}
 ?>
 
 <!DOCTYPE html>

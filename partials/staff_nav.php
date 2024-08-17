@@ -10,7 +10,11 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'seller') {
 }
 
 $user_id = $_SESSION['id'];
+$access = $_SESSION['access'];
+$requests_open = 0;
+
 try {
+    // Fetch user data from users table
     $query = "SELECT username, avatar FROM users WHERE id = :id";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':id', $user_id);
@@ -23,6 +27,36 @@ try {
     }
 } catch (PDOException $ex) {
     echo "An error occurred: " . $ex->getMessage();
+}
+
+try {
+    // Fetch value from seller table
+    $query = "SELECT requests_open FROM seller WHERE user_id = :user_id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $user_id);
+    $stmt->execute();
+
+    if ($stmt->rowCount() == 1) {
+        $row = $stmt->fetch();
+        $requests_open = $row['requests_open'];
+    }
+} catch (PDOException $ex) {
+    echo "An error occurred: " . $ex->getMessage();
+}
+
+//toggle request link
+if (isset($_POST['toggleRequest'])) {
+    $requests_open = isset($_POST['requests_open']) ? 1 : 0;
+    $seller_id = $_SESSION['seller_id'];
+
+    try {
+        $stmt = $db->prepare("UPDATE seller SET requests_open = :requests_open WHERE id = :seller_id");
+        $stmt->execute([':requests_open' => $requests_open, ':seller_id' => $seller_id]);
+
+        echo "<script>alert('Request settings updated.');</script>";
+    } catch (PDOException $ex) {
+        echo "<script>alert('An error occurred: " . $ex->getMessage() . "');</script>";
+    }
 }
 ?>
 
@@ -61,6 +95,9 @@ try {
 
         .weather-widget span {
             font-size: 14px;
+        }
+        .alert{
+            margin-bottom: 0 !important;
         }
     </style>
 </head>
@@ -184,6 +221,21 @@ try {
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
                                 </a>
+                                <?php if ($access === 'verify' && $requests_open === 0): ?>
+                                    <a class="dropdown-item" href="#" id="openRequestLink">
+                                        <i class="fas fa-file-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        Open Request Link
+                                    </a>
+                                    <form id="toggleRequestForm" method="post" action="" style="display:none;">
+                                        <input type="hidden" name="requests_open" value="1">
+                                        <button type="submit" name="toggleRequest"></button>
+                                    </form>
+                                <?php elseif ($access === 'verify' && $requests_open === 1): ?>
+                                    <a class="dropdown-item" href="../profile_management/accept_link.php" id="applyLinkAccount">
+                                        <i class="fas fa-check-square fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        Apply Link Account
+                                    </a>
+                                <?php endif; ?>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="../login_management/logout.php">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -193,7 +245,6 @@ try {
                         </li>
                     </ul>
                 </nav>
-
                 <a class="scroll-to-top rounded" href="#page-top" style="z-index: 99;">
                     <i class="fas fa-angle-up"></i>
                 </a>
@@ -207,25 +258,24 @@ try {
 
                 if ($access === 'inactive') {
                     echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>Account Inactive!</strong> Your account is currently inactive. 
-            <a href="../profile_management/active_account.php" class="btn btn-primary btn-sm">Activate Account</a>
-          </div>';
+                            <strong>Account Inactive!</strong> Your account is currently inactive. 
+                            <a href="../profile_management/active_account.php" class="btn btn-primary btn-sm">Activate Account</a>
+                            </div>';
                 } elseif ($access === 'pending') {
                     echo '<div class="alert alert-info alert-dismissible fade show" role="alert">
-            <strong>Account Pending!</strong> Your account is under review. Please wait for up to 3 working days.
-          </div>';
+                            <strong>Account Pending!</strong> Your account is under review. Please wait for up to 3 working days.
+                            </div>';
                 } elseif ($access === 'rejected') {
                     echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Account Rejected!</strong> Your account request has been rejected. 
-            <a href="active_account.php" class="btn btn-primary btn-sm">Submit New Request</a>
-          </div>';
+                            <strong>Account Rejected!</strong> Your account request has been rejected. 
+                            <a href="active_account.php" class="btn btn-primary btn-sm">Submit New Request</a>
+                            </div>';
                 } elseif ($access === 'verify') {
                 }
             } else {
                 echo '<div class="alert alert-danger" role="alert">Unauthorized access.</div>';
             }
             ?>
-
             <script src="../vendor/jquery/jquery.min.js"></script>
             <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
             <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
@@ -233,7 +283,6 @@ try {
             <script src="../vendor/chart.js/Chart.min.js"></script>
             <script src="../js/demo/chart-area-demo.js"></script>
             <script src="../js/demo/chart-pie-demo.js"></script>
-
             <script>
                 $(document).scroll(function() {
                     var scrollDistance = $(this).scrollTop();
@@ -272,6 +321,34 @@ try {
                         error: function(error) {
                             console.log(error);
                             $('#weather span').text('Unable to fetch weather data');
+                        }
+                    });
+                });
+                document.getElementById('openRequestLink').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    swal({
+                        title: "Are you sure?",
+                        text: "Do you want to open requests for linking?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willOpen) => {
+                        if (willOpen) {
+                            var xhr = new XMLHttpRequest();
+                            xhr.open("POST", window.location.href, true);
+                            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+                            xhr.onreadystatechange = function() {
+                                if (xhr.readyState === XMLHttpRequest.DONE) {
+                                    if (xhr.status === 200) {
+                                        swal("Success!", "Request settings updated.", "success");
+                                    } else {
+                                        swal("Error!", "An error occurred while updating the request settings.", "error");
+                                    }
+                                }
+                            };
+
+                            xhr.send("toggleRequest=true&requests_open=1");
                         }
                     });
                 });

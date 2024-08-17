@@ -7,12 +7,10 @@ include_once '../resource/utilities.php';
 if (isset($_POST['loginBtn'])) {
     $form_errors = array();
 
-    //validate
     $required_fields = array('username', 'password');
     $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
 
     if (empty($form_errors)) {
-        //collect form data
         $user = $_POST['username'];
         $password = $_POST['password'];
 
@@ -46,33 +44,49 @@ if (isset($_POST['loginBtn'])) {
                 //remember me
                 if ($remember === 'yes') {
                     rememberMe($id);
-                }
-
+                }  
                 if ($role === 'customer') {
                     $sqlQueryCustomer = "SELECT Cust_ID FROM customer WHERE user_id = :user_id";
                     $statementCustomer = $db->prepare($sqlQueryCustomer);
                     $statementCustomer->execute(array(':user_id' => $id));
                     $CustomerRow = $statementCustomer->fetch();
-
-                        if ($CustomerRow) {                       
+                    if ($CustomerRow) {
                         $_SESSION['Cust_ID'] = $CustomerRow['Cust_ID'];
-                    }
-
-                }    
-
-                if ($role === 'seller') {
-                    $sqlQuerySeller = "SELECT id AS seller_id, access FROM seller WHERE user_id = :user_id";
-                    $statementSeller = $db->prepare($sqlQuerySeller);
-                    $statementSeller->execute(array(':user_id' => $id));
-                    $sellerRow = $statementSeller->fetch();
-
-                    if ($sellerRow) {
-                        $_SESSION['access'] = $sellerRow['access'];
-                        $_SESSION['seller_id'] = $sellerRow['seller_id'];
                     }
                 }
 
-                // Determine redirect based on role
+                if ($role === 'seller') {
+                    $sqlLinkRequest = "SELECT seller_id FROM link_requests WHERE user_id = :user_id AND status = 'accepted'";
+                    $statementLink = $db->prepare($sqlLinkRequest);
+                    $statementLink->execute(array(':user_id' => $id));
+                    $linkRow = $statementLink->fetch();
+
+                    if ($linkRow) {
+                        $linkedSellerId = $linkRow['seller_id'];
+                        $_SESSION['linked_seller_id'] = $linkedSellerId;
+
+                        $sqlQuerySeller = "SELECT id AS seller_id, access FROM seller WHERE id = :seller_id";
+                        $statementSeller = $db->prepare($sqlQuerySeller);
+                        $statementSeller->execute(array(':seller_id' => $linkedSellerId));
+                        $sellerRow = $statementSeller->fetch();
+
+                        if ($sellerRow) {
+                            $_SESSION['access'] = $sellerRow['access'];
+                            $_SESSION['seller_id'] = $sellerRow['seller_id'];
+                        }
+                    } else {
+                        $sqlQuerySeller = "SELECT id AS seller_id, access FROM seller WHERE user_id = :user_id";
+                        $statementSeller = $db->prepare($sqlQuerySeller);
+                        $statementSeller->execute(array(':user_id' => $id));
+                        $sellerRow = $statementSeller->fetch();
+
+                        if ($sellerRow) {
+                            $_SESSION['access'] = $sellerRow['access'];
+                            $_SESSION['seller_id'] = $sellerRow['seller_id'];
+                        }
+                    }
+                }
+
                 if ($role === 'customer') {
                     $redirect_url = '../index.php';
                 } elseif ($role === 'seller') {

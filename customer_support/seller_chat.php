@@ -5,9 +5,17 @@ include_once '../resource/session.php';
 include_once '../partials/staff_nav.php';
 
 $chat_partner_id = $_GET['user_id'];
-$user_id = $_SESSION['id'];
+$seller_id = $_SESSION['seller_id'];
 
 try {
+    $sqlSeller = "SELECT user_id FROM seller WHERE id = :seller_id";
+    $stmtSeller = $db->prepare($sqlSeller);
+    $stmtSeller->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
+    $stmtSeller->execute();
+
+    $sellerData = $stmtSeller->fetch(PDO::FETCH_ASSOC);
+    $user_id = $sellerData['user_id'];
+
     $sql = "SELECT c.Name AS customer_name, u.avatar, u.status 
             FROM users u 
             LEFT JOIN customer c ON c.user_id = u.id
@@ -92,7 +100,7 @@ $(document).ready(function() {
         console.log("Message submitted:", message);
         if (message !== "") {
             $.ajax({
-                url: "../customer_support/insert-chat.php",
+                url: "../customer_support/seller-insert-chat.php",
                 type: "POST",
                 data: $(this).serialize(),
                 success: function(data) {

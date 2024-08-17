@@ -2,12 +2,21 @@
 include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
-$outgoing_id = $_SESSION['id'];
+$seller_id = $_SESSION['seller_id'];
 
 try {
-    $sql = "SELECT DISTINCT u.id AS user_id, u.username AS customer_name, u.avatar 
+    $sqlSeller = "SELECT user_id FROM seller WHERE id = :seller_id";
+    $stmtSeller = $db->prepare($sqlSeller);
+    $stmtSeller->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
+    $stmtSeller->execute();
+
+    $sellerData = $stmtSeller->fetch(PDO::FETCH_ASSOC);
+    $outgoing_id = $sellerData['user_id'];
+
+    $sql = "SELECT DISTINCT u.id AS user_id, c.Name AS customer_name, u.avatar 
             FROM messages m
             JOIN users u ON u.id = CASE WHEN m.incoming_msg_id = :outgoing_id THEN m.outgoing_msg_id ELSE m.incoming_msg_id END
+            JOIN customer c ON c.user_id = u.id
             WHERE (m.incoming_msg_id = :outgoing_id OR m.outgoing_msg_id = :outgoing_id)
             ORDER BY m.msg_id DESC";
     $stmt = $db->prepare($sql);

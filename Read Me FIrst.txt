@@ -8,3 +8,10 @@ sweetalert 很好用
 https://www.youtube.com/watch?v=D2AGpBIZ30k&list=PL9mwDhhLGZilsMTm1POos9aXjvorie3Me&index=15
 
 php.ini 里面的 display_errors = Off 改去off 了原本是on的
+
+-----
+coming soon:
+
+live tracking
+email（user create好账户后send一个email给他）
+seller pro??? (可以连接多个账户)

@@ -72,14 +72,12 @@ include_once '../partials/parseActiveAccount.php';
             <h1>Activate Account</h1>
             <form action="" method="post" enctype="multipart/form-data">
                 <br />
-
                 <?php if (isset($result) || !empty($form_errors)): ?>
                     <div>
                         <?php echo show_combined_messages($result, $form_errors); ?>
                     </div>
                 <?php endif; ?>
                 <div class="clearfix"></div>
-
                 <label>Name: <input type="text" name="seller_name" value="<?php if (isset($_POST['seller_name']))
                     echo htmlspecialchars($_POST['seller_name']); ?>"></label><br>
                 <label>Restaurant Profile Picture: </label>
@@ -117,10 +115,13 @@ include_once '../partials/parseActiveAccount.php';
                 </label>
                 <label>Bank Account: <input type="number" name="bank_account_number" value="<?php if (isset($_POST['bank_account_number']))
                     echo htmlspecialchars($_POST['bank_account_number']); ?>"></label><br>
-
                 <label>Document needed for approval (Business owner/Partner’s NRIC, e-SSM Business Profile, Certificate of Registration of Business (Form D), Halal License, Liquor license, Business Premises License & other): </label><br>
                 <input type="file" name="images[]" accept=".jpg, .jpeg, .png" multiple><br><br>
                 <button type="submit" name="activeAccountBtn" value="Activate Account">Activate Account</button>
+                <br/>
+                <br/>
+                <br/>
+                <a href="link_account.php">Link To Other Company</a>
             </form>
         </div>
     </div>

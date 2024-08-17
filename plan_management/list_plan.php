@@ -6,6 +6,12 @@ include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
 $seller_id = $_SESSION['seller_id'];
+$seller_access = $_SESSION['access'];
+
+if (empty($seller_access) || $seller_access !== 'verify') {
+    echo '<p>You do not have permission to access this page.</p>';
+    exit;
+}
 
 $query = "SELECT * FROM plan WHERE seller_id = :seller_id ORDER BY status ASC";
 $stmt = $db->prepare($query);

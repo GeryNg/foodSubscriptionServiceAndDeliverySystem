@@ -69,7 +69,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                             <li><a class="dropdown-item" href="../profile_management/profile.php">Profile</a></li>
                             <li><a class="dropdown-item" href="../Cust_Address/address_management.php">Manage Addresses</a></li>
-                            <li><a class="dropdown-item" href="../order_management/order_history.php">Order History</a></li>
+                            <li><a class="dropdown-item" href="../order_delivery/order_history.php">Order History</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="../login_management/logout.php">Logout</a></li>
                         </ul>

@@ -38,9 +38,9 @@
                 echo "<p><strong>$line1</strong> $line2, $city, $state, $postal_code, $country</p>";
 
                 echo "<div class='address-actions'>";
-                echo "<a href='edit_address.php?id=$address_id'>Edit</a>";
+                echo "<a href='edit_address.php?address_id=$address_id'>Edit</a>";
                 echo "<a href='delete_address.php?address_id=$address_id' class='delete-link'>Delete</a>";
-                echo "<a href='set_default.php?id=$address_id' class='default-link'>Set as default</a>";
+                echo "<a href='set_default.php?address_id=$address_id' class='default-link'>Set as default</a>";
                 echo "</div>";
                 echo "</div>";
             }

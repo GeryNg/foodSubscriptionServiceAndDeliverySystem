@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $delivery_address_id = intval($_POST['delivery_address_id']);
     $instructions = $_POST['instructions'];
     $start_date = $_POST['start_date'];
-    $end_date = $_POST['end_date']; // Assuming the end date is set somewhere in the form
+    $end_date = $_POST['end_date'];
 
     // Fetch the price of the plan
     $sql = "SELECT price FROM plan WHERE id = :plan_id";
@@ -19,25 +19,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($plan) {
         $price = $plan['price'];
+        $duration = (new DateTime($end_date))->diff(new DateTime($start_date))->days + 1;
 
         // Calculate the grand total
-        $grandTotal = $price * $quantity;
+        $grandTotal = $price * $quantity * $duration;
 
         // Insert the order into the order_cust table
         $sql = "INSERT INTO order_cust (OrderDate, GrandTotal, Status, Duration, StartDate, EndDate, Quantity, Cust_ID, Plan_ID, delivery_address_id, instructions) 
-                VALUES (NOW(), :grandTotal, 'Active', 5, :start_date, :end_date, :quantity, :cust_id, :plan_id, :delivery_address_id, :instructions)";
+                VALUES (NOW(), :grandTotal, 'Active', :duration, :start_date, :end_date, :quantity, :cust_id, :plan_id, :delivery_address_id, :instructions)";
         $statement = $db->prepare($sql);
         $statement->bindParam(':grandTotal', $grandTotal, PDO::PARAM_STR);
+        $statement->bindParam(':duration', $duration, PDO::PARAM_INT);
         $statement->bindParam(':start_date', $start_date, PDO::PARAM_STR);
         $statement->bindParam(':end_date', $end_date, PDO::PARAM_STR);
         $statement->bindParam(':quantity', $quantity, PDO::PARAM_INT);
-        $statement->bindParam(':cust_id', $_SESSION['Cust_ID'], PDO::PARAM_INT); // Assuming Cust_ID is stored in the session
+        $statement->bindParam(':cust_id', $_SESSION['Cust_ID'], PDO::PARAM_INT);
         $statement->bindParam(':plan_id', $plan_id, PDO::PARAM_INT);
         $statement->bindParam(':delivery_address_id', $delivery_address_id, PDO::PARAM_INT);
         $statement->bindParam(':instructions', $instructions, PDO::PARAM_STR);
 
         if ($statement->execute()) {
-            echo "<script>alert('Your order has been successfully placed!'); window.location.href = 'orders.php';</script>";
+            // Get the last inserted order ID
+            $order_id = $db->lastInsertId();
+
+            // Redirect to payment page with order ID
+            header("Location: ../Payment/payment.php?order_id=$order_id");
             exit();
         } else {
             echo "<script>alert('Failed to place order. Please try again.'); window.location.href = 'orders.php';</script>";

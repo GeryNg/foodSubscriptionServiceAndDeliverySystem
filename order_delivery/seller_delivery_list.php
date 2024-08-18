@@ -41,6 +41,39 @@ if (empty($seller_access) || $seller_access !== 'verify') {
             border-radius: 5px;
             margin: 8px;
         }
+        .btn-group{
+            display:flex;
+            width: 100%;
+
+        }
+        .button {
+            background-color: #5C67F2;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin: 10px 5px 10px 5px;
+            font-weight: 900;
+        }
+        .button1{
+            background-color: #e67300;
+        }
+        .button2{
+            background-color: #005ce6;
+        }
+        .button3{
+            background-color: #29a329;
+        }
+        @media only screen and (max-width: 500px) {
+            h4{
+                font-size: 15px;
+            }
+            .totalQuantuty{
+                font-size: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -48,7 +81,7 @@ if (empty($seller_access) || $seller_access !== 'verify') {
         <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Delivery List Table</h1><hr/>
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h4 class="m-0 font-weight-bold text-primary"><strong>Delivery</strong></h6>
+                <h4 class="m-0 font-weight-bold text-primary"><strong>Lunch Section</strong></h6>
                 <div class="totalQuantuty"><strong>Pending Delivery Item: </strong><div class="number">32</div></div>
             </div>
             <div class="card-body">
@@ -91,6 +124,66 @@ if (empty($seller_access) || $seller_access !== 'verify') {
                                 </tr>
                         </tbody>
                     </table>
+                    <br/>
+                    <div class="btn_group">
+                        <button class="button button1" id="button1">Set All On Prepare</button>
+                        <button class="button button2" id="button2">Set All On Delivery</button>
+                        <button class="button button3" id="button3">Set All Done Delivery</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h4 class="m-0 font-weight-bold text-primary"><strong>Dinner Section</strong></h6>
+                <div class="totalQuantuty"><strong>Pending Delivery Item: </strong><div class="number">32</div></div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Order Date</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Duration</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                                <th>Cust_ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Order Date</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Duration</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                                <th>Cust_ID</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                                <tr>
+                                    <td>003</td>
+                                    <td>06/08/2024</td>
+                                    <td>06/08/2024</td>
+                                    <td>31/08/2024</td>
+                                    <td>25</td>
+                                    <td>2</td>
+                                    <td>Active</td>
+                                    <td>0024</td>
+                                </tr>
+                        </tbody>
+                    </table>
+                    <br/>
+                    <div class="btn_group">
+                        <button class="button button1" id="button1">Set All On Prepare</button>
+                        <button class="button button2" id="button2">Set All On Delivery</button>
+                        <button class="button button3" id="button3">Set All Done Delivery</button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -3,6 +3,7 @@ $page_title = "Order list";
 $current_page = basename(__FILE__);
 include_once '../partials/staff_nav.php';
 include_once '../resource/Database.php';
+include_once '../resource/session.php';
 
 $seller_id = $_SESSION['seller_id'];
 $seller_access = $_SESSION['access'];
@@ -12,6 +13,7 @@ if (empty($seller_access) || $seller_access !== 'verify') {
     exit;
 }
 
+// Fetch Plan Detail
 $query = "SELECT id, plan_name FROM plan WHERE seller_id = :seller_id";
 $stmt = $db->prepare($query);
 $stmt->bindParam(':seller_id', $seller_id);
@@ -107,6 +109,7 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="totalQuantity"><strong> Active Order Quantity: </strong>
                             <div class="number"><?php echo $totalQuantity; ?></div>
                         </div>
+
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -141,6 +144,7 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                            <button class="btn btn-primary generate-receipt" data-plan-id="<?php echo $plan['id']; ?>" data-meal="<?php echo $meal; ?>">Generate Receipt</button>
                         </div>
                     </div>
                 </div>
@@ -223,6 +227,7 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
     <script>
+        //Table format fomr https://datatables.net/
         $(document).ready(function() {
             <?php foreach ($plans as $plan): ?>
                 <?php foreach ($meals as $meal): ?>
@@ -242,6 +247,8 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $('.meal-table[data-meal="' + meal + '"]').addClass('active');
             });
         });
+
+        //Toggle Button
         $(document).ready(function() {
             var dataTable = $('#dataTableAllOrders').DataTable();
 
@@ -261,6 +268,31 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 });
 
                 dataTable.draw();
+            });
+        });
+
+        //Print receipt Function
+        $(document).ready(function() {
+            $('.generate-receipt').on('click', function() {
+                var planId = $(this).data('plan-id');
+                var meal = $(this).data('meal');
+                $.ajax({
+                    url: 'generate_receipt.php',
+                    type: 'POST',
+                    data: {
+                        plan_id: planId,
+                        meal: meal
+                    },
+                    success: function(response) {
+                        var receiptWindow = window.open('', '_blank');
+                        receiptWindow.document.write(response);
+                        receiptWindow.document.close();
+                        receiptWindow.print();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('An error occurred while generating the receipt.');
+                    }
+                });
             });
         });
     </script>

@@ -54,7 +54,7 @@
                     echo "<div class='plan-info'>";
                     echo "<h1>" . $planName . "</h1>";
                     echo "<p>" . $planDescription . "</p>";
-                    echo "<p class='price'>Price: $" . $planPrice . "</p>";
+                    echo "<p class='price'>Price: RM" . $planPrice . "</p>";
                     echo "</div>";
                 } else {
                     echo "<p>Plan not found.</p>";
@@ -70,10 +70,18 @@
                 <form action="add_order.php" method="POST" onsubmit="return validateDates();">
                     <!-- Hidden field to store the Plan ID -->
                     <input type="hidden" name="plan_id" value="<?php echo $plan_id; ?>">
+                    <input type="hidden" name="plan_price" value="<?php echo $planPrice; ?>">
 
                     <!-- Quantity -->
                     <label for="quantity">Quantity:</label>
                     <input type="number" name="quantity" id="quantity" value="1" min="1" required>
+
+                    <!-- Meal Selection -->
+                    <label for="meal">Meal:</label>
+                    <select name="meal" id="meal" required>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Dinner">Dinner</option>
+                    </select>
 
                     <!-- Delivery Address -->
                     <label for="delivery_address">Delivery Address:</label>
@@ -118,10 +126,10 @@
 
                     <!-- Grand Total (display only, calculated dynamically with JavaScript) -->
                     <label for="grand_total">Grand Total:</label>
-                    <input type="text" name="grand_total" id="grand_total" value="$<?php echo $planPrice; ?>" readonly>
+                    <input type="text" name="grand_total" id="grand_total" value="RM <?php echo $planPrice; ?>" readonly>
 
-                    <!-- Submit Button -->
-                    <button type="submit" class="btn">Add Order</button>
+                    <!-- Checkout Button -->
+                    <button type="submit" class="btn">Checkout</button>
                 </form>
             </div>
         </div>
@@ -156,35 +164,38 @@
             dots[slideIndex-1].className += " active";
         }
 
-        // Set minimum start date as tomorrow and calculate duration
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
         const durationInput = document.getElementById('duration');
         const grandTotalInput = document.getElementById('grand_total');
+        const quantityInput = document.getElementById('quantity');
 
         const today = new Date();
         today.setDate(today.getDate() + 1);
         const minDate = today.toISOString().split('T')[0];
         startDateInput.setAttribute('min', minDate);
+        endDateInput.setAttribute('min', minDate);
 
         startDateInput.addEventListener('change', calculateDuration);
         endDateInput.addEventListener('change', calculateDuration);
+        quantityInput.addEventListener('change', calculateDuration);
 
         function calculateDuration() {
             const startDate = new Date(startDateInput.value);
             const endDate = new Date(endDateInput.value);
+            const quantity = parseInt(quantityInput.value);
 
             if (startDate && endDate && endDate >= startDate) {
                 const timeDiff = Math.abs(endDate - startDate);
-                const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1; // Include both start and end dates
+                const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
                 durationInput.value = daysDiff;
 
                 const pricePerDay = <?php echo $planPrice; ?>;
-                const grandTotal = pricePerDay * daysDiff;
-                grandTotalInput.value = "$" + grandTotal.toFixed(2);
+                const grandTotal = pricePerDay * daysDiff * quantity;
+                grandTotalInput.value = "RM" + grandTotal.toFixed(2);
             } else {
                 durationInput.value = '';
-                grandTotalInput.value = "$<?php echo $planPrice; ?>";
+                grandTotalInput.value = "RM <?php echo $planPrice; ?>";
             }
         }
 

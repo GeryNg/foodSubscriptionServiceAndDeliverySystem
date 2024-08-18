@@ -14,4 +14,3 @@ coming soon:
 
 live tracking
 email（user create好账户后send一个email给他）
-seller pro??? (可以连接多个账户)

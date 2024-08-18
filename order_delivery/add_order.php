@@ -5,6 +5,7 @@ include '../resource/session.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $plan_id = intval($_POST['plan_id']);
     $quantity = intval($_POST['quantity']);
+    $meal = $_POST['meal']; // Get the meal selection from the form
     $delivery_address_id = intval($_POST['delivery_address_id']);
     $instructions = $_POST['instructions'];
     $start_date = $_POST['start_date'];
@@ -24,11 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Calculate the grand total
         $grandTotal = $price * $quantity * $duration;
 
-        // Insert the order into the order_cust table with status set to 'Inactive'
-        $sql = "INSERT INTO order_cust (OrderDate, GrandTotal, Status, Duration, StartDate, EndDate, Quantity, Cust_ID, Plan_ID, delivery_address_id, instructions) 
-                VALUES (NOW(), :grandTotal, 'Inactive', :duration, :start_date, :end_date, :quantity, :cust_id, :plan_id, :delivery_address_id, :instructions)";
+        // Insert the order into the order_cust table with the meal selection
+        $sql = "INSERT INTO order_cust (OrderDate, GrandTotal, Status, Meal, Duration, StartDate, EndDate, Quantity, Cust_ID, Plan_ID, delivery_address_id, instructions) 
+                VALUES (NOW(), :grandTotal, 'Inactive', :meal, :duration, :start_date, :end_date, :quantity, :cust_id, :plan_id, :delivery_address_id, :instructions)";
         $statement = $db->prepare($sql);
         $statement->bindParam(':grandTotal', $grandTotal, PDO::PARAM_STR);
+        $statement->bindParam(':meal', $meal, PDO::PARAM_STR); // Bind the meal parameter
         $statement->bindParam(':duration', $duration, PDO::PARAM_INT);
         $statement->bindParam(':start_date', $start_date, PDO::PARAM_STR);
         $statement->bindParam(':end_date', $end_date, PDO::PARAM_STR);

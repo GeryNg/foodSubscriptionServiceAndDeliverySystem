@@ -76,6 +76,13 @@
                     <label for="quantity">Quantity:</label>
                     <input type="number" name="quantity" id="quantity" value="1" min="1" required>
 
+                    <!-- Meal Selection -->
+                    <label for="meal">Meal:</label>
+                    <select name="meal" id="meal" required>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Dinner">Dinner</option>
+                    </select>
+
                     <!-- Delivery Address -->
                     <label for="delivery_address">Delivery Address:</label>
                     <select name="delivery_address_id" id="delivery_address" required>
@@ -185,10 +192,10 @@
 
                 const pricePerDay = <?php echo $planPrice; ?>;
                 const grandTotal = pricePerDay * daysDiff * quantity;
-                grandTotalInput.value = "$" + grandTotal.toFixed(2);
+                grandTotalInput.value = "RM" + grandTotal.toFixed(2);
             } else {
                 durationInput.value = '';
-                grandTotalInput.value = "$<?php echo $planPrice; ?>";
+                grandTotalInput.value = "RM <?php echo $planPrice; ?>";
             }
         }
 

@@ -18,7 +18,7 @@
             $cust_id = $_SESSION['Cust_ID']; // Assuming the user ID is stored in session
             $sql = "SELECT order_cust.Order_ID, order_cust.OrderDate, order_cust.Duration, 
                            order_cust.StartDate, order_cust.EndDate, order_cust.Quantity, 
-                           order_cust.Status, order_cust.GrandTotal, plan.plan_name 
+                           order_cust.Status, order_cust.GrandTotal, order_cust.Meal, plan.plan_name 
                     FROM order_cust 
                     INNER JOIN plan ON order_cust.Plan_ID = plan.id 
                     WHERE order_cust.Cust_ID = :cust_id 
@@ -38,11 +38,13 @@
                     $quantity = htmlspecialchars($row['Quantity'], ENT_QUOTES, 'UTF-8');
                     $status = htmlspecialchars($row['Status'], ENT_QUOTES, 'UTF-8');
                     $grand_total = htmlspecialchars($row['GrandTotal'], ENT_QUOTES, 'UTF-8');
+                    $meal = htmlspecialchars($row['Meal'], ENT_QUOTES, 'UTF-8'); 
 
                     echo "<div class='order-card'>";
                     echo "<h3>Order #$order_id</h3>";
                     echo "<p><strong>Plan:</strong> $plan_name</p>";
                     echo "<p><strong>Order Date:</strong> $order_date</p>";
+                    echo "<p><strong>Meal:</strong> $meal</p>"; 
                     echo "<p><strong>Duration:</strong> $duration days ($start_date to $end_date)</p>";
                     echo "<p><strong>Quantity:</strong> $quantity</p>";
                     echo "<p><strong>Status:</strong> $status</p>";

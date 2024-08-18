@@ -31,10 +31,12 @@
                 $planName = htmlspecialchars($order['plan_name'], ENT_QUOTES, 'UTF-8');
                 $quantity = $order['Quantity'];
                 $duration = $order['Duration'];
+                $meal = htmlspecialchars($order['Meal'], ENT_QUOTES, 'UTF-8'); 
                 $grandTotal = number_format($order['GrandTotal'], 2);
 
                 echo "<p><strong>Plan:</strong> $planName</p>";
                 echo "<p><strong>Quantity:</strong> $quantity</p>";
+                echo "<p><strong>Meal:</strong> $meal</p>"; 
                 echo "<p><strong>Start Date:</strong> {$order['StartDate']}</p>";
                 echo "<p><strong>End Date:</strong> {$order['EndDate']}</p>";
                 echo "<p><strong>Duration:</strong> $duration days</p>";

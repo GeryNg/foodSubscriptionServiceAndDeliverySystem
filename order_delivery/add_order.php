@@ -24,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Calculate the grand total
         $grandTotal = $price * $quantity * $duration;
 
-        // Insert the order into the order_cust table
+        // Insert the order into the order_cust table with status set to 'Inactive'
         $sql = "INSERT INTO order_cust (OrderDate, GrandTotal, Status, Duration, StartDate, EndDate, Quantity, Cust_ID, Plan_ID, delivery_address_id, instructions) 
-                VALUES (NOW(), :grandTotal, 'Active', :duration, :start_date, :end_date, :quantity, :cust_id, :plan_id, :delivery_address_id, :instructions)";
+                VALUES (NOW(), :grandTotal, 'Inactive', :duration, :start_date, :end_date, :quantity, :cust_id, :plan_id, :delivery_address_id, :instructions)";
         $statement = $db->prepare($sql);
         $statement->bindParam(':grandTotal', $grandTotal, PDO::PARAM_STR);
         $statement->bindParam(':duration', $duration, PDO::PARAM_INT);
@@ -54,3 +54,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 } else {
     echo "<script>alert('Invalid request. Please try again.'); window.location.href = 'orders.php';</script>";
 }
+?>

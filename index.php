@@ -39,7 +39,7 @@ include_once 'partials/headers.php';
             </div>
             <div class="secondary-text">
                 <h2>Food need not be fussy</h2>
-                <p>Homecook soul food that will remind you of your mother's cooking</p>
+                <p>Homecook soul food that will remind you of your mother's cooking</p>               
             </div>
         </div>
     </section>

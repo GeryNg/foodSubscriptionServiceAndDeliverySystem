@@ -34,7 +34,7 @@
                     echo "<div class='slideshow-container'>";
                     foreach ($planImages as $index => $image) {
                         echo "<div class='mySlides'>";
-                        echo "<img src='" . trim($image) . "' style='width:100%'>";
+                        echo "<center><img src='" . trim($image) . "' ></center>";
                         echo "</div>";
                     }
                     echo "<a class='prev' onclick='plusSlides(-1)'>&#10094;</a>";

@@ -30,7 +30,8 @@
 }
 
 .plan-images img {
-    max-height: 400px; /* Limit the height of the images */
+    height: auto;
+    max-height: fit-content;
     width: auto;
     display: block;
 }
@@ -43,7 +44,9 @@
 }
 
 .mySlides {
+    justify-content: flex-end;
     display: none;
+    background-color: antiquewhite;
 }
 
 /* Thumbnail images */

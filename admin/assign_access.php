@@ -172,7 +172,6 @@ if (isset($_GET['seller_id'])) {
 </head>
 
 <body>
-<h1 class="h3 mb-2 text-gray-800" style="margin: 20px;">Assign Table</h1><hr/>
     <div class="container">
         <h1>Seller Basic Information</h1><br />
         <form action="update_seller_access.php" method="post">

@@ -1,5 +1,4 @@
 <?php
-
 include_once '../resource/Database.php';
 include_once '../resource/utilities.php';
 
@@ -131,4 +130,3 @@ if ((isset($_SESSION['id']) || isset($_GET['user_identify'])) && !isset($_POST['
         $result .= show_errors($form_errors);
     }
 }
-?>

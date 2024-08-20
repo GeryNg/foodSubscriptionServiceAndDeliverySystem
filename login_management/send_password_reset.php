@@ -1,5 +1,8 @@
 <?php
+$page_title = "User Authentication - Password Recovery";
 include_once '../resource/Database.php';
+include_once '../resource/session.php';
+include_once '../partials/headers.php';
 
 if (!isset($db)) {
     die("Database connection not established.");
@@ -30,17 +33,43 @@ if ($stmt->rowCount() > 0) {
     $mail->Subject = "Password Reset";
     $mail->Body = <<<END
     <p>Click <a href="http://localhost:3000/login_management/reset_password.php?token=$token">here</a> to reset your password.</p>
-    END;    
+    END;
 
     try {
         $mail->send();
-        echo "Message sent, please check your inbox.";
+        echo "<script>
+            swal({
+                title: 'Success',
+                text: 'Message sent, please check your inbox. Maybe in your spam folder',
+                icon: 'success',
+                button: 'OK'
+            }).then(function() {
+                window.location.href = '../login_management/login.php';
+            });
+        </script>";
     } catch (Exception $e) {
-        echo "Message could not be sent. Mailer error: {$mail->ErrorInfo}";
+        echo "<script>
+        swal({
+            title: 'Error',
+            text: 'Message could not be sent. Mailer error: {$mail->ErrorInfo}',
+            type: 'error',
+            confirmButtonText: 'OK'
+        });
+            setTimeout(function(){
+            window.location.href = '../login_management/login.php';
+            }, 3000);
+        </script>";
     }
 } else {
-    echo "No matching email found, or token not set.";
+    echo "<script>
+    swal({
+        title: 'Error',
+        text: 'No matching email found, or token not set.',
+        type: 'error',
+        confirmButtonText: 'OK'
+    });
+        setTimeout(function(){
+        window.location.href = '../login_management/login.php';
+        }, 3000);
+    </script>";
 }
-
-
-

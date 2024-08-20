@@ -1,6 +1,6 @@
 <?php
-    $page_title = "User Authentication - Password Recovery";
-    include_once '../partials/headers.php';
+$page_title = "User Authentication - Password Recovery";
+include_once '../partials/headers.php';
 ?>
 
 <!DOCTYPE HTML>
@@ -9,7 +9,8 @@
 <head lang="en">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert/dist/sweetalert.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert/dist/sweetalert.min.js"></script>
     <style>
         .main-container {
             margin-top: 20px;
@@ -42,14 +43,11 @@
 </head>
 
 <body>
-
-
     <div class="main-container">
         <main class="form-signin">
             <form method="post" action="send_password_reset.php">
                 <img class="mb-4" src="../image/logo-rounded.png" alt="Logo" width="80" height="80">
                 <h1 class="h3 mb-3 fw-normal">Password Revovery</h1>
-
                 <?php if (isset($result) || !empty($form_errors)): ?>
                     <div>
                         <?php echo show_combined_messages($result, $form_errors); ?>
@@ -70,11 +68,10 @@
             </form>
         </main>
     </div>
-
-
-
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-q/gThh3Fv0LVQNADnE8wrfFHTX9pSR4xD6oJ/bh1SvQOgavPaOvInlK0UrrXkgx4" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-ym9WY18K7F4+DA8BZBQ8nK7K5bGyQXTKBRUjog9pa7BrpprAP+KEKWDDYV9oHBB8" crossorigin="anonymous"></script>
 </body>
 
 </html>
+
+<?php include_once '../partials/footer.php'; ?>

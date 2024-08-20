@@ -1,10 +1,13 @@
 <?php
-$token = $_GET["token"];
-$token_hash = hash("sha256", $token);
-
+$page_title = "User Authentication - Password Reset";
+include_once '../partials/headers.php';
 include_once "../resource/Database.php";
 include_once "../resource/session.php";
 include_once "../resource/utilities.php";
+
+// Check token
+$token = $_GET["token"];
+$token_hash = hash("sha256", $token);
 
 $sql = "SELECT * FROM users WHERE reset_token_hash = :token_hash";
 $stmt = $db->prepare($sql);
@@ -16,11 +19,11 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 if ($user === false) {
     die("Token not found");
 }
-
 if (strtotime($user["reset_token_expires_at"]) <= time()) {
     die("Token has expired");
 }
 ?>
+
 <?php
 if (isset($_POST['passwordResetBtn'])) {
     $form_errors = array();
@@ -47,17 +50,15 @@ if (isset($_POST['passwordResetBtn'])) {
                 $statement->execute(array(':password' => $hashed_password, ':token_hash' => $token_hash));
 
                 echo "<script>
-                Swal.fire({
-                title: 'Password Reset Successfully!',
-                text: 'Your password has been reset successfully',
-                icon: 'success',
-                confirmButtonText: 'Go To Homepage'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '../index.php';
-                    }
+                swal({
+                    title: 'Password Reset Successfully!',
+                    text: 'Your password has been reset successfully',
+                    type: 'success',
+                    confirmButtonText: 'Go To Homepage'
+                }, function() {
+                    window.location.href = '../index.php';
                 });
-              </script>";
+                </script>";
         
             } catch (PDOException $ex) {
                 $result = "<p style='padding: 10px; color: #58151c;'>An error occurred: " . $ex->getMessage() . "</p>";
@@ -69,13 +70,11 @@ if (isset($_POST['passwordResetBtn'])) {
 
 <!DOCTYPE HTML>
 <html>
-
 <head lang="en">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.all.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert/dist/sweetalert.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert/dist/sweetalert.min.js"></script>
     <style>
         .form-signin {
             max-width: 500px;
@@ -100,21 +99,15 @@ if (isset($_POST['passwordResetBtn'])) {
 </head>
 
 <body>
-    <?php
-    $page_title = "User Authentication - Password Reset";
-    include_once '../partials/headers.php';
-    ?>
     <main class="form-signin">
         <form method="post" action="">
             <img class="mb-4" src="../image/logo-rounded.png" alt="Logo" width="80" height="80">
             <h1 class="h3 mb-3 fw-normal">Reset Password Form</h1>
-
             <?php if (isset($result) || !empty($form_errors)) : ?>
                 <div>
                     <?php echo show_combined_messages($result, $form_errors); ?>
                 </div>
             <?php endif; ?>
-
             <div class="form-floating">
                 <input type="password" class="form-control" id="floatingPassword" name="new_password" placeholder="Password" required>
                 <label for="floatingPassword">Password</label>
@@ -128,8 +121,9 @@ if (isset($_POST['passwordResetBtn'])) {
             <p class="mt-5 mb-3 text-body-secondary">© 2024-2024</p>
         </form>
     </main>
-
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-q/gThh3Fv0LVQNADnE8wrfFHTX9pSR4xD6oJ/bh1SvQOgavPaOvInlK0UrrXkgx4" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-ym9WY18K7F4+DA8BZBQ8nK7K5bGyQXTKBRUjog9pa7BrpprAP+KEKWDDYV9oHBB8" crossorigin="anonymous"></script>
 </body>
 </html>
+
+<?php include_once '../partials/footer.php';?>

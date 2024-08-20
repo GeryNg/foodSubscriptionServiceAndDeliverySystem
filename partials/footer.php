@@ -1,6 +1,7 @@
 <style>
 footer{
   background-color: #111111;
+  margin-top: 8%;
 }
 div.container-footer.w-container {
   box-sizing: border-box;
@@ -286,8 +287,8 @@ strong.link-email-footer {
   font-weight: 700;
 }
 </style>
-<!-- footer section start -->
- <footer>
+
+<footer>
 <div class="container-footer w-container">
   <div class="w-row">
     <div class="footer-column w-clearfix w-col w-col-4" style="display: block; right:auto; left:auto;">
@@ -300,11 +301,11 @@ strong.link-email-footer {
           <div class="w-row">
             <div class="w-col w-col-7 w-col-small-6 w-col-tiny-7">
               <h3 class="footer-titles">Service</h3>
-              <p class="footer-links"><a href="../index.php" target="_blank"><span class="footer-link">Homepage<br></span></a><a href="#"><span class="footer-link">Restaurant<br></span></a><a href="#"><span class="footer-link">Plan</span></a><span><br></span><a href="#"><span class="footer-link">Review<br></span></a><a href="#"><span class="footer-link">Customer Support<br></span></a><a href="#"><span class="footer-link">Profile<br></span></a>
+              <p class="footer-links"><a href="../index.php"><span class="footer-link">Homepage<br></span></a><a href="../Restaurant/restaurants.php"><span class="footer-link">Restaurant<br></span></a><a href="../Restaurant/restaurant_plan.php"><span class="footer-link">Plan</span></a><span><br></span><a href="#"><span class="footer-link">Review<br></span></a><a href="../customer_support/live_chat.php"><span class="footer-link">Customer Support<br></span></a><a href="../profile_management/profile.php"><span class="footer-link">Profile<br></span></a>
             </div>
             <div class="w-col w-col-5 w-col-small-6 w-col-tiny-5">
               <h3 class="footer-titles">Other</h3>
-              <p class="footer-links"><a href="#"><span class="footer-link">Delivery Area<br></span></a><a href="#"><span class="footer-link">About Us<br></span></a><a href="#"><span class="footer-link">Join Us<br></span></a><a href="#"><span class="footer-link">Seller Page<br></span></a><a href=""><span class="footer-link">FAQ</span></a><strong><br></strong></p>
+              <p class="footer-links"><a href="#"><span class="footer-link">Delivery Area<br></span></a><a href="#"><span class="footer-link">About Us<br></span></a><a href="../login_management/seller_singup.php"><span class="footer-link">Join Us<br></span></a><a href="../partials/seller_dashboard.php"><span class="footer-link">Seller Page<br></span></a><a href=""><span class="footer-link">FAQ</span></a><strong><br></strong></p>
             </div>
           </div>
         </div>
@@ -317,4 +318,4 @@ strong.link-email-footer {
     </div>
   </div>
 </div>
- </footer>
+</footer>

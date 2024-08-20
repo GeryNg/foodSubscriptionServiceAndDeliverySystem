@@ -4,7 +4,6 @@ include_once '../resource/Database.php';
 include_once '../resource/utilities.php';
 
 if (isset($_POST['signupBtn'])) {
-    // Initialize error array
     $form_errors = array();
 
     // Required fields
@@ -43,7 +42,6 @@ if (isset($_POST['signupBtn'])) {
     } elseif (checkDuplicateEntries("users", "username", $username, $db)) {
         $result = flashMessage("Username is already taken, please try another one");
     } elseif (empty($form_errors)) {
-        // Hashing the password
         $hashed_password = password_hash($password1, PASSWORD_DEFAULT);
 
         try {

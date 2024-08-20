@@ -1,5 +1,8 @@
+
+
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,24 +12,30 @@
         .pull-right {
             float: right !important;
         }
+
         .btn {
             margin-top: 10px;
         }
+
         .document-image {
             max-width: 200px;
             max-height: 200px;
             margin-bottom: 10px;
             margin: 10px;
+            cursor: pointer;
         }
+
         .profile-picture {
             max-width: 200px;
             max-height: 200px;
             margin-bottom: 10px;
         }
+
         .documents-container {
             display: flex;
             flex-wrap: wrap;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -40,20 +49,30 @@
             background-color: rgb(0, 0, 0);
             background-color: rgba(0, 0, 0, 0.9);
         }
+
         .modal-content {
             margin: auto;
             display: block;
             width: 80%;
             max-width: 500px;
         }
-        .modal-content, #caption {
+
+        .modal-content,
+        #caption {
             animation-name: zoom;
             animation-duration: 0.6s;
         }
+
         @keyframes zoom {
-            from {transform: scale(0)}
-            to {transform: scale(1)}
+            from {
+                transform: scale(0)
+            }
+
+            to {
+                transform: scale(1)
+            }
         }
+
         .close {
             position: absolute;
             top: 15px;
@@ -63,12 +82,14 @@
             font-weight: bold;
             transition: 0.3s;
         }
+
         .close:hover,
         .close:focus {
             color: #bbb;
             text-decoration: none;
             cursor: pointer;
         }
+
         #caption {
             margin: auto;
             display: block;
@@ -79,6 +100,7 @@
             padding: 10px 0;
             height: 150px;
         }
+
         @media only screen and (max-width: 700px) {
             .modal-content {
                 width: 100%;
@@ -86,155 +108,30 @@
         }
     </style>
 </head>
-<body>
 
+<body>
 <?php
     $page_title = "Edit Seller Information";
-    include_once "../partials/staff_nav.php";
-    include_once '../resource/Database.php';
-    include_once '../resource/session.php';
-
-    $result = '';
-    $form_errors = array();
-    $name = '';
-    $detail = '';
-    $contact_number = '';
-    $address = '';
-    $bank_account = '';
-    $documents = '';
-    $profile_pic = '';
-    $seller = [];
-
-    $user_id = $_SESSION['id'];
-
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        try {
-            $query = "SELECT * FROM seller WHERE user_id = :user_id";
-            $stmt = $db->prepare($query);
-            $stmt->execute([':user_id' => $user_id]);
-            $seller = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($seller) {
-                $name = $seller['name'];
-                $detail = $seller['detail'];
-                $contact_number = $seller['contact_number'];
-                $address = $seller['address'];
-                $bank_account = $seller['bank_account'];
-                $documents = $seller['image_urls'];
-                $profile_pic = $seller['profile_pic'];
-                $id = $seller['id'];
-            } else {
-                echo '<p>No seller data found.</p>';
-            }
-        } catch (PDOException $ex) {
-            echo "Error fetching seller data: " . $ex->getMessage();
-        }
-    }
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateSellerInformation'])) {
-        $name = $_POST['name'];
-        $detail = $_POST['detail'];
-        $contact_number = $_POST['contact_number'];
-        $address = $_POST['address'];
-        $bank_account = $_POST['bank_account'];
-        $hidden_id = $_POST['hidden_id'];
-
-        $existing_documents = $_POST['existing_documents'];
-        $existing_profile_pic = $_POST['existing_profile_pic'];
-
-        $uploaded_files = isset($_FILES['document_image']['name']) ? $_FILES['document_image']['name'] : [];
-        $profile_pic_file = isset($_FILES['profile_pic']['name']) ? $_FILES['profile_pic']['name'] : '';
-
-        if (!empty($uploaded_files[0])) {
-            $upload_paths = [];
-            foreach ($_FILES['document_image']['tmp_name'] as $key => $tmp_name) {
-                $file_ext = pathinfo($uploaded_files[$key], PATHINFO_EXTENSION);
-                $unique_file_name = uniqid('seller_', true) . '.' . $file_ext;
-                $file_path = '../document/' . $unique_file_name;
-                if (move_uploaded_file($tmp_name, $file_path)) {
-                    $upload_paths[] = $file_path;
-                } else {
-                    $form_errors[] = "Failed to upload file: " . htmlspecialchars($uploaded_files[$key]);
-                }
-            }
-            if (!empty($upload_paths)) {
-                $documents = empty($existing_documents) ? implode(',', $upload_paths) : $existing_documents . ',' . implode(',', $upload_paths);
-            }
-        } else {
-            $documents = $existing_documents;
-        }
-
-        if (!empty($profile_pic_file)) {
-            $file_ext = pathinfo($profile_pic_file, PATHINFO_EXTENSION);
-            $unique_file_name = uniqid('profile_', true) . '.' . $file_ext;
-            $profile_pic_path = '../seller_profile_pic/' . $unique_file_name;
-            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $profile_pic_path)) {
-                $profile_pic = $profile_pic_path;
-            } else {
-                $form_errors[] = "Failed to upload profile picture.";
-            }
-        } else {
-            $profile_pic = $existing_profile_pic;
-        }
-
-        if (empty($form_errors)) {
-            try {
-                $query = "UPDATE seller SET name = :name, detail = :detail, contact_number = :contact_number, address = :address, bank_account = :bank_account, image_urls = :documents, profile_pic = :profile_pic WHERE id = :id";
-                $stmt = $db->prepare($query);
-                $stmt->execute([
-                    ':name' => $name,
-                    ':profile_pic' => $profile_pic,
-                    ':detail' => $detail,
-                    ':contact_number' => $contact_number,
-                    ':address' => $address,
-                    ':bank_account' => $bank_account,
-                    ':documents' => $documents,
-                    ':id' => $hidden_id
-                ]);
-
-                if ($stmt->rowCount() == 1) {
-                    echo "<script type=\"text/javascript\">
-                        swal({
-                            title: \"Good job!\",
-                            text: \"Profile updated successfully!\",
-                            icon: \"success\",
-                            button: \"OK\"
-                        }).then(function() {
-                            window.location.href = 'seller_profile.php';
-                        });
-                    </script>";
-                } else {
-                    echo "<script type=\"text/javascript\">
-                        swal({
-                            title: \"Nothing Happened\",
-                            text: \"You have not made any changes\",
-                            icon: \"info\"
-                        }).then(function() {
-                            window.location.href = 'seller_profile.php';
-                        });
-                    </script>";
-                }
-            } catch (PDOException $ex) {
-                $result = flashMessage("An error occurred: " . $ex->getMessage());
-            }
-        } else {
-            $result = flashMessage("There were errors in the form<br>");
-            $result .= show_errors($form_errors);
-        }
-    }
+    include_once '../partials/staff_nav.php';
+    include_once '../resource/utilities.php';
+    include_once '../partials/parseSellerEditInformation.php';
 ?>
 
     <div class="container" style="margin-top:50px; margin-bottom:80px;">
         <section class="col col-lg-7">
-            <h2>Edit Profile</h2>
+            <h1>Edit Profile</h1>
 
             <?php if (isset($result) || !empty($form_errors)): ?>
                 <div>
                     <?php echo show_combined_messages($result, $form_errors); ?>
                 </div>
             <?php endif; ?>
+            <div class="clearfix"></div>
 
-            <?php if (!empty($seller)): ?>
+            <?php if (!isset($_SESSION['username'])): ?>
+                <p class="lead">You are not authorized to view this page. <a href="login.php">Login</a>
+                    Not yet a member? <a href="../login_management/signup.php">Signup</a></p>
+            <?php else: ?>
                 <form method="post" action="" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="nameField">Name</label>
@@ -251,7 +148,7 @@
                         <input type="file" name="profile_pic" class="form-control" id="profilePicField" />
                         <input type="hidden" name="existing_profile_pic" value="<?php echo htmlspecialchars($profile_pic); ?>" />
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="detailField">Detail</label>
                         <input type="text" name="detail" class="form-control" id="detailField" value="<?php echo htmlspecialchars($detail); ?>" />
@@ -271,21 +168,27 @@
                         <label for="bankAccountField">Bank Account</label>
                         <input type="text" name="bank_account" class="form-control" id="bankAccountField" value="<?php echo htmlspecialchars($bank_account); ?>" />
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="documentImagesField">Documents</label>
                         <div id="documentImagesField" class="documents-container">
                             <?php
-                                if (!empty($documents)) {
-                                    $document_urls = explode(',', $documents);
-                                    foreach ($document_urls as $document_url) {
-                                        echo '<div class="mb-2"><img src="' . htmlspecialchars($document_url) . '" alt="Document Image" class="document-image" onclick="openModal(this)" /></div>';
-                                    }
+                            if (!empty($documents)) {
+                                $document_urls = explode(',', $documents);
+                                foreach ($document_urls as $document_url) {
+                                    echo '<div class="image-wrapper mb-2 position-relative">';
+                                    echo '<button type="button" class="btn btn-danger btn-sm position-absolute top-0 translate-middle" onclick="deleteImage(this, \'' . htmlspecialchars($document_url) . '\')">';
+                                    echo '<i class="far fa-trash-alt"></i>';
+                                    echo '</button>';
+                                    echo '<img src="' . htmlspecialchars($document_url) . '" alt="Document Image" class="document-image" onclick="openModal(this)" />';
+                                    echo '</div>';
                                 }
+                            }
                             ?>
                         </div>
                         <input type="file" name="document_image[]" class="form-control" id="documentImagesField" multiple />
                         <input type="hidden" name="existing_documents" value="<?php echo htmlspecialchars($documents); ?>" />
+                        <input type="hidden" id="deleted_images" name="deleted_images" value="" />
                     </div>
 
                     <input type="hidden" name="hidden_id" value="<?php if (isset($id)) echo $id; ?>" />
@@ -302,6 +205,21 @@
     </div>
 
     <script>
+        function deleteImage(button, imageUrl) {
+            var imageWrapper = button.closest('.image-wrapper');
+            imageWrapper.remove();
+
+            var deletedImagesInput = document.getElementById('deleted_images');
+            var deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
+
+            // Add the imageUrl to the list of deleted images
+            deletedImages.push(imageUrl);
+
+            // Update the hidden input field with the updated list of deleted images
+            deletedImagesInput.value = deletedImages.join(',');
+        }
+
+        // Modal for viewing the image
         var modal = document.getElementById("myModal");
         var modalImg = document.getElementById("img01");
         var captionText = document.getElementById("caption");
@@ -322,5 +240,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.all.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 </body>
+
 </html>

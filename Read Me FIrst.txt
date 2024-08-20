@@ -1,6 +1,6 @@
-1. reset_password.php 里面的sweet alert 不能用，要fix
-
-2. reset_password.php 里面的phpmailer如果有放上去online要换https...
+1. reset_password.php 里面的phpmailer如果有放上去online要换https...
+2. admin 的live chat 跟 dashboard 还没有做
+5. weather 的换一下 (api没有work要看明天)
 
 
 -----

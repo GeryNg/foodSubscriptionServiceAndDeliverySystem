@@ -23,6 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $insertStmt->bindParam(':company_id', $company_id, PDO::PARAM_INT);
                 $insertStmt->execute();
 
+                $updateQuery = "UPDATE seller SET access = 'linked' WHERE user_id = :user_id";
+                $updateStmt = $db->prepare($updateQuery);
+                $updateStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $updateStmt->execute();
+
+                $_SESSION['access'] ='linked';
+
                 echo "<script>
                 swal({
                   title: \"Success\",
@@ -34,13 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }, 2000);
                 </script>";
             } else {
-                echo "<script>Swal.fire('Error', 'Invalid company or the request is not open.', 'error');</script>";//got problem
+                echo "<script>Swal.fire('Error', 'Invalid company or the request is not open.', 'error');</script>"; //got problem
             }
         } catch (PDOException $ex) {
-            echo "<script>Swal.fire('Error', 'An error occurred: " . addslashes($ex->getMessage()) . "', 'error');</script>";//got problem
+            echo "<script>Swal.fire('Error', 'An error occurred: " . addslashes($ex->getMessage()) . "', 'error');</script>"; //got problem
         }
     } else {
-        echo "<script>Swal.fire('Error', 'Company ID is missing.', 'error');</script>";//got problem
+        echo "<script>Swal.fire('Error', 'Company ID is missing.', 'error');</script>"; //got problem
     }
 
     exit;

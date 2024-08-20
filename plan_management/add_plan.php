@@ -16,6 +16,7 @@ if (empty($seller_access) || $seller_access !== 'verify') {
 
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -24,6 +25,7 @@ if (empty($seller_access) || $seller_access !== 'verify') {
             padding: 20px;
             background-color: #f3f3f3;
         }
+
         .container {
             background: white;
             max-width: 600px;
@@ -31,14 +33,17 @@ if (empty($seller_access) || $seller_access !== 'verify') {
             padding: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             color: #333;
         }
+
         label {
             margin-bottom: 10px;
             display: block;
             color: #666;
         }
+
         input[type="text"],
         input[type="number"],
         textarea,
@@ -49,6 +54,7 @@ if (empty($seller_access) || $seller_access !== 'verify') {
             margin-bottom: 20px;
             box-sizing: border-box;
         }
+
         .button1 {
             background-color: #5C67F2;
             color: white;
@@ -59,14 +65,17 @@ if (empty($seller_access) || $seller_access !== 'verify') {
             float: right;
             margin-top: 10px;
         }
+
         .button1:hover {
             background-color: #7a85ff;
         }
+
         form {
             overflow: auto;
         }
     </style>
 </head>
+
 <body>
     <div class="main-content">
         <div class="container">
@@ -74,7 +83,7 @@ if (empty($seller_access) || $seller_access !== 'verify') {
                 <h1>Add New Plan</h1>
                 <form action="" method="post" enctype="multipart/form-data">
                     <br />
-
+                    
                     <?php if (isset($result) || !empty($form_errors)): ?>
                         <div>
                             <?php echo show_combined_messages($result, $form_errors); ?>
@@ -88,8 +97,8 @@ if (empty($seller_access) || $seller_access !== 'verify') {
                     <label>Date From: <input type="date" name="date_from" id="date_from"></label><br>
                     <label>Date To: <input type="date" name="date_to" id="date_to"></label><br>
                     <label>Section:</label>
-                        <input type="checkbox" name="sections[]" value="Lunch"> Lunch<br>
-                        <input type="checkbox" name="sections[]" value="Dinner"> Dinner<br><br>
+                    <input type="checkbox" name="sections[]" value="Lunch"> Lunch<br>
+                    <input type="checkbox" name="sections[]" value="Dinner"> Dinner<br><br>
                     <label>Images (up to 6, format: jpg/jpeg/png):</label><br>
                     <input type="file" name="images[]" accept=".jpg, .jpeg, .png" multiple><br><br>
                     <button type="submit" name="AddPlanBtn" value="AddPlan" class="button1">Add Plan</button>
@@ -148,4 +157,5 @@ if (empty($seller_access) || $seller_access !== 'verify') {
         });
     </script>
 </body>
+
 </html>

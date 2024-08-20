@@ -13,6 +13,7 @@ try {
             LEFT JOIN messages m ON (u.id = CASE WHEN m.incoming_msg_id = :outgoing_id THEN m.outgoing_msg_id ELSE m.incoming_msg_id END)
             WHERE (m.incoming_msg_id = :outgoing_id OR m.outgoing_msg_id = :outgoing_id OR m.incoming_msg_id IS NULL)
             AND s.name LIKE :searchTerm
+            AND s.access = 'verify'
             ORDER BY m.msg_id DESC";
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':outgoing_id', $outgoing_id, PDO::PARAM_INT);

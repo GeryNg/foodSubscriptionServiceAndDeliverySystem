@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurants</title>
     <link rel="stylesheet" href="../css/restaurant.css">
+    <link rel="icon" type="image/x-icon" href="../image/logo-circle.png">
 </head>
 <body>
     <?php include '../partials/headers.php'; ?>
@@ -24,9 +25,10 @@
             <?php
             $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
 
-            $sql = "SELECT seller.profile_pic, seller.name, seller.detail, seller.address, seller.id FROM seller";
+            // Modify the SQL query to only select sellers with access = 'verify'
+            $sql = "SELECT seller.profile_pic, seller.name, seller.detail, seller.address, seller.id FROM seller WHERE seller.access = 'verify'";
             if (!empty($searchTerm)) {
-                $sql .= " WHERE seller.name LIKE :searchTerm";
+                $sql .= " AND seller.name LIKE :searchTerm";
             }
             $sql .= " ORDER BY seller.name";
 

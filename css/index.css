@@ -3,22 +3,18 @@ body {
     font-family: 'Merriweather Sans', sans-serif;
     line-height: 1.6;
     background-color: #f8f9fa;
-}
-
-.container {
-    max-width: 1140px;
-    margin: auto;
-    padding: 20px;
+    margin: 0;
+    padding: 0;
 }
 
 /* Hero Section Styles */
 .hero-section {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    height: 80vh;
-    background-color: #000; /* Black background */
-    color: #fff; /* White text */
+    height: 100vh; /* Full viewport height */
+    background-color: #fff; /* White background */
+    color: #000; /* Black text */
     padding: 20px;
     box-sizing: border-box;
 }
@@ -27,11 +23,8 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    background-color: #1c1c1c; /* Dark gray background */
     border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 1200px;
     width: 100%;
 }
 
@@ -44,16 +37,18 @@ body {
     font-size: 3rem;
     margin-bottom: 20px;
     font-weight: bold;
+    color: #000; /* Black text */
 }
 
 .hero-text p {
     font-size: 1.25rem;
     line-height: 1.5;
     margin-bottom: 20px;
+    color: #000; /* Black text */
 }
 
 .hero-image {
-    flex: 1;
+    flex: 1.5; /* More emphasis on the image */
     display: flex;
     justify-content: center;
 }
@@ -64,56 +59,63 @@ body {
     border-radius: 10px;
 }
 
-/* Modern Button Styles */
-.btn-modern {
+/* Button Styles */
+.btn-modern, .btn-signin, .btn-signup, .btn-order {
     display: inline-block;
-    padding: 10px 20px;
+    padding: 12px 25px;
     font-size: 1rem;
     color: #fff;
-    background-color: #007bff;
+    background-color: #28a745; /* Green button */
     border: none;
     border-radius: 5px;
     text-decoration: none;
     transition: background-color 0.3s, transform 0.3s;
+    margin-right: 10px;
 }
 
-.btn-modern:hover {
-    background-color: #0056b3;
+.btn-signup {
+    background-color: #007bff; /* Blue button for signup */
+}
+
+.btn-signin {
+    background-color: #6c757d; /* Grey button for signin */
+}
+
+.btn-modern:hover, .btn-signin:hover, .btn-signup:hover, .btn-order:hover {
+    background-color: #218838; /* Darker green on hover */
     transform: scale(1.05);
 }
 
-.btn-modern:active {
-    background-color: #004085;
+.btn-modern:active, .btn-signin:active, .btn-signup:active, .btn-order:active {
+    background-color: #1e7e34; /* Even darker green on click */
     transform: scale(1);
 }
 
 /* Secondary Section Styles */
 .secondary-section {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    height: 100vh;
+    background-color: #000; /* Black background for contrast */
+    color: #fff; /* White text */
+    padding: 50px 10%;
     box-sizing: border-box;
-    background-color: #fff; /* White background */
-    color: #000; /* Black text */
 }
 
 .secondary-container {
     display: flex;
     flex-direction: row;
     align-items: center;
-    background-color: #e9ecef; /* Light gray background */
     border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 1200px;
     width: 100%;
 }
 
 .secondary-image {
-    flex: 1;
+    flex: 1.5; /* More emphasis on the image */
     display: flex;
     justify-content: center;
+    height: 100%;
 }
 
 .secondary-image img {
@@ -131,11 +133,13 @@ body {
     font-size: 2.5rem;
     margin-bottom: 20px;
     font-weight: bold;
+    color: #fff; /* White text */
 }
 
 .secondary-text p {
     font-size: 1.25rem;
     line-height: 1.5;
+    color: #fff; /* White text */
 }
 
 /* Media Query for Responsiveness */

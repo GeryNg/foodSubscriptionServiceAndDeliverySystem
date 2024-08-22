@@ -79,3 +79,18 @@ h2 {
         font-size: 20px;
     }
 }
+
+.rate-button {
+    display: inline-block;
+    padding: 10px 15px;
+    margin-top: 10px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.rate-button:hover {
+    background-color: #0056b3;
+}
+

@@ -25,15 +25,20 @@
     padding: 25px 30px;
 }
 
-.users header,
-.users-list a {
+.users header{
     display: flex;
     align-items: center;
     padding-bottom: 20px;
     border-bottom: 1px solid #e6e6e6;
     justify-content: space-between;
 }
-
+.users-list a {
+    display: flex;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e6e6e6;
+    cursor: pointer;
+}
 .wrapper img {
     object-fit: cover;
     border-radius: 50%;
@@ -120,6 +125,7 @@
 .users .search button.active {
     background: #3E424B;
     color: #fff;
+    cursor: pointer;
 }
 
 .search button.active i::before {

@@ -1,6 +1,5 @@
 body {
     margin: 0;
-    padding: 20px;
     font-family: "Figtree", sans-serif;
     background-color: #f8f9fa;
 }
@@ -29,11 +28,11 @@ h1, h2 {
 }
 
 .avatar_image {
-    max-width: 150px; /* Adjust the max width */
-    max-height: 150px; /* Adjust the max height */
+    max-width: 150px;
+    max-height: 150px;
     width: auto;
     height: auto;
-    border-radius: 10px; /* Optionally add some border-radius */
+    border-radius: 10px;
     margin-right: 20px;
 }
 

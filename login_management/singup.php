@@ -154,3 +154,5 @@
     </script>
 </body>
 </html>
+
+<?php include_once '../partials/footer.php';?>

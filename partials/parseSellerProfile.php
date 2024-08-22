@@ -128,7 +128,6 @@ if ((isset($_SESSION['id']) || isset($_GET['user_identify'])) && !isset($_POST['
         } else {
             $result = flashMessage("There were " . count($form_errors) . " errors in the form <br>");
         }
-        $result .= show_errors($form_errors);
     }
 }
 ?>

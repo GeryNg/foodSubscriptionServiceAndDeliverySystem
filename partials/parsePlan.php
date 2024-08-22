@@ -6,24 +6,24 @@ include_once '../resource/utilities.php';
 if (isset($_POST['AddPlanBtn'])) {
     $form_errors = array();
 
-    // Required fields
+    // Chceck Required fields
     $required_fields = ['plan_name', 'description', 'price', 'date_from', 'date_to'];
     $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
 
-    // Fields to check length
+    // Check Fields to check length
     $fields_to_check_length = ['plan_name' => 3, 'description' => 10];
     $form_errors = array_merge($form_errors, check_min_length($fields_to_check_length));
 
-    // Validate numeric value for price
+    // Check Validate numeric value for price
     $numeric_fields = ['price'];
     $form_errors = array_merge($form_errors, check_numeric($numeric_fields));
 
-    // Validate checkboxes for sections
+    // Check Validate checkboxes for sections
     if (!isset($_POST['sections']) || count($_POST['sections']) === 0) {
         $form_errors[] = "At least one section must be selected.";
     }
 
-    // Validate date range
+    // Check Validate date range
     $date_from = strtotime($_POST['date_from']);
     $date_to = strtotime($_POST['date_to']);
     $today = strtotime(date('Y-m-d'));
@@ -88,10 +88,10 @@ if (isset($_POST['AddPlanBtn'])) {
                 htmlspecialchars($_POST['price']),
                 htmlspecialchars($_POST['date_from']),
                 htmlspecialchars($_POST['date_to']),
-                implode(',', $_POST['sections']), // Assuming 'sections' is an array of selected values
+                implode(',', $_POST['sections']),
                 $status,
                 $seller_id,
-                implode(',', $imageUrls) // Assuming $imageUrls is an array of uploaded image paths
+                implode(',', $imageUrls)
             ]);
 
             if ($stmt->rowCount() == 1) {

@@ -44,10 +44,11 @@ try {
     echo "An error occurred: " . $ex->getMessage();
 }
 
-//toggle request link
+//Toggle request link (Subaccount Button)
 if (isset($_POST['toggleRequest'])) {
     $requests_open = isset($_POST['requests_open']) ? 1 : 0;
     $seller_id = $_SESSION['seller_id'];
+    $linked_seller_id = $_SESSION['linked_seller_id'];
 
     try {
         $stmt = $db->prepare("UPDATE seller SET requests_open = :requests_open WHERE id = :seller_id");
@@ -96,7 +97,8 @@ if (isset($_POST['toggleRequest'])) {
         .weather-widget span {
             font-size: 14px;
         }
-        .alert{
+
+        .alert {
             margin-bottom: 0 !important;
         }
     </style>
@@ -106,15 +108,12 @@ if (isset($_POST['toggleRequest'])) {
     <div id="wrapper">
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-            <!-- logo -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../partials/seller_dashboard.php">
                 <img src="../image/logo-circle.png" alt="logo" style="width: 50px;">
                 <div class="sidebar-brand-text mx-3">Makan Apa</div>
             </a>
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-            <!-- Nav Item - Dashboard -->
             <li class="nav-item <?php echo $current_page == 'seller_dashboard.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="../partials/seller_dashboard.php">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -130,6 +129,7 @@ if (isset($_POST['toggleRequest'])) {
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Add Plan</span></a>
             </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
             <li class="nav-item  <?php echo $current_page == 'list_plan.php' ? 'active' : ''; ?>">
@@ -160,21 +160,19 @@ if (isset($_POST['toggleRequest'])) {
             <div class="sidebar-heading">
                 Customer Support
             </div>
-            <!-- Nav Item - Tables -->
             <li class="nav-item <?php echo $current_page == 'seller_list_feeback.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="../feeback/seller_list_feeback.php">
                     <i class="fas fa-fw fa-table"></i>
                     <span>Feeback</span></a>
             </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-            <!-- Nav Item - Tables -->
             <li class="nav-item <?php echo $current_page == 'seller_live_chat.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="../customer_support/seller_live_chat.php">
                     <i class="fas fa-fw fa-table"></i>
                     <span>Live chat</span></a>
             </li>
-            <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline" style="margin-left: auto !important; margin-right: auto !important;">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
@@ -183,30 +181,18 @@ if (isset($_POST['toggleRequest'])) {
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
-
-            <!-- Main Content -->
             <div id="content">
-
-                <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar static-top shadow">
-
-                    <!-- Sidebar Toggle (Topbar) -->
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" style="text-align:center !important;">
                         <i class="fa fa-bars"></i>
                     </button>
-
-                    <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
-
-                        <!-- Weather Widget -->
                         <div class="weather-widget" id="weather">
                             <img src="../image/weather-icon.png" alt="weather">
                             <span>Loading...</span>
                         </div>
 
                         <div class="topbar-divider d-none d-sm-block"></div>
-
-                        <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -221,7 +207,7 @@ if (isset($_POST['toggleRequest'])) {
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
                                 </a>
-                                <?php if ($access === 'verify' && $requests_open === 0): ?>
+                                <?php if ($access === 'verify' && $requests_open === 0 && !$linked_seller_id): ?>
                                     <a class="dropdown-item" href="#" id="openRequestLink">
                                         <i class="fas fa-file-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Open Request Link
@@ -230,7 +216,7 @@ if (isset($_POST['toggleRequest'])) {
                                         <input type="hidden" name="requests_open" value="1">
                                         <button type="submit" name="toggleRequest"></button>
                                     </form>
-                                <?php elseif ($access === 'verify' && $requests_open === 1): ?>
+                                <?php elseif ($access === 'verify' && $requests_open === 1 && !$linked_seller_id): ?>
                                     <a class="dropdown-item" href="../profile_management/accept_link.php" id="applyLinkAccount">
                                         <i class="fas fa-check-square fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Apply Link Account
@@ -268,13 +254,18 @@ if (isset($_POST['toggleRequest'])) {
                 } elseif ($access === 'rejected') {
                     echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <strong>Account Rejected!</strong> Your account request has been rejected. 
-                            <a href="active_account.php" class="btn btn-primary btn-sm">Submit New Request</a>
+                            <a href="../profile_management/active_account.php" class="btn btn-primary btn-sm">Submit New Request</a>
+                            </div>';
+                } elseif ($access === 'linked') {
+                    echo '<div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <strong>Account Linked!</strong> Your account is under review. Please wait for up to 3 working days.
                             </div>';
                 } elseif ($access === 'verify') {
                 }
             } else {
                 echo '<div class="alert alert-danger" role="alert">Unauthorized access.</div>';
             }
+
             ?>
             <script src="../vendor/jquery/jquery.min.js"></script>
             <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -284,6 +275,7 @@ if (isset($_POST['toggleRequest'])) {
             <script src="../js/demo/chart-area-demo.js"></script>
             <script src="../js/demo/chart-pie-demo.js"></script>
             <script>
+                //Back to top button
                 $(document).scroll(function() {
                     var scrollDistance = $(this).scrollTop();
                     if (scrollDistance > 100) {
@@ -301,29 +293,45 @@ if (isset($_POST['toggleRequest'])) {
                     event.preventDefault();
                 });
 
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
+                //Weather API
+                function fetchWeatherData(latitude, longitude) {
+    const apiKey = '3d64b8fb8077a50ea89c4f36ce7dc549'; // Replace with your OpenWeatherMap API key
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
 
-                    const apiKey = '#apikey';
-                    const apiUrl = `https://api.stormglass.io/v2/weather/point?lat=${latitude}&lng=${longitude}&params=airTemperature`;
+    console.log("Fetching weather data from URL:", apiUrl);
 
-                    $.ajax({
-                        url: apiUrl,
-                        headers: {
-                            'Authorization': apiKey
-                        },
-                        success: function(data) {
-                            const temperature = data.hours[0].airTemperature.sg;
-                            const weatherElement = $('#weather span');
-                            weatherElement.text(`${temperature}°C`);
-                        },
-                        error: function(error) {
-                            console.log(error);
-                            $('#weather span').text('Unable to fetch weather data');
-                        }
-                    });
-                });
+    fetch(apiUrl)
+        .then(response => {
+            console.log("API response status:", response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log("Weather data received:", data);
+            const temperature = data.main.temp;
+            const weatherDescription = data.weather[0].description;
+            const weatherElement = document.getElementById('weather');
+
+            weatherElement.innerHTML = `
+                <img src="../image/weather-icon.png" alt="weather">
+                <span>${temperature}°C - ${weatherDescription}</span>
+            `;
+        })
+        .catch(error => {
+            console.log("Error fetching weather data:", error);
+            document.getElementById('weather').innerHTML = 'Unable to fetch weather data';
+        });
+}
+
+navigator.geolocation.getCurrentPosition(function(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    fetchWeatherData(latitude, longitude);
+}, function(error) {
+    console.log("Geolocation error:", error);
+    document.getElementById('weather').innerHTML = 'Unable to fetch weather data';
+});
+
+                //Request link
                 document.getElementById('openRequestLink').addEventListener('click', function(e) {
                     e.preventDefault();
                     swal({

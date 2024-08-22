@@ -57,15 +57,13 @@ try {
     <div id="wrapper">
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-            <!-- logo -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../admin/admin_dashboard.php">
                 <img src="../image/logo-circle.png" alt="logo" style="width: 50px;">
                 <div class="sidebar-brand-text mx-3">Makan Apa</div>
             </a>
+
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-            <!-- Nav Item - Dashboard -->
             <li class="nav-item <?php echo $current_page == 'admin_dashboard.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="../admin/admin_dashboard.php">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -81,15 +79,14 @@ try {
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Assign</span></a>
             </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-            <!-- Nav Item - Tables -->
             <li class="nav-item <?php echo $current_page == 'seller_live_chat.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="../customer_support/seller_live_chat.php">
                     <i class="fas fa-fw fa-table"></i>
                     <span>Live chat</span></a>
             </li>
-            <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline" style="margin-left: auto !important; margin-right: auto !important;">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
@@ -98,24 +95,13 @@ try {
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
-
-            <!-- Main Content -->
             <div id="content">
-
-                <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar static-top shadow">
-
-                    <!-- Sidebar Toggle (Topbar) -->
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" style="text-align:center !important;">
                         <i class="fa fa-bars"></i>
                     </button>
-
-                    <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
-
                         <div class="topbar-divider d-none d-sm-block"></div>
-
-                        <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -123,14 +109,8 @@ try {
                                 <img class="img-profile rounded-circle"
                                     src="<?php echo htmlspecialchars($avatar); ?>">
                             </a>
-                            <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="../profile_management/seller_profile.php">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
-                                <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="../login_management/logout.php">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout

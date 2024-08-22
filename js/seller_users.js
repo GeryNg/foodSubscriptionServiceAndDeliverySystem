@@ -34,7 +34,7 @@ searchIcon.onclick = () => {
 }
 
 searchBar.onkeyup = () => {
-    let searchTerm = searchBar.value.trim()
+    let searchTerm = searchBar.value.trim();
     if (searchTerm !== "") {
         searchBar.classList.add("active");
     } else {
@@ -46,7 +46,7 @@ searchBar.onkeyup = () => {
     xhr.onload = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
-                let data = xhr.response;
+                let data = xhr.responseText;
                 usersList.innerHTML = data;
             }
         }

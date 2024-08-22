@@ -4,7 +4,6 @@ include_once '../resource/Database.php';
 include_once '../resource/utilities.php';
 
 if (isset($_POST['signupBtn'])) {
-    // Initialize error array
     $form_errors = array();
 
     // Required fields

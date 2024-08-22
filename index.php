@@ -48,5 +48,9 @@ include_once 'partials/headers.php';
                 <p>Homecook soul food that will remind you of your mother's cooking</p>               
             </div>
         </div>
-</section>
-<?php include_once 'partials/footer.php';?>  
+    </section>
+
+
+
+    <!--add footer for the future-->
+<?php include_once 'partials/footer.php';?>    <!--add footer for the future-->

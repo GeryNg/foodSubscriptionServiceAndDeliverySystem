@@ -7,6 +7,7 @@ include_once '../resource/utilities.php';
 if (isset($_POST['loginBtn'])) {
     $form_errors = array();
 
+    //Check fields required
     $required_fields = array('username', 'password');
     $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
 
@@ -36,15 +37,17 @@ if (isset($_POST['loginBtn'])) {
                 $statement = $db->prepare($sqlUpdate);
                 $statement->execute(array(':id' => $id));
 
-                //guard
+                //Guard (which mean that same user id cant open in 2 device or 2 windows)
                 $fingerprint = md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']);
                 $_SESSION['last_active'] = time();
                 $_SESSION['fingerprint'] = $fingerprint;
 
-                //remember me
+                //Remember me
                 if ($remember === 'yes') {
                     rememberMe($id);
-                }  
+                } 
+
+                //Check the role is customer
                 if ($role === 'customer') {
                     $sqlQueryCustomer = "SELECT Cust_ID FROM customer WHERE user_id = :user_id";
                     $statementCustomer = $db->prepare($sqlQueryCustomer);
@@ -55,12 +58,14 @@ if (isset($_POST['loginBtn'])) {
                     }
                 }
 
+                //Check the rolw is seller
                 if ($role === 'seller') {
                     $sqlLinkRequest = "SELECT seller_id FROM link_requests WHERE user_id = :user_id AND status = 'accepted'";
                     $statementLink = $db->prepare($sqlLinkRequest);
                     $statementLink->execute(array(':user_id' => $id));
                     $linkRow = $statementLink->fetch();
 
+                    //Link Row (which mena check if the account is subaccount)
                     if ($linkRow) {
                         $linkedSellerId = $linkRow['seller_id'];
                         $_SESSION['linked_seller_id'] = $linkedSellerId;
@@ -107,7 +112,7 @@ if (isset($_POST['loginBtn'])) {
                 });
                 setTimeout(function(){
                 window.location.href = '$redirect_url';
-                }, 3000);
+                }, 2000);
                 </script>";
 
             } else {

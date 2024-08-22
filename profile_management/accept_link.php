@@ -1,6 +1,7 @@
 <?php
 $page_title = "Accept Link";
 include_once '../partials/staff_nav.php';
+include_once '../resource/session.php';
 include_once '../resource/Database.php';
 
 $seller_access = $_SESSION['access'];
@@ -39,7 +40,9 @@ try {
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+
     <style>
         .card-header {
             display: flex;
@@ -79,7 +82,7 @@ try {
                             </tr>
                         </tfoot>
                         <tbody>
-                        <?php foreach ($requests as $request): ?>
+                            <?php foreach ($requests as $request): ?>
                                 <tr>
                                     <td>
                                         <img src="<?php echo htmlspecialchars($request['avatar']); ?>" alt="Avatar" width="60">
@@ -89,9 +92,13 @@ try {
                                     <td><?php echo htmlspecialchars($request['join_date']); ?></td>
                                     <td><?php echo htmlspecialchars($request['linked_date']); ?></td>
                                     <td>
-                                        <form method="post" action="process_accept_link.php">
+                                        <form method="post" action="process_link.php" style="display:inline;">
                                             <input type="hidden" name="request_id" value="<?php echo htmlspecialchars($request['request_id']); ?>">
-                                            <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                            <button type="submit" name="action" value="accept" class="btn btn-success btn-sm">Accept</button>
+                                        </form>
+                                        <form method="post" action="process_link.php" style="display:inline;">
+                                            <input type="hidden" name="request_id" value="<?php echo htmlspecialchars($request['request_id']); ?>">
+                                            <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Reject</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -109,7 +116,6 @@ try {
     <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
     <script src="../js/demo/datatables-demo.js"></script>
     <script src="../js/sb-admin-2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.all.min.js"></script>
 </body>
 
 </html>

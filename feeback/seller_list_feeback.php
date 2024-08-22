@@ -6,11 +6,45 @@ include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
 $seller_access = $_SESSION['access'];
+$seller_id = $_SESSION['seller_id'];
 
 if (empty($seller_access) || $seller_access !== 'verify') {
     echo '<p>You do not have permission to access this page.</p>';
     exit;
 }
+
+$query1 = "SELECT id AS plan_id, plan_name, image_urls FROM plan WHERE seller_id = :seller_id LIMIT 1";
+$stmt1 = $db->prepare($query1);
+$stmt1->bindParam(':seller_id', $seller_id);
+$stmt1->execute();
+$planDetails = $stmt1->fetch(PDO::FETCH_ASSOC);
+
+$sellerPlan = $planDetails['plan_id'];
+$planName = $planDetails['plan_name'];
+
+$imageUrls = explode(',', $planDetails['image_urls']);
+$planImage = $imageUrls[0];
+
+$query2 = "
+SELECT 
+    f.Feedback_ID, 
+    f.Cust_ID, 
+    f.Order_ID, 
+    f.Comment, 
+    f.Rating, 
+    f.FeedbackDate, 
+    oc.Plan_ID
+FROM 
+    feedback f
+JOIN 
+    order_cust oc ON f.Order_ID = oc.Order_ID
+WHERE 
+    oc.Plan_ID = :plan_id";
+
+$stmt2 = $db->prepare($query2);
+$stmt2->bindParam(':plan_id', $sellerPlan);
+$stmt2->execute();
+$feedbackList = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -182,48 +216,37 @@ if (empty($seller_access) || $seller_access !== 'verify') {
     <div class="container-fluid" style="margin-top: 20px;">
         <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Feedback</h1>
         <br />
-        <div class="container1">
-            <div class="product-details">
-                <h1>CHRISTMAS TREE</h1>
-                <span class="hint-star star">
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i>
-                </span>
-                <p class="information">" Let's spread the joy , here is Christmas , the most awaited day of the year.Christmas Tree is what one need the most. Here is the correct tree which will enhance your Christmas.</p>
-                <div class="control">
-                    <p><strong>Order ID: </strong> 003 </p>
-                    <p><strong>Customer ID: </strong> 002 </p>
-                    <p><strong>Date: </strong> 08/04/2024 </p>
+        <?php
+        $counter = 0;
+        foreach ($feedbackList as $feedback):
+            // Alternate between 'container1' and 'container2'
+            $containerClass = ($counter % 2 == 0) ? 'container1' : 'container2';
+            $imageFloatClass = ($counter % 2 == 0) ? 'float-right' : 'float-left';
+        ?>
+            <div class="<?php echo $containerClass; ?>">
+                <div class="product-image <?php echo $imageFloatClass; ?>">
+                    <img src="<?php echo htmlspecialchars($planImage); ?>" alt="">
+                </div>
+                <div class="product-details">
+                    <h1><?php echo htmlspecialchars($planName); ?></h1>
+                    <span class="hint-star star">
+                        <?php for ($i = 0; $i < 5; $i++): ?>
+                            <i class="fa fa-star<?php echo ($i < $feedback['Rating']) ? '' : '-o'; ?>" aria-hidden="true"></i>
+                        <?php endfor; ?>
+                    </span>
+                    <p class="information">"<?php echo htmlspecialchars($feedback['Comment']); ?>"</p>
+                    <div class="control">
+                        <p><strong>Order ID: </strong> <?php echo htmlspecialchars($feedback['Order_ID']); ?></p>
+                        <p><strong>Customer ID: </strong> <?php echo htmlspecialchars($feedback['Cust_ID']); ?></p>
+                        <p><strong>Date: </strong> <?php echo htmlspecialchars($feedback['FeedbackDate']); ?></p>
+                    </div>
                 </div>
             </div>
-            <div class="product-image">
-                <img src="https://images.unsplash.com/photo-1606830733744-0ad778449672?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mzl8fGNocmlzdG1hcyUyMHRyZWV8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="">
-            </div>
-        </div>
-        <div class="container2">
-            <div class="product-image">
-                <img src="https://images.unsplash.com/photo-1606830733744-0ad778449672?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mzl8fGNocmlzdG1hcyUyMHRyZWV8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="">
-            </div>
-            <div class="product-details">
-                <h1>CHRISTMAS TREE</h1>
-                <span class="hint-star star">
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i>
-                </span>
-                <p class="information">" Let's spread the joy , here is Christmas , the most awaited day of the year.Christmas Tree is what one need the most. Here is the correct tree which will enhance your Christmas.</p>
-                <div class="control">
-                    <p><strong>Order ID: </strong> 003 </p>
-                    <p><strong>Customer ID: </strong> 002 </p>
-                    <p><strong>Date: </strong> 08/04/2024 </p>
-                </div>
-            </div>
-        </div>
+        <?php
+            $counter++;
+        endforeach;
+        ?>
+    </div>
 </body>
 
 </html>

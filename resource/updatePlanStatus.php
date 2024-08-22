@@ -1,5 +1,5 @@
 <?php
-include_once '../resource/Database.php';
+include_once 'Database.php';
 
 function updatePlanStatuses($db)
 {

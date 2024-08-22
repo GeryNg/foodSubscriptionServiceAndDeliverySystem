@@ -219,7 +219,6 @@ $feedbackList = $stmt2->fetchAll(PDO::FETCH_ASSOC);
         <?php
         $counter = 0;
         foreach ($feedbackList as $feedback):
-            // Alternate between 'container1' and 'container2'
             $containerClass = ($counter % 2 == 0) ? 'container1' : 'container2';
             $imageFloatClass = ($counter % 2 == 0) ? 'float-right' : 'float-left';
         ?>

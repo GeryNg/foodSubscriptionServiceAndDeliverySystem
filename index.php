@@ -12,7 +12,7 @@ include_once 'partials/headers.php';
             <?php if (!isset($_SESSION['username'])): ?>
                 <div class="buttons">
                     <a href="/login_management/login.php" class="btn btn-signin">Sign In</a>
-                    <a href="/login_management/signup.php" class="btn btn-signup">Sign Up</a>
+                    <a href="/login_management/singup.php" class="btn btn-signup">Sign Up</a>
                 </div>
             <?php else: ?>
                 <a href="../Restaurant/restaurants.php" class="btn btn-order">Order Now</a>

@@ -295,7 +295,7 @@ if (isset($_POST['toggleRequest'])) {
 
                 //Weather API
                 function fetchWeatherData(latitude, longitude) {
-    const apiKey = '3d64b8fb8077a50ea89c4f36ce7dc549'; // Replace with your OpenWeatherMap API key
+    const apiKey = '#'; // Replace with your OpenWeatherMap API key
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
 
     console.log("Fetching weather data from URL:", apiUrl);

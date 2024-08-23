@@ -5,6 +5,9 @@ include_once 'staff_nav.php';
 include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
+$seller_id = $_SESSION['seller_id'];
+$todayDate = date('Y-m-d');
+
 //fetch the announcement
 $user_id = $_SESSION['id'];
 $query = "SELECT join_date FROM users WHERE id = :user_id";
@@ -57,6 +60,58 @@ $query = "SELECT COUNT(*) AS active_orders FROM order_cust WHERE Status = 'Activ
 $stmt = $db->prepare($query);
 $stmt->execute();
 $activeOrderCount = $stmt->fetch(PDO::FETCH_ASSOC)['active_orders'];
+
+//fetch total deliveries for today
+$queryTotal = "
+    SELECT COUNT(*) AS total_deliveries 
+    FROM delivery 
+    WHERE seller_id = :seller_id 
+    AND delivery_date = :delivery_date
+";
+$stmtTotal = $db->prepare($queryTotal);
+$stmtTotal->execute([
+    ':seller_id' => $seller_id,
+    ':delivery_date' => $todayDate
+]);
+$totalDeliveries = $stmtTotal->fetch(PDO::FETCH_ASSOC)['total_deliveries'];
+
+//fetch the status is 'done delivery' for today
+$queryDone = "
+    SELECT COUNT(*) AS done_deliveries 
+    FROM delivery 
+    WHERE seller_id = :seller_id 
+    AND delivery_date = :delivery_date 
+    AND status = 'done delivery'
+";
+$stmtDone = $db->prepare($queryDone);
+$stmtDone->execute([
+    ':seller_id' => $seller_id,
+    ':delivery_date' => $todayDate
+]);
+$doneDeliveries = $stmtDone->fetch(PDO::FETCH_ASSOC)['done_deliveries'];
+
+//calculate the percentage
+$percentageDone = ($totalDeliveries > 0) ? ($doneDeliveries / $totalDeliveries) * 100 : 0;
+
+//fetch total feeback
+$queryPlan = "SELECT id FROM plan WHERE seller_id = :seller_id LIMIT 1";
+$stmtPlan = $db->prepare($queryPlan);
+$stmtPlan->execute([':seller_id' => $seller_id]);
+$sellerPlan = $stmtPlan->fetchColumn();
+
+if ($sellerPlan) {
+    $queryFeedback = "
+        SELECT COUNT(*) AS total_feedback
+        FROM feedback f
+        JOIN order_cust oc ON f.Order_ID = oc.Order_ID
+        WHERE oc.Plan_ID = :plan_id
+    ";
+    $stmtFeedback = $db->prepare($queryFeedback);
+    $stmtFeedback->execute([':plan_id' => $sellerPlan]);
+    $totalFeedback = $stmtFeedback->fetchColumn();
+} else {
+    $totalFeedback = 0;
+}
 ?>
 
 <!DOCTYPE html>
@@ -133,12 +188,12 @@ $activeOrderCount = $stmt->fetch(PDO::FETCH_ASSOC)['active_orders'];
                                 <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Done Delivery</div>
                                 <div class="row no-gutters align-items-center">
                                     <div class="col-auto">
-                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"><?php echo round($percentageDone, 2); ?>%</div>
                                     </div>
                                     <div class="col">
                                         <div class="progress progress-sm mr-2">
                                             <div class="progress-bar bg-info" role="progressbar"
-                                                style="width: 50%" aria-valuenow="50" aria-valuemin="0"
+                                                style="width: <?php echo round($percentageDone, 2); ?>%" aria-valuenow="<?php echo round($percentageDone, 2); ?>" aria-valuemin="0"
                                                 aria-valuemax="100"></div>
                                         </div>
                                     </div>
@@ -159,8 +214,8 @@ $activeOrderCount = $stmt->fetch(PDO::FETCH_ASSOC)['active_orders'];
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                    Pending Requests</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                    Feedback</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $totalFeedback; ?></div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-comments fa-2x text-gray-300"></i>

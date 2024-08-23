@@ -83,6 +83,51 @@ $on_delivery_lunch_count = count(array_filter($lunch_deliveries, function ($deli
 $on_delivery_dinner_count = count(array_filter($dinner_deliveries, function ($delivery) {
     return $delivery['status'] === 'on delivery';
 }));
+
+// Handle status update
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $delivery_id = $_POST['delivery_id'] ?? null;
+    $status = $_POST['status'] ?? null;
+
+    if (empty($delivery_id) || !in_array($status, ['order accepted', 'food preparing', 'on delivery', 'done delivery'])) {
+        echo 'Invalid data';
+        exit;
+    }
+
+    $query = "
+        UPDATE delivery
+        SET status = ?
+        WHERE delivery_id = ?
+    ";
+
+    try {
+        $stmt = $db->prepare($query);
+        $stmt->execute([$status, $delivery_id]);
+        echo "<script>
+                swal({
+                  title: \"Status Updated\",
+                  text: \"The Delivery Status Had Updated\",
+                  icon: 'success',
+                  button: \"OK!\",
+                });
+                setTimeout(function(){
+                window.location.href = 'seller_delivery_list.php';
+                }, 2000);
+                </script>";
+    } catch (PDOException $e) {
+        echo "<script>
+        swal({
+            title: 'Error',
+            text: 'Having error when update',
+            type: 'error',
+            confirmButtonText: 'OK'
+        });
+            setTimeout(function(){
+            window.location.href = 'seller_delivery_list.php';
+            }, 2000);
+        </script>";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -212,7 +257,7 @@ $on_delivery_dinner_count = count(array_filter($dinner_deliveries, function ($de
                                     <td><?php echo htmlspecialchars($delivery['Quantity']); ?></td>
                                     <td><?php echo htmlspecialchars($delivery['full_address']); ?></td>
                                     <td>
-                                        <form method="post" action="update_delivery_status.php">
+                                        <form method="post" action="">
                                             <input type="hidden" name="delivery_id" value="<?php echo htmlspecialchars($delivery['delivery_id']); ?>">
                                             <select name="status" onchange="this.form.submit()">
                                                 <option value="order accepted" <?php echo ($delivery['status'] === 'order accepted') ? 'selected' : ''; ?>>Order Accepted</option>
@@ -283,7 +328,7 @@ $on_delivery_dinner_count = count(array_filter($dinner_deliveries, function ($de
                                     <td><?php echo htmlspecialchars($delivery['Quantity']); ?></td>
                                     <td><?php echo htmlspecialchars($delivery['full_address']); ?></td>
                                     <td>
-                                        <form method="post" action="update_delivery_status.php">
+                                        <form method="post" action="">
                                             <input type="hidden" name="delivery_id" value="<?php echo htmlspecialchars($delivery['delivery_id']); ?>">
                                             <select name="status" onchange="this.form.submit()">
                                                 <option value="order accepted" <?php echo ($delivery['status'] === 'order accepted') ? 'selected' : ''; ?>>Order Accepted</option>
@@ -315,7 +360,6 @@ $on_delivery_dinner_count = count(array_filter($dinner_deliveries, function ($de
     <script src="../js/demo/datatables-demo.js"></script>
     <script src="../js/sb-admin-2.min.js"></script>
     <script>
-        //Format for table
         $(document).ready(function() {
             $('#lunchTable').DataTable({
                 "paging": true,
@@ -332,12 +376,11 @@ $on_delivery_dinner_count = count(array_filter($dinner_deliveries, function ($de
             });
         });
 
-        //Update the delivery status
         document.addEventListener('DOMContentLoaded', function() {
             function updateDeliveryStatuses(status, meal) {
                 const deliveryIds = [];
                 document.querySelectorAll(`.${meal}Table tbody tr`).forEach(row => {
-                    const deliveryId = row.querySelector('td').innerText;
+                    const deliveryId = row.querySelector('td').innerText.trim();
                     deliveryIds.push(deliveryId);
                 });
 

@@ -12,12 +12,13 @@ yclm fcdy xumw gkgw
 Stormglass.io
 Email: makanapa024@gmail.com
 password: 12345678
-apikey: b5f8acec-5981-11ef-8a8f-0242ac130004-b5f8ad46-5981-11ef-8a8f-0242ac130004 (staff_nac.php line 259)
+apikey: b5f8acec-5981-11ef-8a8f-0242ac130004-b5f8ad46-5981-11ef-8a8f-0242ac130004 (staff_nav.php line 259)
 
 OpenWeatherMap
 Email: makanapa024@gmail.com
 Username: makanApa
 Password: 12345678
+apikey: 3d64b8fb8077a50ea89c4f36ce7dc549 (staff_nav.php line 298)
 
 Drift
 login using goole

@@ -24,27 +24,6 @@ $planName = $planDetails['plan_name'];
 
 $imageUrls = explode(',', $planDetails['image_urls']);
 $planImage = $imageUrls[0];
-
-$query2 = "
-SELECT 
-    f.Feedback_ID, 
-    f.Cust_ID, 
-    f.Order_ID, 
-    f.Comment, 
-    f.Rating, 
-    f.FeedbackDate, 
-    oc.Plan_ID
-FROM 
-    feedback f
-JOIN 
-    order_cust oc ON f.Order_ID = oc.Order_ID
-WHERE 
-    oc.Plan_ID = :plan_id";
-
-$stmt2 = $db->prepare($query2);
-$stmt2->bindParam(':plan_id', $sellerPlan);
-$stmt2->execute();
-$feedbackList = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -68,16 +47,7 @@ $feedbackList = $stmt2->fetchAll(PDO::FETCH_ASSOC);
             width: 80%;
         }
 
-        .container1 .product-details {
-            position: relative;
-            text-align: left;
-            overflow: hidden;
-            padding: 30px;
-            height: 100%;
-            float: left;
-            width: 60%;
-        }
-
+        .container1 .product-details,
         .container2 .product-details {
             position: relative;
             text-align: left;
@@ -122,7 +92,8 @@ $feedbackList = $stmt2->fetchAll(PDO::FETCH_ASSOC);
             width: 100%;
         }
 
-        .container1 .product-image {
+        .container1 .product-image,
+        .container2 .product-image {
             transition: all 0.3s ease-out;
             display: inline-block;
             position: relative;
@@ -134,14 +105,7 @@ $feedbackList = $stmt2->fetchAll(PDO::FETCH_ASSOC);
         }
 
         .container2 .product-image {
-            transition: all 0.3s ease-out;
-            display: inline-block;
-            position: relative;
-            overflow: hidden;
-            height: 100%;
             float: left;
-            width: 22%;
-            display: inline-block;
         }
 
         .container1 img,
@@ -159,7 +123,6 @@ $feedbackList = $stmt2->fetchAll(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 768px) {
-
             .container1,
             .container2 {
                 height: 170px;
@@ -216,36 +179,93 @@ $feedbackList = $stmt2->fetchAll(PDO::FETCH_ASSOC);
     <div class="container-fluid" style="margin-top: 20px;">
         <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Feedback</h1>
         <br />
-        <?php
-        $counter = 0;
-        foreach ($feedbackList as $feedback):
-            $containerClass = ($counter % 2 == 0) ? 'container1' : 'container2';
-            $imageFloatClass = ($counter % 2 == 0) ? 'float-right' : 'float-left';
-        ?>
-            <div class="<?php echo $containerClass; ?>">
-                <div class="product-image <?php echo $imageFloatClass; ?>">
-                    <img src="<?php echo htmlspecialchars($planImage); ?>" alt="">
-                </div>
-                <div class="product-details">
-                    <h1><?php echo htmlspecialchars($planName); ?></h1>
-                    <span class="hint-star star">
-                        <?php for ($i = 0; $i < 5; $i++): ?>
-                            <i class="fa fa-star<?php echo ($i < $feedback['Rating']) ? '' : '-o'; ?>" aria-hidden="true"></i>
-                        <?php endfor; ?>
-                    </span>
-                    <p class="information">"<?php echo htmlspecialchars($feedback['Comment']); ?>"</p>
-                    <div class="control">
-                        <p><strong>Order ID: </strong> <?php echo htmlspecialchars($feedback['Order_ID']); ?></p>
-                        <p><strong>Customer ID: </strong> <?php echo htmlspecialchars($feedback['Cust_ID']); ?></p>
-                        <p><strong>Date: </strong> <?php echo htmlspecialchars($feedback['FeedbackDate']); ?></p>
+        <div id="feedback-container">
+            <?php
+            $query2 = "
+            SELECT 
+                f.Feedback_ID, 
+                f.Cust_ID, 
+                f.Order_ID, 
+                f.Comment, 
+                f.Rating, 
+                f.FeedbackDate, 
+                oc.Plan_ID
+            FROM 
+                feedback f
+            JOIN 
+                order_cust oc ON f.Order_ID = oc.Order_ID
+            WHERE 
+                oc.Plan_ID = :plan_id
+            ORDER BY 
+                f.FeedbackDate DESC
+            LIMIT 5";
+            
+            $stmt2 = $db->prepare($query2);
+            $stmt2->bindParam(':plan_id', $sellerPlan);
+            $stmt2->execute();
+            $feedbackList = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+            $counter = 0;
+
+            foreach ($feedbackList as $feedback):
+                $containerClass = ($counter % 2 == 0) ? 'container1' : 'container2';
+                $imageFloatClass = ($counter % 2 == 0) ? 'float-right' : 'float-left';
+            ?>
+                <div class="<?php echo $containerClass; ?>">
+                    <div class="product-image <?php echo $imageFloatClass; ?>">
+                        <img src="<?php echo htmlspecialchars($planImage); ?>" alt="">
+                    </div>
+                    <div class="product-details">
+                        <h1><?php echo htmlspecialchars($planName); ?></h1>
+                        <span class="hint-star star">
+                            <?php for ($i = 0; $i < 5; $i++): ?>
+                                <i class="fa fa-star<?php echo ($i < $feedback['Rating']) ? '' : '-o'; ?>" aria-hidden="true"></i>
+                            <?php endfor; ?>
+                        </span>
+                        <p class="information">"<?php echo htmlspecialchars($feedback['Comment']); ?>"</p>
+                        <div class="control">
+                            <p><strong>Order ID: </strong> <?php echo htmlspecialchars($feedback['Order_ID']); ?></p>
+                            <p><strong>Customer ID: </strong> <?php echo htmlspecialchars($feedback['Cust_ID']); ?></p>
+                            <p><strong>Date: </strong> <?php echo htmlspecialchars($feedback['FeedbackDate']); ?></p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        <?php
-            $counter++;
-        endforeach;
-        ?>
+            <?php
+                $counter++;
+            endforeach;
+            ?>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="loadMore" class="btn btn-primary">Load More</button>
+        </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var limit = 5;
+        var offset = 5;
+
+        $(document).ready(function () {
+            $('#loadMore').click(function () {
+                loadFeedback();
+            });
+
+            function loadFeedback() {
+                $.ajax({
+                    url: 'load_feedback.php',
+                    method: 'POST',
+                    data: {
+                        limit: limit,
+                        offset: offset
+                    },
+                    success: function (data) {
+                        $('#feedback-container').append(data);
+                        offset += limit; 
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

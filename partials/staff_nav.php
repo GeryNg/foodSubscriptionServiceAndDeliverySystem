@@ -3,9 +3,6 @@ include_once '../resource/session.php';
 include_once '../resource/Database.php';
 include_once '../resource/utilities.php';
 include_once '../resource/updatePlanStatus.php';
-echo '<pre>';
-var_dump($_SESSION);
-echo '</pre>';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'seller') {
     header("Location: ../partials/error.php");

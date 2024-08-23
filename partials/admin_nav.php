@@ -80,16 +80,6 @@ try {
                     <span>Assign</span></a>
             </li>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-            <li class="nav-item <?php echo $current_page == 'seller_live_chat.php' ? 'active' : ''; ?>">
-                <a class="nav-link" href="../customer_support/seller_live_chat.php">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Live chat</span></a>
-            </li>
-            <div class="text-center d-none d-md-inline" style="margin-left: auto !important; margin-right: auto !important;">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
         </ul>
         <!-- End of Sidebar -->
 

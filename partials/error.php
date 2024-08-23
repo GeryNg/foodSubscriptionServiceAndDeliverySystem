@@ -1,4 +1,5 @@
 <?php
+$page_title = "Erorr!";
 include_once '../resource/Database.php';
 include_once '../resource/session.php';
 include_once '../partials/headers.php';

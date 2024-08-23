@@ -20,6 +20,34 @@ try {
     $stmtTotal = $db->query("SELECT COUNT(*) FROM announcement");
     $totalAnnouncements = $stmtTotal->fetchColumn();
     $totalPages = ceil($totalAnnouncements / $limit);
+
+    //fetch active plans
+    $stmtActivePlans = $db->prepare("SELECT COUNT(*) FROM plan WHERE status = :status");
+    $status = 'active';
+    $stmtActivePlans->bindParam(':status', $status, PDO::PARAM_STR);
+    $stmtActivePlans->execute();
+    $activePlansCount = $stmtActivePlans->fetchColumn();
+
+    //fetch for the this month
+    $currentMonth = date('Y-m');
+    $stmtOrders = $db->prepare("SELECT COUNT(*) FROM order_cust WHERE DATE_FORMAT(OrderDate, '%Y-%m') = :currentMonth");
+    $stmtOrders->bindParam(':currentMonth', $currentMonth, PDO::PARAM_STR);
+    $stmtOrders->execute();
+    $totalOrders = $stmtOrders->fetchColumn();
+
+    //fetch count of sellers with access 'verify'
+    $stmtVerifiedSellers = $db->prepare("SELECT COUNT(*) FROM seller WHERE access = :access");
+    $accessVerified = 'verify';
+    $stmtVerifiedSellers->bindParam(':access', $accessVerified, PDO::PARAM_STR);
+    $stmtVerifiedSellers->execute();
+    $verifiedSellersCount = $stmtVerifiedSellers->fetchColumn();
+
+    //fetch count of sellers with access 'pending'
+    $stmtPendingSellers = $db->prepare("SELECT COUNT(*) FROM seller WHERE access = :access");
+    $accessPending = 'pending';
+    $stmtPendingSellers->bindParam(':access', $accessPending, PDO::PARAM_STR);
+    $stmtPendingSellers->execute();
+    $pendingSellersCount = $stmtPendingSellers->fetchColumn();
 } catch (PDOException $e) {
     echo "Error fetching announcements: " . $e->getMessage();
 }
@@ -165,7 +193,7 @@ if (isset($_POST['AddAnnouncementBtn'])) {
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Plan Active</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">11</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo htmlspecialchars($activePlansCount); ?></div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-clipboard-list  fa-2x text-gray-300"></i>
@@ -180,39 +208,12 @@ if (isset($_POST['AddAnnouncementBtn'])) {
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Order</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">23</div>
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Order (This Month)</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo htmlspecialchars($totalOrders); ?></div>
                             </div>
                             <div class="col-auto">
                                 <i class="fa-solid fa-boxes-stacked"></i>
                                 <i class="fas fa-boxes fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Done Delivery</div>
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col-auto">
-                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="progress progress-sm mr-2">
-                                            <div class="progress-bar bg-info" role="progressbar"
-                                                style="width: 50%" aria-valuenow="50" aria-valuemin="0"
-                                                aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
                             </div>
                         </div>
                     </div>
@@ -226,11 +227,29 @@ if (isset($_POST['AddAnnouncementBtn'])) {
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                    Pending Requests</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                    Seller Amount</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo htmlspecialchars($verifiedSellersCount); ?></div>
                             </div>
                             <div class="col-auto">
-                                <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                <i class="fas fa-child fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Requests Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Assign Pending</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo htmlspecialchars($pendingSellersCount); ?></div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-edit fa-2x text-gray-300"></i>
                             </div>
                         </div>
                     </div>

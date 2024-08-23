@@ -21,4 +21,4 @@ Password: 12345678
 apikey: 3d64b8fb8077a50ea89c4f36ce7dc549 (staff_nav.php line 298)
 
 Drift
-login using goole
+login using google

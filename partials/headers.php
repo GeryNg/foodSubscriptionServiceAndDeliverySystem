@@ -2,6 +2,7 @@
 include_once __DIR__ . '/../resource/session.php';
 include_once __DIR__ . '/../resource/Database.php';
 include_once __DIR__ . '/../resource/utilities.php';
+include_once __DIR__ . '/../order_delivery/status_update.php';
 include_once __DIR__ . '/../resource/updatePlanStatus.php';
 
 $current_page = basename($_SERVER['PHP_SELF']);

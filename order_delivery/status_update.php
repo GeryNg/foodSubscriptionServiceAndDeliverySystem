@@ -14,14 +14,14 @@ try {
     $statement = $db->prepare($sql);
 
     if ($statement->execute()) {
-        echo "Status updated successfully.";
+        //echo "Status updated successfully.";
     } else {
-        echo "Failed to update status: " . implode(":", $statement->errorInfo());
+        //echo "Failed to update status: " . implode(":", $statement->errorInfo());
     }
 
     $db->commit();
 } catch (Exception $e) {
     $db->rollBack();
-    echo "Failed to update status: " . $e->getMessage();
+    //echo "Failed to update status: " . $e->getMessage();
 }
 ?>

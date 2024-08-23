@@ -64,7 +64,7 @@
                 </div>
                  <div class="form-floating">
                     <input type="password" class="form-control" id="floatingPassword" name="password2" value="" placeholder="Comfirm Password">
-                    <label for="floatingPassword">Comfirm Password</label>
+                    <label for="floatingPassword">Confirm Password</label>
                 </div>
                 <div class="form-floating">
                     <select class="form-select" id="securityQuestion1" name="securityQuestion1" onchange="updateSecurityQuestions()">

@@ -1,5 +1,6 @@
 <?php
 include_once 'Database.php';
+date_default_timezone_set('Asia/Kuala_Lumpur');
 
 function updatePlanStatuses($db)
 {

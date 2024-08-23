@@ -1,0 +1,60 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: 'Merriweather Sans', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Container for Payment Page */
+.payment-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading Style */
+.payment-container h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+/* Payment Details Styling */
+.payment-container p {
+    font-size: 1.1rem;
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+/* Strong text styling */
+.payment-container p strong {
+    color: #555;
+}
+
+/* PayPal Button Container */
+#paypal-button-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+    .payment-container {
+        margin: 20px;
+        padding: 15px;
+    }
+
+    .payment-container h1 {
+        font-size: 1.75rem;
+    }
+
+    .payment-container p {
+        font-size: 1rem;
+    }
+}

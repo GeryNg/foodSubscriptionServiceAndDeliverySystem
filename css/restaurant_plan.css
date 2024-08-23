@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    font-family: "Figtree", sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     background-color: #f8f9fa;
 }
 
@@ -11,10 +11,11 @@ body {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding-top: 40px ;
 }
 
 h1, h2 {
-    font-family: "Bebas Neue", cursive;
+    font-family: 'Merriweather Sans', sans-serif;
     font-size: 2rem;
     color: #333;
     margin: 20px 0;
@@ -50,6 +51,7 @@ h1, h2 {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 24px;
+    font-family: 'Merriweather Sans', sans-serif;
 }
 
 .article-wrapper {
@@ -89,7 +91,7 @@ figure {
 }
 
 .article-body h2 {
-    font-family: "Bebas Neue", cursive;
+    font-family: 'Merriweather Sans', sans-serif;
     font-size: 1.5rem;
     color: #333;
     margin: 0 0 8px 0;

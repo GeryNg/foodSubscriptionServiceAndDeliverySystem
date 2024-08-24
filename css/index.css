@@ -13,7 +13,6 @@ body {
     justify-content: space-between;
     align-items: center;
     height: 100vh; /* Full viewport height */
-    background-color: #fff; /* White background */
     color: #000; /* Black text */
     padding: 20px;
     box-sizing: border-box;

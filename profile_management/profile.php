@@ -90,7 +90,6 @@ if (isset($_SESSION['id'])) {
                         </tr>
                     </table>
                 </section>
-                <div class=""><a href="../login_management/logout.php">Log Out</a></div>
             <?php endif ?>
         </div>
     </div>

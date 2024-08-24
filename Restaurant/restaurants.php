@@ -1,6 +1,7 @@
 <?php include '../resource/Database.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +9,10 @@
     <link rel="stylesheet" href="../css/restaurant.css">
     <link rel="icon" type="image/x-icon" href="../image/logo-circle.png">
 </head>
+
 <body>
     <?php include '../partials/headers.php'; ?>
-    <div class="container">
+    <div class="container" style="margin-top: 3%;">
         <h1>All Restaurants</h1>
         <form method="GET" action="" class="search-bar">
             <input type="text" name="search" placeholder="Search for restaurants, cuisines, and dishes" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_QUOTES, 'UTF-8') : ''; ?>">
@@ -44,15 +46,15 @@
                 $detail = htmlspecialchars($row["detail"], ENT_QUOTES, 'UTF-8');
                 $address = htmlspecialchars($row["address"], ENT_QUOTES, 'UTF-8');
                 $id = htmlspecialchars($row["id"], ENT_QUOTES, 'UTF-8');
-                
+
                 echo "<article class='restaurant-card'>";
                 echo "<div class='article-wrapper'>";
-                echo "<figure>"; 
+                echo "<figure>";
                 echo "<img src='" . $profile_pic . "' alt='profile_pic' class='profile-pic'/>";
                 echo "</figure>";
                 echo "<div class='article-body'>";
                 echo "<h2>" . $name . "</h2>";
-                echo "<p class='detail'>" . $detail . "</p>";              
+                echo "<p class='detail'>" . $detail . "</p>";
                 echo "<p class='address'>Address: " . $address . "</p>";
                 echo "<a href='restaurant_plan.php?id=" . $id . "' class='read-more'>Read more <span class='sr-only'>about " . $name . "</span>";
                 echo "<svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 20 20' fill='currentColor'>";
@@ -68,4 +70,5 @@
     </div>
     <?php include '../partials/footer.php'; ?>
 </body>
+
 </html>

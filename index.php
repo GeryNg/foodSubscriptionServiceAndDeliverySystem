@@ -20,7 +20,7 @@ include_once 'partials/headers.php';
         </div>
         
         <div class="hero-image">
-            <img src="/uploads/Chinese Dinner.png" alt="Hero Image">
+            <img src="/image/Chinese Dinner.png" alt="Hero Image">
         </div>
     </div>
 </section>
@@ -33,7 +33,7 @@ include_once 'partials/headers.php';
                 <a href="../Restaurant/restaurants.php" class="btn btn-modern">Browse</a>
             </div>
             <div class="secondary-image">
-                <img src="seller_profile_pic\66ae66152d3a62.91511676.png" alt="Secondary Image">
+                <img src="image\66ae66152d3a62.91511676.png" alt="Secondary Image">
             </div>
         </div>
 </section>
@@ -41,7 +41,7 @@ include_once 'partials/headers.php';
 <section class="hero-section">
         <div class="hero-container">
             <div class="secondary-image">
-                <img src="uploads\66ae690e789a86.59485598.jpeg" alt="Secondary Image">
+                <img src="image\66ae690e789a86.59485598.jpeg" alt="Secondary Image">
             </div>
             <div class="hero-text">
                 <h2>Food need not be fussy</h2>

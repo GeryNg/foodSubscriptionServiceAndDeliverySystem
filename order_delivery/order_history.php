@@ -11,7 +11,11 @@
 <body>
     <?php include '../partials/headers.php'; ?>   
 
-    <div class="container">
+    <div class="container1" style="margin-top: 5%;">
+        <h1>Order History list</h1>
+        <br/>
+        <hr/>
+        <br/>
         <div class="order-history-container">
             <?php
             $cust_id = $_SESSION['Cust_ID'];

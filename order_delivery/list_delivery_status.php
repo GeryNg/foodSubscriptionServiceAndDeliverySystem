@@ -157,7 +157,7 @@ if ($delivery) {
 </style>
 
 <div class="container px-1 px-md-4 py-5 mx-auto">
-    <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Order List Table</h1>
+    <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Delivery List</h1>
     <hr />
     <?php if (empty($deliveries)): ?>
         <p>No deliveries found for today.</p>
@@ -213,5 +213,10 @@ if ($delivery) {
         <?php endforeach; ?>
     <?php endif; ?>
 </div>
+<br/>
+<br/>
+<br/>
+<br/>
+
 
 <?php include_once '../partials/footer.php';?>

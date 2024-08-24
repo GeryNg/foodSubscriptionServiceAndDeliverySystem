@@ -22,7 +22,7 @@ h2 {
 }
 
 .btn-add {
-    background-color: #007bff;
+    background-color: #c34e2e;
     color: #fff;
     padding: 10px 20px;
     border-radius: 5px;
@@ -30,7 +30,7 @@ h2 {
 }
 
 .btn-add:hover {
-    background-color: #0056b3;
+    background-color: #903921;
 }
 
 .address-card {

@@ -10,7 +10,7 @@
 </head>
 <body>
     <?php include '../partials/headers.php'; ?>
-    <div class="container">
+    <div class="container1" style="margin-top: 3%;">
         <?php
         if (isset($_GET['id'])) {
             $id = htmlspecialchars($_GET['id'], ENT_QUOTES, 'UTF-8');
@@ -73,7 +73,7 @@
                     if (isset($_SESSION['username'])) {
                         echo "<a href='../order_delivery/orders.php?plan_id=" . $planId . "' class='read-more'>Read more <span class='sr-only'>about " . $planName . "</span>";
                     } else {
-                        echo "<a href='../login_management/login.php' class='read-more'>Log in to order <span class='sr-only'>about " . $planName . "</span>";
+                        echo "<a href='../login_management/login.php' class='read-more'>Log in to order &nbsp;&nbsp;<span class='sr-only'>about " . $planName . "</span>";
                     }
 
                     echo "<svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 20 20' fill='currentColor'>";

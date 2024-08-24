@@ -1,10 +1,4 @@
-body {
-    margin: 0;
-    font-family: 'Merriweather Sans', sans-serif;
-    background-color: #f8f9fa;
-}
-
-.container {
+.container1 {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
@@ -104,7 +98,7 @@ figure {
 }
 
 .read-more {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     text-decoration: none;
     color: #28666e;

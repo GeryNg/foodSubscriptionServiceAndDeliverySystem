@@ -83,8 +83,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <ul class="navbar-nav ms-auto my-2 my-lg-0">
                     <li class="nav-item"><a class="nav-link <?php echo $current_page == 'index.php' ? 'active' : ''; ?>" href="../index.php">Home</a></li>
                     <li class="nav-item"><a class="nav-link <?php echo $current_page == 'restaurants.php' ? 'active' : ''; ?>" href="../Restaurant/restaurants.php">Restaurant</a></li>
-                    <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="#">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link <?php echo $current_page == '#' ? 'active' : ''; ?>" href="#">Delivery Area</a></li>
                     <li class="nav-item"><a class="nav-link <?php echo $current_page == 'live_chat.php' ? 'active' : ''; ?>" href="../customer_support/live_chat.php">Customer Service</a></li>
                 </ul>
                 <div class="dtext-end">

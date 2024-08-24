@@ -61,6 +61,10 @@ try {
     </div>
 
     <script type="text/javascript" src="../js/users.js"></script>
+    <br>
+    <br>
+    <br>
+    <br>
     <?php include_once '../partials/footer.php';?>
 </body>
 </html>

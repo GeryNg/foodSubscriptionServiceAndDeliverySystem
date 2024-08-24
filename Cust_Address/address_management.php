@@ -40,18 +40,25 @@
                 echo "<div class='address-actions'>";
                 echo "<a href='edit_address.php?address_id=$address_id'>Edit</a>";
                 echo "<a href='delete_address.php?address_id=$address_id' class='delete-link'>Delete</a>";
-                echo "<a href='set_default.php?address_id=$address_id' class='default-link'>Set as default</a>";
                 echo "</div>";
                 echo "</div>";
             }
             ?>
         </div>
     </div>
+<<<<<<< HEAD
     <br/>
     <br/>
     <br/>
     <br/>
     <br/>
+=======
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+>>>>>>> df432d2f1be4e5855c9be90188deef1af6ebc0c1
     <?php include '../partials/footer.php'; ?>
 </body>
 </html>

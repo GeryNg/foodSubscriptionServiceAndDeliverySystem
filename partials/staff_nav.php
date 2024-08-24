@@ -2,6 +2,7 @@
 include_once '../resource/session.php';
 include_once '../resource/Database.php';
 include_once '../resource/utilities.php';
+include_once '../order_delivery/status_update.php';
 include_once '../resource/updatePlanStatus.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'seller') {

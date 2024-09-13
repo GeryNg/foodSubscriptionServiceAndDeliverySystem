@@ -13,7 +13,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    min-height: 450px; 
 }
 
 .restaurant-card:hover {
@@ -42,15 +41,15 @@
 }
 
 h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+    font-size: 1.3rem !important; 
+    margin-bottom: 5px;
     color: #333;
 }
 
 .detail, .address {
     font-size: 1rem;
     color: #777;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .read-more {
@@ -60,12 +59,12 @@ h2 {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: auto; 
+    margin-top: 10%; 
 }
 
 .read-more svg {
     margin-left: 5px;
-    width: 16px; /* Adjust the size of the arrow */
+    width: 16px;
     height: 16px;
 }
 
@@ -82,7 +81,7 @@ h2 {
     align-items: center;
     margin-bottom: 20px;
     max-width: 600px;
-    margin: 0 auto 20px auto;
+    margin: 0 auto 5% auto;
     padding: 0 15px;
 }
 
@@ -129,10 +128,9 @@ h2 {
 }
 
 .rating-display {
-    display: flex;
     align-items: center;
     font-size: 1rem;
-    color: #FFB400; /* Star color */
+    color: #FFB400;
 }
 
 .star {
@@ -144,10 +142,11 @@ h2 {
 .rating-score {
     font-weight: bold;
     color: #333;
-    margin-right: 5px;
+    margin-right: 2px;
 }
 
 .rating-count {
+    font-size: 0.7rem;
     color: #777;
 }
 

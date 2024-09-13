@@ -1,6 +1,42 @@
 <?php
+$page_title = "Order Plan";
 include '../resource/Database.php';
+include '../partials/headers.php';
+
+// Initialize variables
+$plan = null;
+$plan_id = $planPrice = null;
+$addons = [];
+
+// Check if the plan ID is provided
+if (isset($_GET['plan_id'])) {
+    $plan_id = htmlspecialchars($_GET['plan_id'], ENT_QUOTES, 'UTF-8');
+
+    // Fetch plan details from the database
+    $sql = "SELECT plan.plan_name, plan.description, plan.price, plan.image_urls 
+            FROM plan 
+            WHERE plan.id = :plan_id";
+    $statement = $db->prepare($sql);
+    $statement->bindParam(':plan_id', $plan_id, PDO::PARAM_INT);
+    $statement->execute();
+    $plan = $statement->fetch();
+
+    if ($plan) {
+        $planName = htmlspecialchars($plan['plan_name'], ENT_QUOTES, 'UTF-8');
+        $planDescription = htmlspecialchars($plan['description'], ENT_QUOTES, 'UTF-8');
+        $planPrice = htmlspecialchars($plan['price'], ENT_QUOTES, 'UTF-8');
+        $planImages = explode(',', htmlspecialchars($plan['image_urls'], ENT_QUOTES, 'UTF-8'));
+
+        // Fetch add-ons related to the plan
+        $sql_addons = "SELECT * FROM addons WHERE plan_id = :plan_id";
+        $addon_statement = $db->prepare($sql_addons);
+        $addon_statement->bindParam(':plan_id', $plan_id, PDO::PARAM_INT);
+        $addon_statement->execute();
+        $addons = $addon_statement->fetchAll();
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,68 +45,95 @@ include '../resource/Database.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Plan</title>
     <link rel="stylesheet" href="../css/order.css">
+    <link rel="icon" type="image/x-icon" href="../image/logo-circle.png">
+    <style>
+        .slideshow-container {
+            position: relative;
+            height: 400px;
+            max-width: 400px;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        .slider {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide {
+            min-width: 100%;
+            transition: 0.5s;
+        }
+
+        .slide img {
+            width: 100%;
+            height: auto;
+        }
+
+        .slider-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+
+        .slider-controls .prev,
+        .slider-controls .next {
+            cursor: pointer;
+            padding: 16px;
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            user-select: none;
+        }
+
+        .slider-controls .prev:hover,
+        .slider-controls .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+    </style>
 </head>
 
 <body>
-    <?php include '../partials/headers.php'; ?>
     <div class="main-container">
         <div class="left-section">
-            <?php
-            if (isset($_GET['plan_id'])) {
-                $plan_id = htmlspecialchars($_GET['plan_id'], ENT_QUOTES, 'UTF-8');
+            <?php if ($plan): ?>
+                <div class='plan-images'>
+                    <div class="slideshow-container">
+                        <div class="slider">
+                            <?php foreach ($planImages as $index => $image): ?>
+                                <div class="slide">
+                                    <img src='<?php echo htmlspecialchars($image, ENT_QUOTES, 'UTF-8'); ?>' class='plan-image' alt='Plan Image'>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
 
-                // Fetch plan details from the database
-                $sql = "SELECT plan.plan_name, plan.description, plan.price, plan.image_urls 
-                        FROM plan 
-                        WHERE plan.id = :plan_id";
-                $statement = $db->prepare($sql);
-                $statement->bindParam(':plan_id', $plan_id, PDO::PARAM_INT);
-                $statement->execute();
-                $plan = $statement->fetch();
+                        <!-- Slider Navigation -->
+                        <div class="slider-controls">
+                            <span class="prev">&#10094;</span>
+                            <span class="next">&#10095;</span>
+                        </div>
+                    </div>
 
-                if ($plan) {
-                    $planName = htmlspecialchars($plan['plan_name'], ENT_QUOTES, 'UTF-8');
-                    $planDescription = htmlspecialchars($plan['description'], ENT_QUOTES, 'UTF-8');
-                    $planPrice = htmlspecialchars($plan['price'], ENT_QUOTES, 'UTF-8');
-                    $planImages = explode(',', htmlspecialchars($plan['image_urls'], ENT_QUOTES, 'UTF-8'));
+                    <div class='thumbnail-row'>
+                        <?php foreach ($planImages as $index => $image): ?>
+                            <div class='thumbnail-column'>
+                                <img class='demo cursor' src='../plan/<?php echo trim($image); ?>' style='width:100%' onclick='currentSlide(<?php echo ($index + 1); ?>)' alt='Image'>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
 
-                    // Plan image slideshow
-                    echo "<div class='plan-images'>";
-                    echo "<div class='slideshow-container'>";
-                    foreach ($planImages as $index => $image) {
-                        // Assuming the image path is relative to the root directory
-                        $imagePath = "../plan/" . trim($image);
-                        echo "<div class='mySlides fade'>";
-                        echo "<img src='" . $imagePath . "' class='plan-image'>";
-                        echo "</div>";
-                    }
-                    echo "<a class='prev' onclick='plusSlides(-1)'>&#10094;</a>";
-                    echo "<a class='next' onclick='plusSlides(1)'>&#10095;</a>";
-                    echo "</div>";
-
-                    // Thumbnails
-                    echo "<div class='thumbnail-row'>";
-                    foreach ($planImages as $index => $image) {
-                        $imagePath = "../plan/" . trim($image);
-                        echo "<div class='thumbnail-column'>";
-                        echo "<img class='demo cursor' src='" . $imagePath . "' style='width:100%' onclick='currentSlide(" . ($index + 1) . ")' alt='Image'>";
-                        echo "</div>";
-                    }
-                    echo "</div>";
-                    echo "</div>";
-
-                    echo "<div class='plan-info'>";
-                    echo "<h1>" . $planName . "</h1>";
-                    echo "<p>" . $planDescription . "</p>";
-                    echo "<p class='price'>Price: RM" . $planPrice . "</p>";
-                    echo "</div>";
-                } else {
-                    echo "<p>Plan not found.</p>";
-                }
-            } else {
-                echo "<p>No plan ID provided.</p>";
-            }
-            ?>
+                <div class='plan-info'>
+                    <h1><?php echo $planName; ?></h1>
+                    <p><?php echo $planDescription; ?></p>
+                    <p class='price'>Price: RM<?php echo $planPrice; ?></p>
+                </div>
+            <?php else: ?>
+                <p>Plan not found.</p>
+            <?php endif; ?>
         </div>
 
         <div class="right-section">
@@ -136,13 +199,6 @@ include '../resource/Database.php';
                     <label>Add-ons:</label>
                     <div id="addons">
                         <?php
-                        // Fetch add-ons related to the plan
-                        $sql = "SELECT * FROM addons WHERE plan_id = :plan_id";
-                        $addon_statement = $db->prepare($sql);
-                        $addon_statement->bindParam(':plan_id', $plan_id, PDO::PARAM_INT);
-                        $addon_statement->execute();
-                        $addons = $addon_statement->fetchAll();
-
                         if ($addons) {
                             foreach ($addons as $addon) {
                                 $addonName = htmlspecialchars($addon['addon_name'], ENT_QUOTES, 'UTF-8');
@@ -150,7 +206,7 @@ include '../resource/Database.php';
                                 $addonImage = htmlspecialchars($addon['addon_image'], ENT_QUOTES, 'UTF-8');
 
                                 echo "<div class='addon-item'>";
-                                echo "<img src='" . $addonImage . "' alt='Addon Image' style='width:100px; height:100px; object-fit:cover; border:1px solid #ccc;'>"; // Display image
+                                echo "<img src='" . $addonImage . "' alt='Addon Image' style='width:100px; height:100px; object-fit:cover; border:1px solid #ccc;'>";
                                 echo "<p>$addonName - RM$addonPrice</p>";
                                 echo "<label for='addon_quantity_{$addon['id']}'>Quantity:</label>";
                                 echo "<input type='number' name='addon_quantity[{$addon['id']}]' value='0' min='0'>";
@@ -175,90 +231,57 @@ include '../resource/Database.php';
     <?php include '../partials/footer.php'; ?>
 
     <script>
-        let slideIndex = 1;
-        showSlides(slideIndex);
+        let currentIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
 
-        function plusSlides(n) {
-            showSlides(slideIndex += n);
+        function showSlides(index) {
+            if (index >= totalSlides) {
+                currentIndex = 0;
+            } else if (index < 0) {
+                currentIndex = totalSlides - 1;
+            } else {
+                currentIndex = index;
+            }
+
+            const offset = -currentIndex * 100;
+            document.querySelector('.slider').style.transform = `translateX(${offset}%)`;
         }
 
-        function currentSlide(n) {
-            showSlides(slideIndex = n);
-        }
+        document.querySelector('.next').addEventListener('click', () => {
+            showSlides(currentIndex + 1);
+        });
 
-        function showSlides(n) {
-            let i;
-            let slides = document.getElementsByClassName("mySlides");
-            let dots = document.getElementsByClassName("demo");
-            if (n > slides.length) {
-                slideIndex = 1;
-            }
-            if (n < 1) {
-                slideIndex = slides.length;
-            }
-            for (i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-            }
-            for (i = 0; i < dots.length; i++) {
-                dots[i].className = dots[i].className.replace(" active", "");
-            }
-            slides[slideIndex - 1].style.display = "block";
-            dots[slideIndex - 1].className += " active";
-        }
+        document.querySelector('.prev').addEventListener('click', () => {
+            showSlides(currentIndex - 1);
+        });
+
+        showSlides(currentIndex);
 
         // JavaScript for calculating totals
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
-        const durationInput = document.getElementById('duration');
-        const grandTotalInput = document.getElementById('grand_total');
         const quantityInput = document.getElementById('quantity');
-        const addonQuantities = document.querySelectorAll("input[name^='addon_quantity']");
-
-        startDateInput.addEventListener('change', calculateDuration);
-        endDateInput.addEventListener('change', calculateDuration);
-        quantityInput.addEventListener('change', calculateDuration);
-        addonQuantities.forEach(function(addonQuantity) {
-            addonQuantity.addEventListener('change', calculateDuration); // Calculate total when addon quantity changes
-        });
+        const grandTotalInput = document.getElementById('grand_total');
+        const planPrice = parseFloat("<?php echo $planPrice; ?>");
 
         function calculateDuration() {
             const startDate = new Date(startDateInput.value);
             const endDate = new Date(endDateInput.value);
-            const quantity = parseInt(quantityInput.value);
+            const quantity = parseInt(quantityInput.value) || 1;
 
-            if (startDate && endDate && endDate >= startDate) {
-                const timeDiff = Math.abs(endDate - startDate);
-                const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-                durationInput.value = daysDiff;
-
-                // Calculate grand total for the plan
-                const pricePerDay = <?php echo $planPrice; ?>;
-                let grandTotal = pricePerDay * daysDiff * quantity;
-
-                // Calculate grand total for add-ons
-                addonQuantities.forEach(function(addonQuantity) {
-                    const addonPrice = parseFloat(addonQuantity.closest('.addon-item').querySelector('p').innerText.split('RM')[1]);
-                    const addonQty = parseInt(addonQuantity.value);
-                    grandTotal += addonPrice * addonQty;
-                });
-
-                grandTotalInput.value = "RM" + grandTotal.toFixed(2);
-            } else {
-                durationInput.value = '';
-                grandTotalInput.value = "RM <?php echo $planPrice; ?>";
+            if (startDate && endDate && startDate <= endDate) {
+                const duration = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1;
+                document.getElementById('duration').value = duration;
+                const grandTotal = planPrice * duration * quantity;
+                grandTotalInput.value = "RM " + grandTotal.toFixed(2);
             }
         }
 
-        function validateDates() {
-            const startDate = new Date(startDateInput.value);
-            const endDate = new Date(endDateInput.value);
-
-            if (!startDate || !endDate || endDate < startDate) {
-                alert("Please ensure the start date is before the end date.");
-                return false;
-            }
-            return true;
-        }
+        // Attach event listeners to calculate totals on change
+        startDateInput.addEventListener('change', calculateDuration);
+        endDateInput.addEventListener('change', calculateDuration);
+        quantityInput.addEventListener('input', calculateDuration);
     </script>
 </body>
 

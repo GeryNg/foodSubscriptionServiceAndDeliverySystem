@@ -1,4 +1,58 @@
-<?php include '../resource/Database.php'; ?>
+<?php
+$page_title = "Restaurants";
+include '../resource/Database.php';
+include '../partials/headers.php';
+
+// Process the data
+$searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
+$sellers = [];
+
+$sql = "SELECT seller.profile_pic, seller.name, seller.detail, seller.address, seller.id 
+        FROM seller 
+        WHERE seller.access = 'verify'";
+if (!empty($searchTerm)) {
+    $sql .= " AND seller.name LIKE :searchTerm";
+}
+$sql .= " ORDER BY seller.name";
+
+$statement = $db->prepare($sql);
+if (!empty($searchTerm)) {
+    $statement->bindValue(':searchTerm', '%' . $searchTerm . '%');
+}
+$statement->execute();
+
+while ($row = $statement->fetch()) {
+    $profile_pic = htmlspecialchars($row['profile_pic'], ENT_QUOTES, 'UTF-8');
+    $name = htmlspecialchars($row["name"], ENT_QUOTES, 'UTF-8');
+    $detail = htmlspecialchars($row["detail"], ENT_QUOTES, 'UTF-8');
+    $address = htmlspecialchars($row["address"], ENT_QUOTES, 'UTF-8');
+    $id = htmlspecialchars($row["id"], ENT_QUOTES, 'UTF-8');
+
+    // Fetch average rating for the current restaurant
+    $sql_avg_rating = "SELECT AVG(Rating) as avg_rating, COUNT(*) as review_count
+                       FROM feedback f 
+                       JOIN order_cust oc ON f.Order_ID = oc.Order_ID 
+                       WHERE oc.Plan_ID IN (SELECT id FROM plan WHERE seller_id = :seller_id)";
+    $statement_avg = $db->prepare($sql_avg_rating);
+    $statement_avg->bindParam(':seller_id', $id, PDO::PARAM_STR_CHAR);
+    $statement_avg->execute();
+    $rating_result = $statement_avg->fetch();
+
+    $avg_rating = round($rating_result['avg_rating'], 1);
+    $review_count = $rating_result['review_count'];
+
+    $sellers[] = [
+        'profile_pic' => $profile_pic,
+        'name' => $name,
+        'detail' => $detail,
+        'address' => $address,
+        'id' => $id,
+        'avg_rating' => $avg_rating,
+        'review_count' => $review_count
+    ];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,7 +65,6 @@
 </head>
 
 <body>
-    <?php include '../partials/headers.php'; ?>
     <div class="container" style="margin-top: 3%;">
         <h1>All Restaurants</h1>
         <form method="GET" action="" class="search-bar">
@@ -24,71 +77,32 @@
         </form>
 
         <section class="articles">
-            <?php
-            $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
-
-            // Modify the SQL query to only select sellers with access = 'verify'
-            $sql = "SELECT seller.profile_pic, seller.name, seller.detail, seller.address, seller.id FROM seller WHERE seller.access = 'verify'";
-            if (!empty($searchTerm)) {
-                $sql .= " AND seller.name LIKE :searchTerm";
-            }
-            $sql .= " ORDER BY seller.name";
-
-            $statement = $db->prepare($sql);
-            if (!empty($searchTerm)) {
-                $statement->bindValue(':searchTerm', '%' . $searchTerm . '%');
-            }
-            $statement->execute();
-
-            while ($row = $statement->fetch()) {
-                $profile_pic = htmlspecialchars($row['profile_pic'], ENT_QUOTES, 'UTF-8');
-                $name = htmlspecialchars($row["name"], ENT_QUOTES, 'UTF-8');
-                $detail = htmlspecialchars($row["detail"], ENT_QUOTES, 'UTF-8');
-                $address = htmlspecialchars($row["address"], ENT_QUOTES, 'UTF-8');
-                $id = htmlspecialchars($row["id"], ENT_QUOTES, 'UTF-8');
-
-                // Fetch average rating for the current restaurant
-                $sql_avg_rating = "SELECT AVG(Rating) as avg_rating, COUNT(*) as review_count
-                                   FROM feedback f 
-                                   JOIN order_cust oc ON f.Order_ID = oc.Order_ID 
-                                   WHERE oc.Plan_ID IN (SELECT id FROM plan WHERE seller_id = :seller_id)";
-                $statement_avg = $db->prepare($sql_avg_rating);
-                $statement_avg->bindParam(':seller_id', $id, PDO::PARAM_INT);
-                $statement_avg->execute();
-                $rating_result = $statement_avg->fetch();
-
-                $avg_rating = round($rating_result['avg_rating'], 1);
-                $review_count = $rating_result['review_count'];
-
-                echo "<article class='restaurant-card'>";
-                echo "<div class='article-wrapper'>";
-                echo "<figure>";
-                echo "<img src='" . $profile_pic . "' alt='profile_pic' class='profile-pic'/>";
-                echo "</figure>";
-                echo "<div class='article-body'>";
-                echo "<div class='restaurant-title'>";
-                echo "<h3>" . $name . "</h3>";
-
-                // Display average rating and review count next to the name
-                echo "<div class='rating-display'>";
-                echo "<span class='star'>&#9733;</span>";
-                echo "<span class='rating-score'>" . $avg_rating . "</span>";
-                echo "<span class='rating-count'>(" . ($review_count > 100 ? "100+" : $review_count) . ")</span>";
-                echo "</div>";
-
-                echo "</div>"; // Close restaurant-title
-                echo "<p class='detail'>" . $detail . "</p>";
-                echo "<p class='address'>Address: " . $address . "</p>";
-                echo "<a href='restaurant_plan.php?id=" . $id . "' class='read-more'>Read more <span class='sr-only'>about " . $name . "</span>";
-                echo "<svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 20 20' fill='currentColor'>";
-                echo "<path fill-rule='evenodd' d='M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z' clip-rule='evenodd' />";
-                echo "</svg>";
-                echo "</a>";
-                echo "</div>";
-                echo "</div>";
-                echo "</article>";
-            }
-            ?>
+            <?php foreach ($sellers as $seller): ?>
+                <article class='restaurant-card'>
+                    <div class='article-wrapper'>
+                        <figure>
+                            <img src='<?php echo $seller['profile_pic']; ?>' alt='profile_pic' class='profile-pic' />
+                        </figure>
+                        <div class='article-body'>
+                            <div class='restaurant-title'>
+                                <h2><?php echo $seller['name']; ?></h2>
+                            </div>
+                            <div class='rating-display'>
+                                <span class='star'>&#9733;</span>
+                                <span class='rating-score'><?php echo $seller['avg_rating']; ?></span>
+                                <span class='rating-count'>/<?php echo ($seller['review_count'] > 100 ? '100+' : $seller['review_count']); ?></span>
+                            </div>
+                            <p class='detail'><?php echo $seller['detail']; ?></p>
+                            <a href='restaurant_plan.php?id=<?php echo $seller['id']; ?>' class='read-more'>
+                                Read more <span class='sr-only'>about <?php echo $seller['name']; ?></span>
+                                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 20 20' fill='currentColor'>
+                                    <path fill-rule='evenodd' d='M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z' clip-rule='evenodd' />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            <?php endforeach; ?>
         </section>
     </div>
     <?php include '../partials/footer.php'; ?>

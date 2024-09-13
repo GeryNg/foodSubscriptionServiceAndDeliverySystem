@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 13, 2024 at 11:06 AM
+-- Generation Time: Sep 13, 2024 at 07:09 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -245,7 +245,8 @@ CREATE TABLE `delivery` (
 INSERT INTO `delivery` (`delivery_id`, `order_id`, `seller_id`, `address_id`, `cust_id`, `delivery_date`, `status`, `latitude`, `longitude`) VALUES
 ('202409120001', '1', 'S00001', '1', 'C00001', '2024-09-12', 'food preparing', NULL, NULL),
 ('202409130001', '1', 'S00001', '1', 'C00001', '2024-09-13', 'order accepted', NULL, NULL),
-('202409130002', '2', 'S00001', '1', 'C00001', '2024-09-13', 'order accepted', NULL, NULL);
+('202409130002', '2', 'S00001', '1', 'C00001', '2024-09-13', 'order accepted', NULL, NULL),
+('202409140001', '1', 'S00001', '1', 'C00001', '2024-09-14', 'order accepted', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -261,6 +262,14 @@ CREATE TABLE `feedback` (
   `Rating` enum('1','2','3','4','5') NOT NULL,
   `FeedbackDate` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `feedback`
+--
+
+INSERT INTO `feedback` (`Feedback_ID`, `Cust_ID`, `Order_ID`, `Comment`, `Rating`, `FeedbackDate`) VALUES
+(1, '0', '1', 'good ah', '4', '2024-09-13'),
+(2, '0', '2', 'good', '3', '2024-09-13');
 
 -- --------------------------------------------------------
 
@@ -349,7 +358,7 @@ CREATE TABLE `order_cust` (
 
 INSERT INTO `order_cust` (`Order_ID`, `OrderDate`, `GrandTotal`, `Status`, `Meal`, `Duration`, `StartDate`, `EndDate`, `Quantity`, `Cust_ID`, `Plan_ID`, `delivery_address_id`, `instructions`) VALUES
 (1, '2024-09-11', 527.78, 'Active', 'Lunch', 22, '2024-09-12', '2024-10-04', 1, 'C00001', '1', 1, 'no'),
-(2, '2024-09-13', 69.00, 'Active', 'Lunch', 1, '2024-09-13', '2024-09-13', 1, 'C00001', '2', 1, 'no');
+(2, '2024-09-13', 69.00, 'Finished', 'Lunch', 1, '2024-09-13', '2024-09-13', 1, 'C00001', '2', 1, 'no');
 
 -- --------------------------------------------------------
 
@@ -519,7 +528,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `join_date`, `status`, `avatar`, `security_question1`, `security_answer1`, `security_question2`, `security_answer2`, `reset_token_hash`, `reset_token_expires_at`) VALUES
-('U00001', 'testseller1', 'geryng0102@gmail.com', '$2y$10$yD4rMw/kvekHFM6Pl1w7JOlBvOEnfhZTZdYIR0NCrPlkJoZjS1ww.', 'seller', '2024-09-09 22:30:57', 'Online', '../uploads/default.jpg', 'What was your first pet\'s name?', 'lihao', 'What is your mother\'s maiden name?', 'lihao', NULL, NULL),
+('U00001', 'testseller1', 'geryng0102@gmail.com', '$2y$10$yD4rMw/kvekHFM6Pl1w7JOlBvOEnfhZTZdYIR0NCrPlkJoZjS1ww.', 'seller', '2024-09-09 22:30:57', 'Offline now', '../uploads/default.jpg', 'What was your first pet\'s name?', 'lihao', 'What is your mother\'s maiden name?', 'lihao', NULL, NULL),
 ('U00002', 'testcustomer1', 'ngyx-wm22@student.tarc.edu.my', '$2y$10$9Sr6jk6D5YRLlWx3ieDHuugSKg5IrKuL0EZGHzwvYhJa8YbjX9sKm', 'customer', '2024-09-09 23:15:48', 'Offline now', '../uploads/default.jpg', 'What was your first pet\'s name?', 'lihao', 'What is your mother\'s maiden name?', 'lihao', NULL, NULL),
 ('U00003', 'testadmin1', 'hello180102@gmail.com', '$2y$10$2uKhct036G31ubRuqEfaPeSX9LpK63cZedlHCpREt.7zD/16AKNlW', 'admin', '2024-09-10 21:50:33', 'Offline now', '../uploads/default.jpg', 'What was your first pet\'s name?', 'lihao', 'What is your mother\'s maiden name?', 'lihao', NULL, NULL);
 
@@ -703,7 +712,7 @@ ALTER TABLE `announcement`
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
-  MODIFY `Feedback_ID` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `Feedback_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `link_requests`

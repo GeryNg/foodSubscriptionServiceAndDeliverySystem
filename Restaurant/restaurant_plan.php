@@ -1,5 +1,6 @@
 <?php include '../resource/Database.php'; ?>
-<?php include '../resource/session.php'; ?> <!-- Ensure session.php is included to check for session status -->
+<?php include '../resource/session.php'; ?> 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,7 +21,7 @@
                     FROM seller 
                     WHERE seller.id = :id;";
             $statement = $db->prepare($sql);
-            $statement->bindParam(':id', $id, PDO::PARAM_STR_CHAR);
+            $statement->bindParam(':id', $id, PDO::PARAM_INT);
             $statement->execute();
             
             if ($row = $statement->fetch()) {
@@ -36,14 +37,31 @@
                 echo "<p>" . $detail . "</p>";              
                 echo "<p>Address: " . $address . "</p>";
                 echo "</div>";
-                echo "</div>";
+                
+                // Fetch the average rating and count the number of feedback entries
+                $sql_avg_rating = "SELECT AVG(Rating) as avg_rating, COUNT(*) as review_count
+                                   FROM feedback f 
+                                   JOIN order_cust oc ON f.Order_ID = oc.Order_ID 
+                                   WHERE oc.Plan_ID IN (SELECT id FROM plan WHERE seller_id = :seller_id)";
+                $statement_avg = $db->prepare($sql_avg_rating);
+                $statement_avg->bindParam(':seller_id', $id, PDO::PARAM_INT);
+                $statement_avg->execute();
+                $rating_result = $statement_avg->fetch();
+                
+                $avg_rating = round($rating_result['avg_rating'], 1);
+                $review_count = $rating_result['review_count'];
+
+                // Pass the average rating and review count to the JavaScript
+                echo "<div id='star-rating-container' class='star-rating' data-rating='" . $avg_rating . "' data-count='" . $review_count . "'></div>";
+                
+                echo "</div>"; // Closing restaurant-info div
                 
                 // Fetch plans
                 $sql = "SELECT plan.id, plan.image_urls, plan.plan_name, plan.description, plan.price 
                         FROM plan 
                         WHERE plan.seller_id = :id;";
                 $statement = $db->prepare($sql);
-                $statement->bindParam(':id', $id, PDO::PARAM_STR_CHAR);
+                $statement->bindParam(':id', $id, PDO::PARAM_INT);
                 $statement->execute();
 
                 echo "<h2>Plans</h2>";
@@ -95,5 +113,31 @@
         ?>
     </div>
     <?php include '../partials/footer.php'; ?>
+
+    <!-- JavaScript for Star Rating -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const starRatingContainer = document.getElementById('star-rating-container');
+            const rating = parseFloat(starRatingContainer.getAttribute('data-rating'));
+            const reviewCount = starRatingContainer.getAttribute('data-count');
+
+            // Build the star rating display
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '&#9733;'; // Filled star
+                } else if (i - rating < 1) {
+                    stars += '&#9733;'; // Partially filled star (optional, can be a half star here)
+                } else {
+                    stars += '&#9734;'; // Empty star
+                }
+            }
+
+            // Add the rating score and count display
+            const ratingDisplay = `<span class='rating-score'>${rating}</span>/5 <span class='rating-count'>(${reviewCount}+)</span>`;
+
+            starRatingContainer.innerHTML = `<span class="star">&#9733;</span> ${ratingDisplay}`;
+        });
+    </script>
 </body>
 </html>

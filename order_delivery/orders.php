@@ -34,11 +34,14 @@ include '../resource/Database.php';
                     $planPrice = htmlspecialchars($plan['price'], ENT_QUOTES, 'UTF-8');
                     $planImages = explode(',', htmlspecialchars($plan['image_urls'], ENT_QUOTES, 'UTF-8'));
 
+                    // Plan image slideshow
                     echo "<div class='plan-images'>";
                     echo "<div class='slideshow-container'>";
                     foreach ($planImages as $index => $image) {
-                        echo "<div class='mySlides'>";
-                        echo "<center><img src='" . trim($image) . "' ></center>";
+                        // Assuming the image path is relative to the root directory
+                        $imagePath = "../plan/" . trim($image);
+                        echo "<div class='mySlides fade'>";
+                        echo "<img src='" . $imagePath . "' class='plan-image'>";
                         echo "</div>";
                     }
                     echo "<a class='prev' onclick='plusSlides(-1)'>&#10094;</a>";
@@ -48,8 +51,9 @@ include '../resource/Database.php';
                     // Thumbnails
                     echo "<div class='thumbnail-row'>";
                     foreach ($planImages as $index => $image) {
+                        $imagePath = "../plan/" . trim($image);
                         echo "<div class='thumbnail-column'>";
-                        echo "<img class='demo cursor' src='" . trim($image) . "' style='width:100%' onclick='currentSlide(" . ($index + 1) . ")' alt='Image'>";
+                        echo "<img class='demo cursor' src='" . $imagePath . "' style='width:100%' onclick='currentSlide(" . ($index + 1) . ")' alt='Image'>";
                         echo "</div>";
                     }
                     echo "</div>";
@@ -171,8 +175,38 @@ include '../resource/Database.php';
     <?php include '../partials/footer.php'; ?>
 
     <script>
-        // Add logic to calculate total cost including add-ons, similar to the main plan price calculation
+        let slideIndex = 1;
+        showSlides(slideIndex);
 
+        function plusSlides(n) {
+            showSlides(slideIndex += n);
+        }
+
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+
+        function showSlides(n) {
+            let i;
+            let slides = document.getElementsByClassName("mySlides");
+            let dots = document.getElementsByClassName("demo");
+            if (n > slides.length) {
+                slideIndex = 1;
+            }
+            if (n < 1) {
+                slideIndex = slides.length;
+            }
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+            slides[slideIndex - 1].style.display = "block";
+            dots[slideIndex - 1].className += " active";
+        }
+
+        // JavaScript for calculating totals
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
         const durationInput = document.getElementById('duration');

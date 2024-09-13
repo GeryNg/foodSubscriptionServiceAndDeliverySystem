@@ -119,3 +119,26 @@ figure {
 .read-more:hover .icon {
     transform: translateX(5px);
 }
+
+.star-rating {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-family: 'Arial', sans-serif;
+}
+
+.star {
+    color: #FFA500; /* Orange star color */
+    margin-right: 5px;
+    font-size: 20px; /* Slightly bigger star */
+}
+
+.rating-score {
+    font-weight: bold;
+    color: #333; /* Darker color for score */
+    margin-right: 5px;
+}
+
+.rating-count {
+    color: #777; /* Lighter color for count */
+}

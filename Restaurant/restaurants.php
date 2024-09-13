@@ -47,13 +47,36 @@
                 $address = htmlspecialchars($row["address"], ENT_QUOTES, 'UTF-8');
                 $id = htmlspecialchars($row["id"], ENT_QUOTES, 'UTF-8');
 
+                // Fetch average rating for the current restaurant
+                $sql_avg_rating = "SELECT AVG(Rating) as avg_rating, COUNT(*) as review_count
+                                   FROM feedback f 
+                                   JOIN order_cust oc ON f.Order_ID = oc.Order_ID 
+                                   WHERE oc.Plan_ID IN (SELECT id FROM plan WHERE seller_id = :seller_id)";
+                $statement_avg = $db->prepare($sql_avg_rating);
+                $statement_avg->bindParam(':seller_id', $id, PDO::PARAM_INT);
+                $statement_avg->execute();
+                $rating_result = $statement_avg->fetch();
+
+                $avg_rating = round($rating_result['avg_rating'], 1);
+                $review_count = $rating_result['review_count'];
+
                 echo "<article class='restaurant-card'>";
                 echo "<div class='article-wrapper'>";
                 echo "<figure>";
                 echo "<img src='" . $profile_pic . "' alt='profile_pic' class='profile-pic'/>";
                 echo "</figure>";
                 echo "<div class='article-body'>";
+                echo "<div class='restaurant-title'>";
                 echo "<h3>" . $name . "</h3>";
+
+                // Display average rating and review count next to the name
+                echo "<div class='rating-display'>";
+                echo "<span class='star'>&#9733;</span>";
+                echo "<span class='rating-score'>" . $avg_rating . "</span>";
+                echo "<span class='rating-count'>(" . ($review_count > 100 ? "100+" : $review_count) . ")</span>";
+                echo "</div>";
+
+                echo "</div>"; // Close restaurant-title
                 echo "<p class='detail'>" . $detail . "</p>";
                 echo "<p class='address'>Address: " . $address . "</p>";
                 echo "<a href='restaurant_plan.php?id=" . $id . "' class='read-more'>Read more <span class='sr-only'>about " . $name . "</span>";

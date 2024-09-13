@@ -3,8 +3,7 @@ include_once '../resource/Database.php';
 include_once '../resource/utilities.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    if (isset($_SESSION['seller_id']) && !isset($_POST['updateSellerInformation'])) {
-        $seller_id = $_SESSION['seller_id'];
+        $seller_id = $_GET['seller_id'] ?? $_SESSION['seller_id'];
 
         try {
             $sqlQuery = "SELECT * FROM seller WHERE id = :seller_id";
@@ -26,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         } catch (PDOException $ex) {
             echo "Error fetching seller data: " . $ex->getMessage();
         }
-    }
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateSellerInformation'])) {
     $form_errors = array();
 

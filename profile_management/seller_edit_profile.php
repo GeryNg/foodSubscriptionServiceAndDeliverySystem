@@ -1,12 +1,34 @@
+<?php
+$page_title = "User Authentication - Edit Profile";
+include_once '../resource/session.php';
+include_once '../partials/staff_nav.php';
+include_once '../partials/parseSellerProfile.php';
+?>
+
 <!DOCTYPE html>
 <html>
 
 <head lang="en">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
+        .container-fluid {
+            margin-bottom: 5%;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin: 3rem 0 0.5rem 0;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .breadcrumb {
+            background-color: transparent;
+        }
+
         .pull-right {
             float: right !important;
         }
@@ -18,17 +40,15 @@
 </head>
 
 <body>
-
-    <?php
-    $page_title = "User Authentication - Edit Profile";
-    include_once "../partials/staff_nav.php";
-    include_once "../partials/parseSellerProfile.php";
-    ?>
-
-    <div class="container" style="margin-top:20px;">
+    <div class="container-fluid">
+        <h1>Edit information</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="../partials/seller_dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="../profile_management/seller_profile.php">Profile</a></li>
+            <li class="breadcrumb-item active">Edit Profile</li>
+        </ol>
+        
         <section class="col col-lg-7">
-            <h1>Edit information</h1>
-
             <?php if (isset($result) || !empty($form_errors)): ?>
                 <div>
                     <?php echo show_combined_messages($result, $form_errors); ?>

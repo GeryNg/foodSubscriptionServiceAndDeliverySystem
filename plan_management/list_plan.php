@@ -28,11 +28,30 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="../css/list_plan.css" rel="stylesheet">
     <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
     <title><?php echo $page_title; ?></title>
+    <style>
+        .container-fluid{
+            margin-bottom: 5%;
+        }
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin: 3rem 0 0.5rem 0;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .breadcrumb{
+            background-color:transparent;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container-fluid" style="margin-top: 20px;">
-        <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Plan List</h1>
+    <div class="container-fluid">
+        <h1>Plan List</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="../partials/seller_dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item active">Plan List</li>
+        </ol>
         <hr />
         <div class="main">
             <ul class="cards">

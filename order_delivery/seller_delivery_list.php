@@ -128,6 +128,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </script>";
     }
 }
+
+// Query to get the current status of the seller
+$query = "SELECT status FROM seller_location WHERE seller_id = :seller_id LIMIT 1";
+$stmt = $db->prepare($query);
+$stmt->bindParam(':seller_id', $seller_id);
+$stmt->execute();
+$seller_status = $stmt->fetch(PDO::FETCH_ASSOC)['status'] ?? 'close';
 ?>
 
 <!DOCTYPE html>
@@ -141,6 +148,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     <style>
+        .container-fluid {
+            margin-bottom: 5%;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin: 3rem 0 0.5rem 0;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .breadcrumb {
+            background-color: transparent;
+        }
+
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -152,13 +175,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             right: 3%;
             display: flex;
             align-items: center;
+            font-weight: bold;
         }
 
         .totalQuantuty .number {
             background-color: green;
             color: #fff;
             padding: 8px;
-            font-weight: 500;
+            font-weight: bold;
             border-radius: 5px;
             margin: 8px;
         }
@@ -193,6 +217,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: #29a329;
         }
 
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-label {
+            position: absolute;
+            cursor: pointer;
+            background-color: #ccc;
+            border-radius: 30px;
+            width: 100%;
+            height: 100%;
+            transition: 0.4s;
+        }
+
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: 0.4s;
+        }
+
+        input:checked+.toggle-label {
+            background-color: #4caf50;
+        }
+
+        input:checked+.toggle-label::after {
+            transform: translateX(30px);
+        }
+
         @media only screen and (max-width: 500px) {
             h4 {
                 font-size: 15px;
@@ -206,9 +272,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-    <div class="container-fluid" style="margin-top: 20px;">
-        <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Delivery List Table</h1>
-        <hr />
+    <div class="container-fluid">
+        <h1>Delivery List Table</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="../partials/seller_dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item active">Delivery List</li>
+        </ol>
+
+        <label>Location Tracking</label>
+        <div class="toggle-switch">
+            <input type="checkbox" id="toggleLocation" <?php echo ($seller_status === 'open') ? 'checked' : ''; ?> />
+            <label for="toggleLocation" class="toggle-label"></label>
+        </div>
+        <br />
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h4 class="m-0 font-weight-bold text-primary"><strong>Lunch Section</strong></h4>
@@ -434,6 +510,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         });
     </script>
+    <script>
+        let trackingInterval;
+
+        // Automatically start tracking if status is 'open'
+        <?php if ($seller_status === 'open'): ?>
+            startLocationTracking();
+        <?php endif; ?>
+
+        document.getElementById('toggleLocation').addEventListener('change', function() {
+            if (this.checked) {
+                startLocationTracking();
+            } else {
+                closeLocation();
+            }
+        });
+
+        function startLocationTracking() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(startTracking, handleError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function startTracking(position) {
+            const {
+                latitude,
+                longitude
+            } = position.coords;
+            const fingerprint = '<?php echo $_SESSION['fingerprint']; ?>'; // Add fingerprint to the request
+
+            updateSellerLocation(latitude, longitude, 'open', fingerprint);
+
+            // Update location every 15 seconds
+            trackingInterval = setInterval(function() {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const {
+                        latitude,
+                        longitude
+                    } = position.coords;
+                    updateSellerLocation(latitude, longitude, 'open', fingerprint);
+                }, handleError);
+            }, 15000);
+        }
+
+        function closeLocation() {
+            if (trackingInterval) {
+                clearInterval(trackingInterval);
+            }
+            const fingerprint = '<?php echo $_SESSION['fingerprint']; ?>'; // Add fingerprint to the request
+            updateSellerLocation(null, null, 'close', fingerprint);
+        }
+
+        function updateSellerLocation(latitude, longitude, status, fingerprint) {
+            const data = {
+                latitude: latitude,
+                longitude: longitude,
+                status: status,
+                fingerprint: fingerprint
+            };
+
+            console.log('Sending data:', data); // Log the data being sent for debugging
+
+            fetch('update_seller_location.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.text())
+                .then(result => {
+                    console.log('Response from server:', result); // Log the server response
+                    if (result !== 'success') {
+                        alert('Failed to update location.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the location.');
+                });
+        }
+
+        function handleError(error) {
+            console.warn(`ERROR(${error.code}): ${error.message}`);
+        }
+    </script>
+
 </body>
 
 </html>

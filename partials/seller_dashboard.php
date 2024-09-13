@@ -123,6 +123,22 @@ if ($sellerPlan) {
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
     <style>
+        .container-fluid {
+            margin-bottom: 5%;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin: 3rem 0 0.5rem 0;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .breadcrumb {
+            background-color: transparent;
+        }
+
         .button1 {
             background-color: #5C67F2;
             color: white;
@@ -141,11 +157,10 @@ if ($sellerPlan) {
 </head>
 
 <body>
-    <div class="container-fluid" style="margin:20px;">
+    <div class="container-fluid">
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h1 mb-0 text-gray-800" style="font-weight: 600;">Dashboard</h1>
+            <h1>Dashboard</h1>
         </div>
-
         <div class="row">
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card border-left-primary shadow h-100 py-2">
@@ -276,9 +291,8 @@ if ($sellerPlan) {
                 </div>
             </div>
         </div>
-
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Announcement</h1>
+            <h1 class="h3 mb-0 text-gray-800" style="font-weight: bold;">Announcement</h1>
         </div>
 
         <div class="row">
@@ -340,7 +354,6 @@ if ($sellerPlan) {
                 <div id="moreAnnouncements" style="display: none;"></div>
             </div>
         </div>
-    </div>
 
     </div>
     <script>

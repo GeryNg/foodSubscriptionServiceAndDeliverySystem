@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             throw new Exception("Plan not found.");
         }
 
-        // Fetch Orders for the plan which just now click 
+        // Fetch Orders for the plan
         $order_query = $db->prepare("SELECT * FROM order_cust WHERE plan_id = :plan_id AND meal = :meal");
         $order_query->bindParam(':plan_id', $plan_id);
         $order_query->bindParam(':meal', $meal);
@@ -60,13 +60,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 throw new Exception("Address not found for Order ID " . $order['Order_ID']);
             }
 
+            // Fetch Add-ons for the order
+            $addon_query = $db->prepare("
+                SELECT addons.addon_name 
+                FROM order_addon 
+                INNER JOIN addons ON order_addon.addon_id = addons.id 
+                WHERE order_addon.order_id = :order_id
+            ");
+            $addon_query->bindParam(':order_id', $order['Order_ID']);
+            $addon_query->execute();
+            $addons = $addon_query->fetchAll(PDO::FETCH_ASSOC);
 
             echo '<!DOCTYPE html>
                     <html lang="en">
                     <head>
                         <meta charset="UTF-8">
-                        <link rel="shortcut icon" type="image/x-icon" href="https://static.codepen.io/assets/favicon/favicon-8ea04875e70c4b0bb41da869e81236e54394d63638a1ef12fa558a4a835f1164.ico" />
-                        <link rel="mask-icon" type="" href="https://static.codepen.io/assets/favicon/logo-pin-f2d2b6d2c61838f7e76325261b7195c27224080bc099486ddd6dccb469b8e8e6.svg" color="#111" />
                         <title>POS Receipt</title>
                         <style>
                         #invoice-POS {
@@ -179,12 +187,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         </tr>
                                         <tr>
                                             <td colspan="3">
+                                                <p><strong>Add-ons:</strong></p>';
+                                                if (!empty($addons)) {
+                                                    foreach ($addons as $addon) {
+                                                        echo '<p>' . htmlspecialchars($addon['addon_name']) . '</p>';
+                                                    }
+                                                } else {
+                                                    echo '<p>No Add-ons</p>';
+                                                }
+                                                echo '
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
                                                 <div id="legalcopy">
                                                     <p>Order ID: ' . htmlspecialchars($order['Order_ID']) . '</p>
                                                     <p>Customer Name: ' . htmlspecialchars($customer['Name']) . '</p>
                                                     <p>Phone: ' . htmlspecialchars($customer['Phone_num']) . '</p>
                                                     <p>Address: ' . htmlspecialchars($address['line1']) . ', ' . htmlspecialchars($address['line2']) . ', ' . htmlspecialchars($address['city']) . ', ' . htmlspecialchars($address['state']) . ', ' . htmlspecialchars($address['postal_code']) . ', ' . htmlspecialchars($address['country']) . '</p>
-                                                    <p class="legal"><strong>thank you For ordering from Us!</strong> We Hope you Enjoy your meal.</p>
+                                                    <p class="legal"><strong>Thank you for ordering from us!</strong> We hope you enjoy your meal.</p>
                                                 </div>
                                             </td>
                                         </tr>

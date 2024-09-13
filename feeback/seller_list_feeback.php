@@ -34,7 +34,21 @@ $planImage = $imageUrls[0];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bree+Serif&family=EB+Garamond:ital,wght@0,500;1,800&display=swap');
+        .container-fluid{
+            margin-bottom: 5%;
+        }
 
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin: 3rem 0 0.5rem 0;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .breadcrumb{
+            background-color:transparent;
+        }
         .container1,
         .container2 {
             box-shadow: 0 15px 30px 1px grey;
@@ -176,9 +190,12 @@ $planImage = $imageUrls[0];
 </head>
 
 <body>
-    <div class="container-fluid" style="margin-top: 20px;">
-        <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Feedback</h1>
-        <br />
+    <div class="container-fluid">
+        <h1>Feedback</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="../partials/seller_dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item active">Delivery List</li>
+        </ol>
         <div id="feedback-container">
             <?php
             $query2 = "

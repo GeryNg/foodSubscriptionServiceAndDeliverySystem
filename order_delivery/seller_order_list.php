@@ -28,10 +28,25 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     <style>
+        .container-fluid{
+            margin-bottom: 5%;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin: 3rem 0 0.5rem 0;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .breadcrumb{
+            background-color:transparent;
+        }
+
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -43,13 +58,14 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
             right: 3%;
             display: flex;
             align-items: center;
+            font-weight: bold;
         }
 
         .totalQuantity .number {
             background-color: green;
             color: #fff;
             padding: 8px;
-            font-weight: 500;
+            font-weight: bold;
             border-radius: 5px;
             margin: 8px;
         }
@@ -64,6 +80,7 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
             cursor: pointer;
             border: 1px solid #ccc;
             background-color: #f8f9fc;
+            font-weight: bold;
         }
 
         .toggle-btn.active {
@@ -78,13 +95,19 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .meal-table.active {
             display: block;
         }
+        .btn{
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid" style="margin-top: 20px;">
-        <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Order List Table</h1>
-        <hr />
+    <div class="container-fluid">
+        <h1>Order List Table</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="../partials/seller_dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item active">Order List</li>
+        </ol>
 
         <div class="toggle-btn-group">
             <div class="toggle-btn active" data-meal="Lunch">Lunch</div>
@@ -109,7 +132,6 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="totalQuantity"><strong> Active Order Quantity: </strong>
                             <div class="number"><?php echo $totalQuantity; ?></div>
                         </div>
-
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -121,6 +143,7 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <th>Quantity</th>
                                         <th>Cust_ID</th>
                                         <th>Instructions</th>
+                                        <th>Add-ons</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
@@ -130,6 +153,7 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <th>Quantity</th>
                                         <th>Cust_ID</th>
                                         <th>Instructions</th>
+                                        <th>Add-ons</th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
@@ -140,6 +164,26 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?php echo $order['Quantity']; ?></td>
                                             <td><?php echo $order['Cust_ID']; ?></td>
                                             <td><?php echo $order['instructions']; ?></td>
+                                            <td>
+                                                <?php
+                                                $addonQuery = "SELECT addons.addon_name 
+                                                               FROM order_addon 
+                                                               INNER JOIN addons ON order_addon.addon_id = addons.id 
+                                                               WHERE order_addon.order_id = :order_id";
+                                                $addonStmt = $db->prepare($addonQuery);
+                                                $addonStmt->bindParam(':order_id', $order['Order_ID']);
+                                                $addonStmt->execute();
+                                                $addons = $addonStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                                if ($addons) {
+                                                    foreach ($addons as $addon) {
+                                                        echo htmlspecialchars($addon['addon_name']) . "<br>";
+                                                    }
+                                                } else {
+                                                    echo "No Add-ons";
+                                                }
+                                                ?>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

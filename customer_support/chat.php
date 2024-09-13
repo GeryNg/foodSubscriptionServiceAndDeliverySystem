@@ -4,27 +4,26 @@ include_once '../resource/Database.php';
 include_once '../resource/session.php';
 include_once '../partials/headers.php';
 
-if (!isset($_SESSION['id']) || !isset($_GET['user_id'])) {
+if (!isset($_SESSION['id']) || !isset($_GET['seller_id'])) {
     header("Location: ../login_management/login.php");
     exit;
 }
 
-$chat_partner_id = $_GET['user_id'];
+$seller_id = $_GET['seller_id'];
 $user_id = $_SESSION['id'];
 
 try {
-    // Fetch seller name and profile picture
     $sql = "SELECT s.name AS seller_name, s.profile_pic AS avatar, u.status 
-            FROM users u 
-            LEFT JOIN seller s ON s.user_id = u.id
-            WHERE u.id = :id";
+            FROM seller s
+            JOIN users u ON s.user_id = u.id
+            WHERE s.id = :seller_id";
     $stmt = $db->prepare($sql);
-    $stmt->bindParam(':id', $chat_partner_id, PDO::PARAM_INT);
+    $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_STR);
     $stmt->execute();
     $chat_partner = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$chat_partner) {
-        throw new Exception("User not found");
+        throw new Exception("Seller not found");
     }
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
@@ -50,7 +49,7 @@ try {
             </header>
             <div class="chat-box"></div>
             <form action="#" class="typing-area">
-                <input type="text" class="incoming_id" name="incoming_id" value="<?php echo htmlspecialchars($chat_partner_id); ?>" hidden>
+                <input type="text" class="incoming_id" name="incoming_id" value="<?php echo htmlspecialchars($seller_id); ?>" hidden>
                 <input type="text" name="message" class="input-field" placeholder="Type a message here..." autocomplete="off">
                 <button type="submit" class="send-button"><i class="bi bi-arrow-right-circle"></i></button>
             </form>
@@ -114,7 +113,4 @@ try {
         });
     });
 </script>
-
-
-
 </html>

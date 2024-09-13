@@ -90,47 +90,49 @@ if (isset($_SESSION['id'])) {
     $output = "";
 
     try {
-        $sqlSeller = "SELECT user_id FROM seller WHERE id = :seller_id";
-        $stmtSeller = $db->prepare($sqlSeller);
-        $stmtSeller->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
-        $stmtSeller->execute();
-    
-        $sellerData = $stmtSeller->fetch(PDO::FETCH_ASSOC);
-        $outgoing_id = $sellerData['user_id'];
-        
-        $sql = "SELECT messages.msg, messages.outgoing_msg_id, users.avatar 
+        $sql = "SELECT messages.msg, messages.outgoing_msg_id, messages.incoming_msg_id, users.avatar 
                 FROM messages 
                 LEFT JOIN users ON users.id = messages.outgoing_msg_id 
-                WHERE (messages.outgoing_msg_id = :outgoing_id AND messages.incoming_msg_id = :incoming_id) 
-                   OR (messages.outgoing_msg_id = :incoming_id AND messages.incoming_msg_id = :outgoing_id) 
-                ORDER BY messages.msg_id";
+                WHERE (messages.outgoing_msg_id = :seller_id AND messages.incoming_msg_id = :incoming_id) 
+                   OR (messages.outgoing_msg_id = :incoming_id AND messages.incoming_msg_id = :seller_id) 
+                ORDER BY messages.msg_id ASC";
         
         $stmt = $db->prepare($sql);
-        $stmt->bindParam(':outgoing_id', $outgoing_id, PDO::PARAM_INT);
+        $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
         $stmt->bindParam(':incoming_id', $incoming_id, PDO::PARAM_INT);
         $stmt->execute();
 
+        $hasSellerMessages = false;  // Flag to check if any message involves the seller
+
         if ($stmt->rowCount() > 0) {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                if ($row['outgoing_msg_id'] == $outgoing_id) {
-                    $output .= '<div class="chat outgoing">
-                                    <div class="details">
-                                        <p>' . htmlspecialchars($row['msg']) . '</p>
-                                    </div>
-                                </div>';
-                } else {
-                    $profilePicPath = !empty($row['avatar']) ? $row['avatar'] : 'default.jpg';
-                    $avatar = '../uploads/' . htmlspecialchars($profilePicPath);
+                // Check if the seller is involved in the conversation (either as outgoing or incoming)
+                if ($row['outgoing_msg_id'] == $seller_id || $row['incoming_msg_id'] == $seller_id) {
+                    $hasSellerMessages = true;  // Mark that a message involving the seller was found
 
-                    $output .= '<div class="chat incoming">
-                                    <img src="' . $avatar . '" alt="">
-                                    <div class="details">
-                                        <p>' . htmlspecialchars($row['msg']) . '</p>
-                                    </div>
-                                </div>';
+                    if ($row['outgoing_msg_id'] == $seller_id) {
+                        $output .= '<div class="chat outgoing">
+                                        <div class="details">
+                                            <p>' . htmlspecialchars($row['msg']) . '</p>
+                                        </div>
+                                    </div>';
+                    } else {
+                        $profilePicPath = !empty($row['avatar']) ? $row['avatar'] : 'default.jpg';
+                        $avatar = '../uploads/' . htmlspecialchars($profilePicPath);
+
+                        $output .= '<div class="chat incoming">
+                                        <img src="' . $avatar . '" alt="Customer Profile Picture">
+                                        <div class="details">
+                                            <p>' . htmlspecialchars($row['msg']) . '</p>
+                                        </div>
+                                    </div>';
+                    }
                 }
             }
-        } else {
+        }
+
+        // If no messages involving the seller were found, display "No messages are available"
+        if (!$hasSellerMessages) {
             $output .= '<div class="text">No messages are available. Once you send a message, they will appear here.</div>';
         }
 

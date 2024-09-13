@@ -2,56 +2,45 @@
 include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
-$outgoing_id = $_SESSION['id'];
+$user_id = $_SESSION['id'];
 
 try {
-    $sql = "SELECT DISTINCT u.id AS user_id, s.name AS seller_name, u.avatar, s.profile_pic 
+    $sql = "SELECT s.id AS seller_id, s.name AS seller_name, s.profile_pic, m.msg, m.outgoing_msg_id, m.incoming_msg_id
             FROM messages m
-            JOIN seller s ON s.user_id = CASE WHEN m.incoming_msg_id = :outgoing_id THEN m.outgoing_msg_id ELSE m.incoming_msg_id END
-            JOIN users u ON u.id = s.user_id
-            WHERE (m.incoming_msg_id = :outgoing_id OR m.outgoing_msg_id = :outgoing_id)
+            JOIN seller s ON s.id = CASE 
+                WHEN m.incoming_msg_id = :user_id THEN m.outgoing_msg_id 
+                ELSE m.incoming_msg_id 
+            END
+            WHERE (m.incoming_msg_id = :user_id OR m.outgoing_msg_id = :user_id)
+            AND (m.msg_id IN (
+                SELECT MAX(msg_id) 
+                FROM messages 
+                WHERE (incoming_msg_id = s.id OR outgoing_msg_id = s.id) 
+                GROUP BY LEAST(incoming_msg_id, outgoing_msg_id), GREATEST(incoming_msg_id, outgoing_msg_id)
+            ))
             ORDER BY m.msg_id DESC";
+
     $stmt = $db->prepare($sql);
-    $stmt->bindParam(':outgoing_id', $outgoing_id, PDO::PARAM_INT);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_STR);
     $stmt->execute();
 
     $output = "";
 
     if ($stmt->rowCount() > 0) {
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $sqlStatus = "SELECT status FROM users WHERE id = :user_id";
-            $stmtStatus = $db->prepare($sqlStatus);
-            $stmtStatus->bindParam(':user_id', $row['user_id'], PDO::PARAM_INT);
-            $stmtStatus->execute();
-            $userStatus = $stmtStatus->fetch(PDO::FETCH_ASSOC);
+            $you = ($row['outgoing_msg_id'] == $user_id) ? "You: " : "";
 
-            $sql2 = "SELECT msg FROM messages WHERE (incoming_msg_id = :seller_user_id AND outgoing_msg_id = :outgoing_id) 
-                     OR (incoming_msg_id = :outgoing_id AND outgoing_msg_id = :seller_user_id) 
-                     ORDER BY msg_id DESC LIMIT 1";
-            $stmt2 = $db->prepare($sql2);
-            $stmt2->bindParam(':seller_user_id', $row['user_id'], PDO::PARAM_INT);
-            $stmt2->bindParam(':outgoing_id', $outgoing_id, PDO::PARAM_INT);
-            $stmt2->execute();
-            $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
-            $result = ($stmt2->rowCount() > 0) ? $row2['msg'] : "No message available";
-            $msg = (strlen($result) > 28) ? substr($result, 0, 28) . '...' : $result;
+            $profilePicPath = !empty($row['profile_pic']) ? $row['profile_pic'] : '../uploads/default.jpg';
 
-            $you = (isset($row2['outgoing_msg_id']) && $outgoing_id == $row2['outgoing_msg_id']) ? "You: " : "";
-            $hide_me = ($outgoing_id == $row['user_id']) ? "hide" : "";
-
-            $profilePicPath = !empty($row['profile_pic']) ? $row['profile_pic'] : 'default.jpg';
-            $avatar = '../seller_profile_pic/' . $profilePicPath;
-
-            $output .= '<a href="chat.php?user_id=' . htmlspecialchars($row['user_id']) . '" class="' . htmlspecialchars($hide_me) . '">
-                        <div class="content">
-                            <img src="' . htmlspecialchars($avatar) . '" alt="Profile Picture">
-                            <div class="details">
-                                <span>' . htmlspecialchars($row['seller_name']) . '</span>
-                                <p>' . htmlspecialchars($you . $msg) . '</p>
+            $output .= '<a href="chat.php?seller_id=' . htmlspecialchars($row['seller_id']) . '">
+                            <div class="content">
+                                <img src="' . htmlspecialchars($profilePicPath) . '" alt="Profile Picture">
+                                <div class="details">
+                                    <span>' . htmlspecialchars($row['seller_name']) . '</span>
+                                    <p>' . htmlspecialchars($you . $row['msg']) . '</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="status-dot ' . (($userStatus['status'] === "Offline now") ? "offline" : "online") . '"><i class="fas fa-circle"></i></div>
-                    </a>';
+                        </a>';
         }
     } else {
         $output .= 'No active chats found.';
@@ -61,4 +50,3 @@ try {
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
-?>

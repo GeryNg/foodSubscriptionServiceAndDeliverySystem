@@ -6,38 +6,42 @@ include_once '../partials/parseActiveAccount.php';
 
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f3f3f3;
+        .container-fluid {
+            margin-bottom: 5%;
         }
-        .main-content {
-            padding: 20px;
-            background-color: #f3f3f3;
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin: 3rem 0 0.5rem 0;
+            font-weight: 800;
+            line-height: 1.2;
         }
-        .container {
+
+        .breadcrumb {
+            background-color: transparent;
+        }
+
+        .container1 {
             background: white;
-            max-width: 600px;
             margin: 20px auto;
             padding: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            color: #333;
-        }
+
         label {
             margin-bottom: 10px;
             display: block;
+            font-weight: bold;
             color: #666;
         }
+
         input[type="text"],
         input[type="number"],
         textarea,
@@ -45,10 +49,21 @@ include_once '../partials/parseActiveAccount.php';
             width: 100%;
             padding: 8px;
             margin-top: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             box-sizing: border-box;
         }
-        button {
+
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: url('data:image/svg+xml;utf8,<svg fill="gray" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+            background-color: white;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+
+        .button1 {
             background-color: #5C67F2;
             color: white;
             border: none;
@@ -57,19 +72,28 @@ include_once '../partials/parseActiveAccount.php';
             cursor: pointer;
             float: right;
             margin-top: 10px;
+            font-weight: bold;
+            border-radius: 10px;
         }
-        button:hover {
+
+        .button1:hover {
             background-color: #7a85ff;
         }
+
         form {
             overflow: auto;
         }
     </style>
 </head>
+
 <body>
-    <div class="main-content">
-        <div class="container">
-            <h1>Activate Account</h1>
+    <div class="container-fluid">
+        <h1>Activate Account</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="../partials/seller_dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item active">Active Account</li>
+        </ol>
+        <div class="container1">
             <form action="" method="post" enctype="multipart/form-data">
                 <br />
                 <?php if (isset($result) || !empty($form_errors)): ?>
@@ -77,19 +101,41 @@ include_once '../partials/parseActiveAccount.php';
                         <?php echo show_combined_messages($result, $form_errors); ?>
                     </div>
                 <?php endif; ?>
-                <div class="clearfix"></div>
-                <label>Name: <input type="text" name="seller_name" value="<?php if (isset($_POST['seller_name']))
-                    echo htmlspecialchars($_POST['seller_name']); ?>"></label><br>
+                <div class="clearfix" style="margin-bottom: 30px;"></div>
+                <label>Name: </label>
+                <input type="text" name="seller_name" class="form-control" value="<?php if (isset($_POST['seller_name'])) echo htmlspecialchars($_POST['seller_name']); ?>">
+                <br>
+
                 <label>Restaurant Profile Picture: </label>
-                    <input type="file" name="profile_pic" accept=".jpg, .jpeg, .png" multiple><br><br>
-                <label>Describe your restaurant: <textarea name="description"><?php if (isset($_POST['description']))
-                    echo htmlspecialchars($_POST['description']); ?></textarea></label><br>
-                <label>Contact Number: <input type="text" name="contact_num" value="<?php if (isset($_POST['contact_num']))
-                    echo htmlspecialchars($_POST['contact_num']); ?>"></label><br>
-                <label>Address: <textarea name="address"><?php if (isset($_POST['address']))
-                    echo htmlspecialchars($_POST['address']); ?></textarea></label><br>
+                <input type="file" name="profile_pic" class="form-control" accept=".jpg, .jpeg, .png" multiple>
+                <br /><br />
+
+                <label>Describe your restaurant: </label>
+                <textarea name="description" class="form-control"><?php if (isset($_POST['description'])) echo htmlspecialchars($_POST['description']); ?></textarea>
+                <br>
+                <label>Contact Number: </label>
+                <input type="text" name="contact_num" class="form-control" value="<?php if (isset($_POST['contact_num'])) echo htmlspecialchars($_POST['contact_num']); ?>">
+                <br>
+
+                <label>Address: </label>
+                <input type="text" name="address" class="form-control"><?php if (isset($_POST['address'])) echo htmlspecialchars($_POST['address']); ?>
+                <br>
+
+                <label>Postcode: </label>
+                <input type="text" name="postcode" id="postcode" class="form-control" oninput="fetchCityState()">
+                <div id="postcodeError" style="color: red;"></div>
+                <br>
+
+                <label>City: </label>
+                <input type="text" name="city" id="city" class="form-control" readonly>
+                <br>
+
+                <label>State: </label>
+                <input type="text" name="state" id="state" class="form-control" readonly>
+                <br>
+
                 <label>Bank Company:
-                    <select name="bank" id="bank">
+                    <select name="bank" id="bank" class="form-control">
                         <option value="Affin Bank">Affin Bank</option>
                         <option value="Affin Islamic Bank">Affin Islamic Bank</option>
                         <option value="Alliance Bank Malaysia">Alliance Bank Malaysia</option>
@@ -113,19 +159,67 @@ include_once '../partials/parseActiveAccount.php';
                         <option value="RHB Islamic Bank Berhad">RHB Islamic Bank Berhad</option>
                     </select>
                 </label>
-                <label>Bank Account: <input type="number" name="bank_account_number" value="<?php if (isset($_POST['bank_account_number']))
-                    echo htmlspecialchars($_POST['bank_account_number']); ?>"></label><br>
-                <label>Document needed for approval (Business owner/Partner’s NRIC, e-SSM Business Profile, Certificate of Registration of Business (Form D), Halal License, Liquor license, Business Premises License & other): </label><br>
-                <input type="file" name="images[]" accept=".jpg, .jpeg, .png" multiple><br><br>
-                <button type="submit" name="activeAccountBtn" value="Activate Account">Activate Account</button>
-                <br/>
-                <br/>
-                <br/>
+                <br />
+
+                <label>Bank Account: </label>
+                <input type="number" name="bank_account_number" class="form-control" value="<?php if (isset($_POST['bank_account_number'])) echo htmlspecialchars($_POST['bank_account_number']); ?>">
+                <br>
+
+                <label>Document needed for approval (Business owner/Partner's NRIC, e-SSM Business Profile, Certificate of Registration of Business (Form D), Halal License, Liquor license, Business Premises License & other): </label>
+                <input type="file" name="images[]" class="form-control" accept=".jpg, .jpeg, .png" multiple>
+                <br><br>
+
+                <button type="submit" name="activeAccountBtn" class="button1" value="Activate Account">Activate Account</button>
+                <br />
+                <br />
+                <br />
                 <a href="link_account.php">Link To Other Company</a>
             </form>
         </div>
     </div>
+    <script>
+        function fetchCityState() {
+            var postcode = document.getElementById('postcode').value;
+            var cityField = document.getElementById('city');
+            var stateField = document.getElementById('state');
+            var postcodeError = document.getElementById('postcodeError');
+
+            if (postcode.length > 0) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "../partials/parseActiveAccount.php", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                xhr.onreadystatechange = function() {
+                    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                        try {
+                            var response = JSON.parse(this.responseText);
+
+                            if (response.success) {
+                                cityField.value = response.city;
+                                stateField.value = response.state;
+                                postcodeError.textContent = "";
+                            } else {
+                                cityField.value = "";
+                                stateField.value = "";
+                                postcodeError.textContent = "This postcode area is not supported yet.";
+                            }
+                        } catch (e) {
+                            cityField.value = "";
+                            stateField.value = "";
+                            postcodeError.textContent = "Unable to process response.";
+                        }
+                    }
+                };
+                xhr.send("postcode=" + encodeURIComponent(postcode));
+            } else {
+                cityField.value = "";
+                stateField.value = "";
+                postcodeError.textContent = "";
+            }
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.js"></script>
 </body>
+
 </html>

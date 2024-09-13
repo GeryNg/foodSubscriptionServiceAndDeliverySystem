@@ -51,9 +51,24 @@ try {
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
+        .container-fluid {
+            margin-bottom: 5%;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin: 3rem 0 0.5rem 0;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .breadcrumb {
+            background-color: transparent;
+        }
+
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -63,9 +78,13 @@ try {
 </head>
 
 <body>
-    <div class="container-fluid" style="margin-top: 20px;">
-        <h1 class="h1 mb-2 text-gray-800" style="font-weight: 600;">Company List</h1>
-        <hr />
+    <div class="container-fluid">
+        <h1>Profile</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="../partials/seller_dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="../profile_management/seller_profile.php">Profile</a></li>
+            <li class="breadcrumb-item active">Link Company</li>
+        </ol>
         <div class="card shadow mb-4">
             <div class="card-header py-3"></div>
             <div class="card-body">

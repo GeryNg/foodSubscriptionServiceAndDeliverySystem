@@ -79,6 +79,11 @@ try {
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Assign</span></a>
             </li>
+            <li class="nav-item  <?php echo $current_page == 'admin_wallet.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="../wallet/admin_wallet.php">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Wallet</span></a>
+            </li>
 
         </ul>
         <!-- End of Sidebar -->

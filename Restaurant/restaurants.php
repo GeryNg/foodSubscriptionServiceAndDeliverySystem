@@ -53,7 +53,7 @@
                 echo "<img src='" . $profile_pic . "' alt='profile_pic' class='profile-pic'/>";
                 echo "</figure>";
                 echo "<div class='article-body'>";
-                echo "<h2>" . $name . "</h2>";
+                echo "<h3>" . $name . "</h3>";
                 echo "<p class='detail'>" . $detail . "</p>";
                 echo "<p class='address'>Address: " . $address . "</p>";
                 echo "<a href='restaurant_plan.php?id=" . $id . "' class='read-more'>Read more <span class='sr-only'>about " . $name . "</span>";

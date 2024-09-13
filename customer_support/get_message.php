@@ -92,15 +92,14 @@ if (isset($_SESSION['id'])) {
     try {
         $sql = "SELECT messages.msg, messages.outgoing_msg_id, seller.profile_pic 
                 FROM messages 
-                LEFT JOIN users ON users.id = messages.outgoing_msg_id 
-                LEFT JOIN seller ON seller.user_id = users.id
+                LEFT JOIN seller ON (seller.id = messages.incoming_msg_id OR seller.id = messages.outgoing_msg_id)
                 WHERE (messages.outgoing_msg_id = :outgoing_id AND messages.incoming_msg_id = :incoming_id) 
                    OR (messages.outgoing_msg_id = :incoming_id AND messages.incoming_msg_id = :outgoing_id) 
-                ORDER BY messages.msg_id";
+                ORDER BY messages.msg_id ASC";
         
         $stmt = $db->prepare($sql);
-        $stmt->bindParam(':outgoing_id', $outgoing_id, PDO::PARAM_INT);
-        $stmt->bindParam(':incoming_id', $incoming_id, PDO::PARAM_INT);
+        $stmt->bindParam(':outgoing_id', $outgoing_id, PDO::PARAM_STR);
+        $stmt->bindParam(':incoming_id', $incoming_id, PDO::PARAM_STR);
         $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
@@ -113,10 +112,10 @@ if (isset($_SESSION['id'])) {
                                 </div>';
                 } else {
                     $profilePicPath = !empty($row['profile_pic']) ? $row['profile_pic'] : 'default.jpg';
-                    $avatar = '../seller_profile_pic/' . $profilePicPath;
+                    $avatar = '../seller_profile_pic/' . htmlspecialchars($profilePicPath);
 
                     $output .= '<div class="chat incoming">
-                                    <img src="' . htmlspecialchars($avatar) . '" alt="">
+                                    <img src="' . htmlspecialchars($avatar) . '" alt="Seller Profile Picture">
                                     <div class="details">
                                         <p>' . htmlspecialchars($row['msg']) . '</p>
                                     </div>
@@ -126,6 +125,7 @@ if (isset($_SESSION['id'])) {
         } else {
             $output .= '<div class="text">No messages are available. Once you send a message, they will appear here.</div>';
         }
+
         echo $output;
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
@@ -134,4 +134,3 @@ if (isset($_SESSION['id'])) {
     header("Location: ../login.php");
     exit;
 }
-?>

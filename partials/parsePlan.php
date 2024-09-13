@@ -6,7 +6,7 @@ include_once '../resource/utilities.php';
 if (isset($_POST['AddPlanBtn'])) {
     $form_errors = array();
 
-    // Chceck Required fields
+    // Check Required fields
     $required_fields = ['plan_name', 'description', 'price', 'date_from', 'date_to'];
     $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
 
@@ -14,16 +14,16 @@ if (isset($_POST['AddPlanBtn'])) {
     $fields_to_check_length = ['plan_name' => 3, 'description' => 10];
     $form_errors = array_merge($form_errors, check_min_length($fields_to_check_length));
 
-    // Check Validate numeric value for price
+    // Validate numeric value for price
     $numeric_fields = ['price'];
     $form_errors = array_merge($form_errors, check_numeric($numeric_fields));
 
-    // Check Validate checkboxes for sections
+    // Validate checkboxes for sections
     if (!isset($_POST['sections']) || count($_POST['sections']) === 0) {
         $form_errors[] = "At least one section must be selected.";
     }
 
-    // Check Validate date range
+    // Validate date range
     $date_from = strtotime($_POST['date_from']);
     $date_to = strtotime($_POST['date_to']);
     $today = strtotime(date('Y-m-d'));
@@ -34,6 +34,12 @@ if (isset($_POST['AddPlanBtn'])) {
 
     if ($date_to < strtotime('+7 days', $date_from)) {
         $form_errors[] = "Date To must be at least 7 days after Date From.";
+    }
+
+    // Process add-ons if checkbox is checked
+    $has_addons = isset($_POST['has_addons']) ? 1 : 0;
+    if ($has_addons && empty(array_filter($_POST['addon_name']))) {
+        $form_errors[] = "At least one add-on must be provided if add-ons are enabled.";
     }
 
     // Validate and process image uploads
@@ -47,7 +53,6 @@ if (isset($_POST['AddPlanBtn'])) {
             $fileTmpName = $_FILES['images']['tmp_name'][$i];
             $fileSize = $_FILES['images']['size'][$i];
             $fileError = $_FILES['images']['error'][$i];
-            $fileType = $_FILES['images']['type'][$i];
 
             if ($fileError === 0) {
                 $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
@@ -75,12 +80,16 @@ if (isset($_POST['AddPlanBtn'])) {
         }
     }
 
+    // Proceed if there are no errors
     if (empty($form_errors)) {
         try {
             // Default status to "active"
             $status = 'active';
             $seller_id = isset($_SESSION['seller_id']) ? $_SESSION['seller_id'] : null;
-            $stmt = $db->prepare("INSERT INTO plan (plan_name, description, price, date_from, date_to, section, status, seller_id, image_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+            $db->beginTransaction();
+            $stmt = $db->prepare("INSERT INTO plan (plan_name, description, price, date_from, date_to, section, status, seller_id, image_urls, has_addons) 
+                                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             $stmt->execute([
                 htmlspecialchars($_POST['plan_name']),
@@ -91,27 +100,79 @@ if (isset($_POST['AddPlanBtn'])) {
                 implode(',', $_POST['sections']),
                 $status,
                 $seller_id,
-                implode(',', $imageUrls)
+                implode(',', $imageUrls),
+                $has_addons
             ]);
+
+            // Get the last inserted plan ID
+            $plan_id = $db->lastInsertId();
+
+            // Insert add-ons into the `addons` table if available
+            if ($has_addons) {
+                $addonNames = $_POST['addon_name'];
+                $addonPrices = $_POST['addon_price'];
+                $addonImages = $_FILES['addon_image'];
+
+                $addonStmt = $db->prepare("INSERT INTO addons (plan_id, addon_name, addon_price, addon_image) 
+                                           VALUES (?, ?, ?, ?)");
+
+                foreach ($addonNames as $index => $name) {
+                    if (!empty($name)) {
+                        // Handle add-on image upload
+                        $addonImage = null;
+                        if (!empty($addonImages['name'][$index])) {
+                            $fileName = $addonImages['name'][$index];
+                            $fileTmpName = $addonImages['tmp_name'][$index];
+                            $fileSize = $addonImages['size'][$index];
+                            $fileError = $addonImages['error'][$index];
+                            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                            $allowedFormats = ['jpg', 'jpeg', 'png'];
+
+                            if ($fileError === 0 && in_array($fileExtension, $allowedFormats)) {
+                                if ($fileSize <= 2 * 1024 * 1024) {
+                                    $newFileName = uniqid('addon_', true) . "." . $fileExtension;
+                                    $targetDir = "../addon_images/";
+                                    $targetPath = $targetDir . $newFileName;
+
+                                    if (move_uploaded_file($fileTmpName, $targetPath)) {
+                                        $addonImage = $targetPath;
+                                    } else {
+                                        $form_errors[] = "Failed to move uploaded file for add-on: $fileName";
+                                    }
+                                } else {
+                                    $form_errors[] = "File size exceeds the limit for add-on image: $fileName";
+                                }
+                            } else {
+                                $form_errors[] = "Invalid file format for add-on image: $fileName";
+                            }
+                        }
+
+                        // Insert add-on into the database
+                        $addonStmt->execute([$plan_id, $name, $addonPrices[$index], $addonImage]);
+                    }
+                }
+            }
+
+            $db->commit();
 
             if ($stmt->rowCount() == 1) {
                 echo "<script>
-                swal({
-                  title: \"Plan Added!\",
-                  text: \"The plan has been added successfully.\",
-                  icon: 'success',
-                  button: \"OK\",
-                });
-                setTimeout(function(){
-                window.location.href = '../plan_management/list_plan.php';
-                }, 3000);
+                    swal({
+                      title: 'Plan Added!',
+                      text: 'The plan has been added successfully.',
+                      icon: 'success',
+                      button: 'OK',
+                    });
+                    setTimeout(function() {
+                        window.location.href = '../plan_management/list_plan.php';
+                    }, 3000);
                 </script>";
                 exit;
             } else {
                 $result = "Failed to save the plan. Please try again.";
             }
-
         } catch (PDOException $e) {
+            $db->rollBack();
             $result = "Failed to save the plan: " . $e->getMessage();
         }
     } else {
@@ -142,4 +203,3 @@ function uploadErrorToString($errorCode)
             return 'Unknown upload error';
     }
 }
-?>

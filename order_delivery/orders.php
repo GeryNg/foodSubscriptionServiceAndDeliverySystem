@@ -1,12 +1,16 @@
-<?php include '../resource/Database.php'; ?>
+<?php
+include '../resource/Database.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Plan</title>
     <link rel="stylesheet" href="../css/order.css">
 </head>
+
 <body>
     <?php include '../partials/headers.php'; ?>
     <div class="main-container">
@@ -79,8 +83,8 @@
                     <!-- Meal Selection -->
                     <label for="meal">Meal:</label>
                     <select name="meal" id="meal" required>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Dinner">Dinner</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
                     </select>
 
                     <!-- Delivery Address -->
@@ -124,6 +128,36 @@
                     <label for="duration">Duration (days):</label>
                     <input type="text" name="duration" id="duration" readonly>
 
+                    <!-- Add-ons Section -->
+                    <label>Add-ons:</label>
+                    <div id="addons">
+                        <?php
+                        // Fetch add-ons related to the plan
+                        $sql = "SELECT * FROM addons WHERE plan_id = :plan_id";
+                        $addon_statement = $db->prepare($sql);
+                        $addon_statement->bindParam(':plan_id', $plan_id, PDO::PARAM_INT);
+                        $addon_statement->execute();
+                        $addons = $addon_statement->fetchAll();
+
+                        if ($addons) {
+                            foreach ($addons as $addon) {
+                                $addonName = htmlspecialchars($addon['addon_name'], ENT_QUOTES, 'UTF-8');
+                                $addonPrice = htmlspecialchars($addon['addon_price'], ENT_QUOTES, 'UTF-8');
+                                $addonImage = htmlspecialchars($addon['addon_image'], ENT_QUOTES, 'UTF-8');
+
+                                echo "<div class='addon-item'>";
+                                echo "<img src='" . $addonImage . "' alt='Addon Image' style='width:100px; height:100px; object-fit:cover; border:1px solid #ccc;'>"; // Display image
+                                echo "<p>$addonName - RM$addonPrice</p>";
+                                echo "<label for='addon_quantity_{$addon['id']}'>Quantity:</label>";
+                                echo "<input type='number' name='addon_quantity[{$addon['id']}]' value='0' min='0'>";
+                                echo "</div>";
+                            }
+                        } else {
+                            echo "<p>No add-ons available for this plan.</p>";
+                        }
+                        ?>
+                    </div>
+
                     <!-- Grand Total (display only, calculated dynamically with JavaScript) -->
                     <label for="grand_total">Grand Total:</label>
                     <input type="text" name="grand_total" id="grand_total" value="RM <?php echo $planPrice; ?>" readonly>
@@ -137,48 +171,21 @@
     <?php include '../partials/footer.php'; ?>
 
     <script>
-        let slideIndex = 1;
-        showSlides(slideIndex);
-
-        function plusSlides(n) {
-            showSlides(slideIndex += n);
-        }
-
-        function currentSlide(n) {
-            showSlides(slideIndex = n);
-        }
-
-        function showSlides(n) {
-            let i;
-            let slides = document.getElementsByClassName("mySlides");
-            let dots = document.getElementsByClassName("demo");
-            if (n > slides.length) {slideIndex = 1}    
-            if (n < 1) {slideIndex = slides.length}
-            for (i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";  
-            }
-            for (i = 0; i < dots.length; i++) {
-                dots[i].className = dots[i].className.replace(" active", "");
-            }
-            slides[slideIndex-1].style.display = "block";  
-            dots[slideIndex-1].className += " active";
-        }
+        // Add logic to calculate total cost including add-ons, similar to the main plan price calculation
 
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
         const durationInput = document.getElementById('duration');
         const grandTotalInput = document.getElementById('grand_total');
         const quantityInput = document.getElementById('quantity');
-
-        const today = new Date();
-        today.setDate(today.getDate() + 1);
-        const minDate = today.toISOString().split('T')[0];
-        startDateInput.setAttribute('min', minDate);
-        endDateInput.setAttribute('min', minDate);
+        const addonQuantities = document.querySelectorAll("input[name^='addon_quantity']");
 
         startDateInput.addEventListener('change', calculateDuration);
         endDateInput.addEventListener('change', calculateDuration);
         quantityInput.addEventListener('change', calculateDuration);
+        addonQuantities.forEach(function(addonQuantity) {
+            addonQuantity.addEventListener('change', calculateDuration); // Calculate total when addon quantity changes
+        });
 
         function calculateDuration() {
             const startDate = new Date(startDateInput.value);
@@ -190,8 +197,17 @@
                 const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
                 durationInput.value = daysDiff;
 
+                // Calculate grand total for the plan
                 const pricePerDay = <?php echo $planPrice; ?>;
-                const grandTotal = pricePerDay * daysDiff * quantity;
+                let grandTotal = pricePerDay * daysDiff * quantity;
+
+                // Calculate grand total for add-ons
+                addonQuantities.forEach(function(addonQuantity) {
+                    const addonPrice = parseFloat(addonQuantity.closest('.addon-item').querySelector('p').innerText.split('RM')[1]);
+                    const addonQty = parseInt(addonQuantity.value);
+                    grandTotal += addonPrice * addonQty;
+                });
+
                 grandTotalInput.value = "RM" + grandTotal.toFixed(2);
             } else {
                 durationInput.value = '';
@@ -211,4 +227,5 @@
         }
     </script>
 </body>
+
 </html>

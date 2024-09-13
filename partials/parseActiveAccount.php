@@ -3,11 +3,26 @@ include_once '../resource/session.php';
 include_once '../resource/Database.php';
 include_once '../resource/utilities.php';
 
+if (!empty($_POST['postcode']) && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+    $postcode = htmlspecialchars($_POST['postcode']);
+
+    $stmt = $db->prepare("SELECT city, state FROM address_book WHERE postcode = ?");
+    $stmt->execute([$postcode]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        echo json_encode(['success' => true, 'city' => $result['city'], 'state' => $result['state']]);
+    } else {
+        echo json_encode(['success' => false]);
+    }
+    exit();
+}
+
 if (isset($_POST['activeAccountBtn'])) {
     $form_errors = array();
 
     // Required fields
-    $required_fields = ['seller_name', 'description', 'contact_num', 'address', 'bank', 'bank_account_number'];
+    $required_fields = ['seller_name', 'description', 'contact_num', 'address', 'postcode', 'city', 'state', 'bank', 'bank_account_number'];
     $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
 
     // Fields to check length
@@ -47,7 +62,7 @@ if (isset($_POST['activeAccountBtn'])) {
     } else {
         $form_errors[] = "Profile picture is required.";
     }
-    
+
     // Validate and process image uploads
     $imageUrls = [];
     if (!empty(array_filter($_FILES['images']['name']))) {
@@ -92,7 +107,7 @@ if (isset($_POST['activeAccountBtn'])) {
             $access = 'pending';
             $user_id = $_SESSION['id'];
 
-            $stmt = $db->prepare("UPDATE seller SET name = ?, profile_pic = ?, detail = ?, contact_number = ?, address = ?, bank_company = ?, bank_account = ?, access = ?, image_urls = ? WHERE user_id = ?");
+            $stmt = $db->prepare("UPDATE seller SET name = ?, profile_pic = ?, detail = ?, contact_number = ?, address = ?, postcode = ?, city = ?, state = ?, bank_company = ?, bank_account = ?, access = ?, image_urls = ? WHERE user_id = ?");
 
             $stmt->execute([
                 htmlspecialchars($_POST['seller_name']),
@@ -100,6 +115,9 @@ if (isset($_POST['activeAccountBtn'])) {
                 htmlspecialchars($_POST['description']),
                 htmlspecialchars($_POST['contact_num']),
                 htmlspecialchars($_POST['address']),
+                htmlspecialchars($_POST['postcode']),
+                htmlspecialchars($_POST['city']),
+                htmlspecialchars($_POST['state']),
                 htmlspecialchars($_POST['bank']),
                 htmlspecialchars($_POST['bank_account_number']),
                 $access,
@@ -130,7 +148,6 @@ if (isset($_POST['activeAccountBtn'])) {
             } else {
                 $form_errors[] = "Failed to fetch updated seller data.";
             }
-
         } catch (PDOException $e) {
             $form_errors[] = "Failed to activate the account: " . $e->getMessage();
         }
@@ -142,5 +159,3 @@ if (isset($_POST['activeAccountBtn'])) {
             : flashMessage("There were " . count($form_errors) . " errors in the form <br>");
     }
 }
-?>
-

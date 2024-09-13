@@ -35,6 +35,17 @@ if ($delivery) {
         border-radius: 10px;
     }
 
+    #map {
+        height: 450px;
+        width: 800px;
+        margin-top: 20px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     .top {
         padding-top: 40px;
         padding-left: 13% !important;
@@ -209,14 +220,66 @@ if ($delivery) {
                         </div>
                     </div>
                 </div>
+                <div class="map" id="map"></div>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
 </div>
-<br/>
-<br/>
-<br/>
-<br/>
+<br />
+<br />
+<br />
+<br />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script>
+    var map;
+    var sellerMarker;
 
+    // Initialize the map
+    navigator.geolocation.getCurrentPosition(function(position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
 
-<?php include_once '../partials/footer.php';?>
+        map = L.map('map').setView([lat, lng], 14); // Set initial map position
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Add a marker for the seller's location (will be updated later)
+        var sellerIcon = L.icon({
+            iconUrl: 'https://th.bing.com/th/id/R.67bff7b7c746d16a8dbb3ffce63c358c?rik=iw1FPo2fGLDHSA&riu=http%3a%2f%2ficons.iconarchive.com%2ficons%2fcustom-icon-design%2fflatastic-2%2f512%2ftruck-icon.png&ehk=RwUurgow9%2bdUoYMvgoHF6mq8RWXmxiAj%2bVs%2bqGvyPfc%3d&risl=&pid=ImgRaw&r=0', // Replace with the correct icon URL
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -30]
+        });
+
+        sellerMarker = L.marker([lat, lng], {
+                icon: sellerIcon
+            }).addTo(map)
+            .bindPopup("Seller is here");
+
+        // Fetch seller's location every 15 seconds
+        setInterval(fetchSellerLocation, 15000);
+    }, function() {
+        alert("Geolocation is not supported by this browser.");
+    });
+
+    // Fetch the seller's location from the server
+    function fetchSellerLocation() {
+        fetch('get_seller_location.php?cust_id=<?php echo $cust_id; ?>')
+            .then(response => response.json())
+            .then(data => {
+                var lat = data.latitude;
+                var lng = data.longitude;
+
+                // Update the seller's marker position
+                sellerMarker.setLatLng([lat, lng]).update();
+                map.setView([lat, lng], 14); // Recenter the map
+            })
+            .catch(error => console.error('Error fetching seller location:', error));
+    }
+</script>
+
+<?php include_once '../partials/footer.php'; ?>

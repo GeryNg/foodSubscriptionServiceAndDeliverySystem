@@ -12,6 +12,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'seller') {
 
 $user_id = $_SESSION['id'];
 $access = $_SESSION['access'];
+$seller_id = $_SESSION['seller_id'];
 $requests_open = 0;
 
 try {
@@ -31,10 +32,9 @@ try {
 }
 
 try {
-    // Fetch value from seller table
-    $query = "SELECT requests_open FROM seller WHERE user_id = :user_id";
+    $query = "SELECT requests_open FROM seller WHERE id = :seller_id";
     $stmt = $db->prepare($query);
-    $stmt->bindParam(':user_id', $user_id);
+    $stmt->bindParam(':seller_id', $seller_id);
     $stmt->execute();
 
     if ($stmt->rowCount() == 1) {
@@ -45,12 +45,8 @@ try {
     echo "An error occurred: " . $ex->getMessage();
 }
 
-//Toggle request link (Subaccount Button)
 if (isset($_POST['toggleRequest'])) {
     $requests_open = isset($_POST['requests_open']) ? 1 : 0;
-    $seller_id = $_SESSION['seller_id'];
-    $linked_seller_id = $_SESSION['linked_seller_id'];
-
     try {
         $stmt = $db->prepare("UPDATE seller SET requests_open = :requests_open WHERE id = :seller_id");
         $stmt->execute([':requests_open' => $requests_open, ':seller_id' => $seller_id]);
@@ -60,6 +56,12 @@ if (isset($_POST['toggleRequest'])) {
         echo "<script>alert('An error occurred: " . $ex->getMessage() . "');</script>";
     }
 }
+
+$query = "SELECT status FROM seller_location WHERE seller_id = :seller_id LIMIT 1";
+$stmt = $db->prepare($query);
+$stmt->bindParam(':seller_id', $seller_id);
+$stmt->execute();
+$seller_status = $stmt->fetch(PDO::FETCH_ASSOC)['status'] ?? 'close';
 ?>
 
 <!DOCTYPE html>
@@ -174,6 +176,16 @@ if (isset($_POST['toggleRequest'])) {
                     <i class="fas fa-fw fa-table"></i>
                     <span>Live chat</span></a>
             </li>
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Wallet
+            </div>
+            <li class="nav-item <?php echo $current_page == 'seller_wallet.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="../wallet/seller_wallet.php">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Wallet</span></a>
+            </li>
             <div class="text-center d-none d-md-inline" style="margin-left: auto !important; margin-right: auto !important;">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
@@ -197,7 +209,7 @@ if (isset($_POST['toggleRequest'])) {
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?php echo htmlspecialchars($username); ?></span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-800 small" style="font-weight: bold; margin-right:5%"><?php echo htmlspecialchars($username); ?></span>
                                 <img class="img-profile rounded-circle"
                                     src="<?php echo htmlspecialchars($avatar); ?>">
                             </a>
@@ -243,7 +255,7 @@ if (isset($_POST['toggleRequest'])) {
                 $username = $_SESSION['username'];
                 $access = $_SESSION['access'];
 
-                if ($access === 'inactive') {
+                if ($access === 'unknown') {
                     echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
                             <strong>Account Inactive!</strong> Your account is currently inactive. 
                             <a href="../profile_management/active_account.php" class="btn btn-primary btn-sm">Activate Account</a>
@@ -296,41 +308,41 @@ if (isset($_POST['toggleRequest'])) {
 
                 //Weather API
                 function fetchWeatherData(latitude, longitude) {
-    const apiKey = '#'; // Replace with your OpenWeatherMap API key
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
+                    const apiKey = '#'; // Replace with your OpenWeatherMap API key
+                    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
 
-    console.log("Fetching weather data from URL:", apiUrl);
+                    console.log("Fetching weather data from URL:", apiUrl);
 
-    fetch(apiUrl)
-        .then(response => {
-            console.log("API response status:", response.status);
-            return response.json();
-        })
-        .then(data => {
-            console.log("Weather data received:", data);
-            const temperature = data.main.temp;
-            const weatherDescription = data.weather[0].description;
-            const weatherElement = document.getElementById('weather');
+                    fetch(apiUrl)
+                        .then(response => {
+                            console.log("API response status:", response.status);
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log("Weather data received:", data);
+                            const temperature = data.main.temp;
+                            const weatherDescription = data.weather[0].description;
+                            const weatherElement = document.getElementById('weather');
 
-            weatherElement.innerHTML = `
+                            weatherElement.innerHTML = `
                 <img src="../image/weather-icon.png" alt="weather">
                 <span>${temperature}°C - ${weatherDescription}</span>
             `;
-        })
-        .catch(error => {
-            console.log("Error fetching weather data:", error);
-            document.getElementById('weather').innerHTML = 'Unable to fetch weather data';
-        });
-}
+                        })
+                        .catch(error => {
+                            console.log("Error fetching weather data:", error);
+                            document.getElementById('weather').innerHTML = 'Unable to fetch weather data';
+                        });
+                }
 
-navigator.geolocation.getCurrentPosition(function(position) {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
-    fetchWeatherData(latitude, longitude);
-}, function(error) {
-    console.log("Geolocation error:", error);
-    document.getElementById('weather').innerHTML = 'Unable to fetch weather data';
-});
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    fetchWeatherData(latitude, longitude);
+                }, function(error) {
+                    console.log("Geolocation error:", error);
+                    document.getElementById('weather').innerHTML = 'Unable to fetch weather data';
+                });
 
                 //Request link
                 document.getElementById('openRequestLink').addEventListener('click', function(e) {
@@ -362,6 +374,10 @@ navigator.geolocation.getCurrentPosition(function(position) {
                     });
                 });
             </script>
+            <script>
+                const sellerStatus = "<?php echo $seller_status; ?>";
+            </script>
+            <script src="../order_delivery/location_tracking.js"></script>
 </body>
 
 </html>

@@ -20,7 +20,7 @@
                     FROM seller 
                     WHERE seller.id = :id;";
             $statement = $db->prepare($sql);
-            $statement->bindParam(':id', $id, PDO::PARAM_INT);
+            $statement->bindParam(':id', $id, PDO::PARAM_STR_CHAR);
             $statement->execute();
             
             if ($row = $statement->fetch()) {
@@ -43,7 +43,7 @@
                         FROM plan 
                         WHERE plan.seller_id = :id;";
                 $statement = $db->prepare($sql);
-                $statement->bindParam(':id', $id, PDO::PARAM_INT);
+                $statement->bindParam(':id', $id, PDO::PARAM_STR_CHAR);
                 $statement->execute();
 
                 echo "<h2>Plans</h2>";

@@ -11,24 +11,19 @@ $seller_id = $_SESSION['seller_id'];
 $incoming_id = $_POST['incoming_id'];
 $message = $_POST['message'];
 
+$output = ""; 
+
 if (empty($incoming_id) || empty($message)) {
     echo "Error: Invalid input";
     exit;
 }
 
 try {
-    $sqlSeller = "SELECT user_id FROM seller WHERE id = :seller_id";
-    $stmtSeller = $db->prepare($sqlSeller);
-    $stmtSeller->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
-    $stmtSeller->execute();
-
-    $sellerData = $stmtSeller->fetch(PDO::FETCH_ASSOC);
-    $outgoing_id = $sellerData['user_id'];
-
+    // Insert the message into the database
     $sql = "INSERT INTO messages (incoming_msg_id, outgoing_msg_id, msg) VALUES (:incoming_id, :outgoing_id, :message)";
     $stmt = $db->prepare($sql);
-    $stmt->bindParam(':incoming_id', $incoming_id, PDO::PARAM_INT);
-    $stmt->bindParam(':outgoing_id', $outgoing_id, PDO::PARAM_INT);
+    $stmt->bindParam(':incoming_id', $incoming_id, PDO::PARAM_STR);
+    $stmt->bindParam(':outgoing_id', $seller_id, PDO::PARAM_STR);
     $stmt->bindParam(':message', $message, PDO::PARAM_STR);
     
     if ($stmt->execute()) {

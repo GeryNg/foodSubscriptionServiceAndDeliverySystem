@@ -9,16 +9,36 @@ Password: Eatwhat12345678+
 google app password(Google SMTP):
 yclm fcdy xumw gkgw
 
-Stormglass.io
+Stormglass.io:
 Email: makanapa024@gmail.com
 password: 12345678
 apikey: b5f8acec-5981-11ef-8a8f-0242ac130004-b5f8ad46-5981-11ef-8a8f-0242ac130004 (staff_nav.php line 259)
 
-OpenWeatherMap
+OpenWeatherMap:
 Email: makanapa024@gmail.com
 Username: makanApa
 Password: 12345678
 apikey: 3d64b8fb8077a50ea89c4f36ce7dc549 (staff_nav.php line 298)
 
-Drift
+Drift:
 login using google
+
+PayNet(FPX Online Transfer):
+Email: makanapa024@gmail.com
+first name: Makan
+lastname: apa
+password: MakanApa12345678+
+
+Billplz:
+Email: makanapa024@gmail.com
+
+Paypal: 
+Email: makanapa024@gmail.com
+password: MakanApa987321+
+
+mapbox:
+Email: makanapa024@gmail.com
+password: MakanApa12345678+
+
+gohdarren317@gmail.com
+12345678

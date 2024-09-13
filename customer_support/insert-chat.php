@@ -17,10 +17,12 @@ if (empty($incoming_id) || empty($message)) {
 }
 
 try {
-    $sql = "INSERT INTO messages (incoming_msg_id, outgoing_msg_id, msg) VALUES (:incoming_id, :outgoing_id, :message)";
+    $sql = "INSERT INTO messages (incoming_msg_id, outgoing_msg_id, msg) 
+            VALUES (:incoming_id, :outgoing_id, :message)";
     $stmt = $db->prepare($sql);
-    $stmt->bindParam(':incoming_id', $incoming_id, PDO::PARAM_INT);
-    $stmt->bindParam(':outgoing_id', $outgoing_id, PDO::PARAM_INT);
+    
+    $stmt->bindParam(':incoming_id', $incoming_id, PDO::PARAM_STR);
+    $stmt->bindParam(':outgoing_id', $outgoing_id, PDO::PARAM_STR);
     $stmt->bindParam(':message', $message, PDO::PARAM_STR);
     
     if ($stmt->execute()) {
@@ -31,4 +33,3 @@ try {
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
-?>

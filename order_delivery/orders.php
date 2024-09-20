@@ -93,6 +93,22 @@ if (isset($_GET['plan_id'])) {
         .slider-controls .next:hover {
             background-color: rgba(0, 0, 0, 0.8);
         }
+
+        #addonsContainer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        #addonsContainer.open {
+            max-height: 1000px;
+            /* Adjust according to the expected content height */
+            transition: max-height 0.5s ease-in;
+        }
+        .active-thumbnail {
+    border: 2px solid #5C67F2; /* Adjust the color */
+    opacity: 0.8;
+}
     </style>
 </head>
 
@@ -120,7 +136,7 @@ if (isset($_GET['plan_id'])) {
                     <div class='thumbnail-row'>
                         <?php foreach ($planImages as $index => $image): ?>
                             <div class='thumbnail-column'>
-                                <img class='demo cursor' src='../plan/<?php echo trim($image); ?>' style='width:100%' onclick='currentSlide(<?php echo ($index + 1); ?>)' alt='Image'>
+                                <img class='demo cursor' src='../plan/<?php echo trim($image); ?>' style='width:100%' onclick='showSlides(<?php echo $index; ?>)' alt='Image'>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -162,7 +178,7 @@ if (isset($_GET['plan_id'])) {
                         $cust_id = $_SESSION['Cust_ID'];
                         $sql = "SELECT * FROM address WHERE Cust_ID = :cust_id";
                         $statement = $db->prepare($sql);
-                        $statement->bindParam(':cust_id', $cust_id, PDO::PARAM_INT);
+                        $statement->bindParam(':cust_id', $cust_id, PDO::PARAM_STR_CHAR);
                         $statement->execute();
 
                         while ($row = $statement->fetch()) {
@@ -195,28 +211,34 @@ if (isset($_GET['plan_id'])) {
                     <label for="duration">Duration (days):</label>
                     <input type="text" name="duration" id="duration" readonly>
 
-                    <!-- Add-ons Section -->
-                    <label>Add-ons:</label>
-                    <div id="addons">
-                        <?php
-                        if ($addons) {
-                            foreach ($addons as $addon) {
-                                $addonName = htmlspecialchars($addon['addon_name'], ENT_QUOTES, 'UTF-8');
-                                $addonPrice = htmlspecialchars($addon['addon_price'], ENT_QUOTES, 'UTF-8');
-                                $addonImage = htmlspecialchars($addon['addon_image'], ENT_QUOTES, 'UTF-8');
+                    <!-- Add-ons Section with Toggle -->
+                    <label>
+                        <input type="checkbox" id="showAddonsCheckbox" onclick="toggleAddons()" style="max-width:5%" />
+                        Show Add-ons
+                    </label>
+                    <div id="addonsContainer" style="display: none;">
+                        <div id="addons">
+                            <?php
+                            if ($addons) {
+                                foreach ($addons as $addon) {
+                                    $addonName = htmlspecialchars($addon['addon_name'], ENT_QUOTES, 'UTF-8');
+                                    $addonPrice = htmlspecialchars($addon['addon_price'], ENT_QUOTES, 'UTF-8');
+                                    $addonImage = htmlspecialchars($addon['addon_image'], ENT_QUOTES, 'UTF-8');
 
-                                echo "<div class='addon-item'>";
-                                echo "<img src='" . $addonImage . "' alt='Addon Image' style='width:100px; height:100px; object-fit:cover; border:1px solid #ccc;'>";
-                                echo "<p>$addonName - RM$addonPrice</p>";
-                                echo "<label for='addon_quantity_{$addon['id']}'>Quantity:</label>";
-                                echo "<input type='number' name='addon_quantity[{$addon['id']}]' value='0' min='0'>";
-                                echo "</div>";
+                                    echo "<div class='addon-item'>";
+                                    echo "<img src='" . $addonImage . "' alt='Addon Image' style='width:100px; height:100px; object-fit:cover; border:1px solid #ccc;'>";
+                                    echo "<p>$addonName - RM$addonPrice</p>";
+                                    echo "<label for='addon_quantity_{$addon['id']}'>Quantity:</label>";
+                                    echo "<input type='number' name='addon_quantity[{$addon['id']}]' value='0' min='0'>";
+                                    echo "</div>";
+                                }
+                            } else {
+                                echo "<p>No add-ons available for this plan.</p>";
                             }
-                        } else {
-                            echo "<p>No add-ons available for this plan.</p>";
-                        }
-                        ?>
+                            ?>
+                        </div>
                     </div>
+
 
                     <!-- Grand Total (display only, calculated dynamically with JavaScript) -->
                     <label for="grand_total">Grand Total:</label>
@@ -229,7 +251,55 @@ if (isset($_GET['plan_id'])) {
         </div>
     </div>
     <?php include '../partials/footer.php'; ?>
+    <script>
+        function toggleAddons() {
+            const checkbox = document.getElementById('showAddonsCheckbox');
+            const addonsContainer = document.getElementById('addonsContainer');
 
+            if (checkbox.checked) {
+                addonsContainer.style.display = 'block';
+                addonsContainer.classList.add('open');
+            } else {
+                addonsContainer.style.display = 'none';
+                addonsContainer.classList.remove('open');
+            }
+        }
+    </script>
+    <script>
+        let currentIndex1 = 0;
+const slides1 = document.querySelectorAll('.slide');
+const totalSlides1 = slides.length;
+
+function showSlides(index) {
+    if (index >= totalSlides1) {
+        currentIndex1 = 0;
+    } else if (index < 0) {
+        currentIndex1 = totalSlides1 - 1;
+    } else {
+        currentIndex1 = index;
+    }
+
+    const offset = -currentIndex * 100;
+    document.querySelector('.slider').style.transform = `translateX(${offset}%)`;
+
+    // Update active thumbnail
+    updateActiveThumbnail(currentIndex);
+}
+
+// Update active thumbnail styling
+function updateActiveThumbnail(index) {
+    const thumbnails = document.querySelectorAll('.thumbnail-column img');
+    thumbnails.forEach((thumbnail, i) => {
+        thumbnail.classList.remove('active-thumbnail');
+        if (i === index) {
+            thumbnail.classList.add('active-thumbnail');
+        }
+    });
+}
+
+// Initially show the first slide
+showSlides(currentIndex);
+    </script>
     <script>
         let currentIndex = 0;
         const slides = document.querySelectorAll('.slide');

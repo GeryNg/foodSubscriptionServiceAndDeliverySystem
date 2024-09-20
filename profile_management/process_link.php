@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $query = "SELECT id AS seller_id FROM seller WHERE user_id = :user_id";
             $stmt = $db->prepare($query);
-            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_STR_CHAR);
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update the access field in the seller table
             $query = "UPDATE seller SET access = 'rejected' WHERE id = :seller_id";
             $stmt = $db->prepare($query);
-            $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
+            $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_STR_CHAR);
             $stmt->execute();
 
             // Delete the link request

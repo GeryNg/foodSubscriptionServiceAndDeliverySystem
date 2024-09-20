@@ -41,7 +41,7 @@
         <main class="form-signin">
             <form method="post" action="">
                 <img class="mb-4" src="../image/logo-rounded.png" alt="Logo" width="80" height="80">
-                <h1 class="h3 mb-3 fw-normal">Register Form</h1>
+                <h1 class="h3 mb-3 fw-normal">Signup as a customer</h1>
 
                 <?php if (isset($result) || !empty($form_errors)): ?>
                 <div>

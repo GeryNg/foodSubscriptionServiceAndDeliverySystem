@@ -6,6 +6,7 @@ include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
 $seller_access = $_SESSION['access'] ?? '';
+$seller_id = $_SESSION['seller_id'] ?? '';
 
 if (empty($seller_access) || $seller_access !== 'verify') {
     echo '<p>You do not have permission to access this page.</p>';
@@ -13,6 +14,7 @@ if (empty($seller_access) || $seller_access !== 'verify') {
 }
 
 try {
+    // Fetch wallet balance and revenue
     $sql = "SELECT balance, revenue FROM wallet WHERE seller_id = :seller_id";
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_STR);
@@ -29,6 +31,41 @@ try {
     $stmtTransactions->execute();
     $transactions = $stmtTransactions->fetchAll(PDO::FETCH_ASSOC);
 
+    // Fetch the total revenue for the current and previous months
+    $sqlCurrentMonthRevenue = "
+        SELECT SUM(amount) as current_month_revenue 
+        FROM transaction 
+        WHERE seller_id = :seller_id 
+        AND transactionType = 'Sale' 
+        AND MONTH(datetime) = MONTH(CURRENT_DATE()) 
+        AND YEAR(datetime) = YEAR(CURRENT_DATE())";
+    $stmtCurrentMonthRevenue = $db->prepare($sqlCurrentMonthRevenue);
+    $stmtCurrentMonthRevenue->bindParam(':seller_id', $seller_id, PDO::PARAM_STR);
+    $stmtCurrentMonthRevenue->execute();
+    $currentMonthRevenue = $stmtCurrentMonthRevenue->fetch(PDO::FETCH_ASSOC)['current_month_revenue'] ?? 0.00;
+
+    $sqlLastMonthRevenue = "
+        SELECT SUM(amount) as last_month_revenue 
+        FROM transaction 
+        WHERE seller_id = :seller_id 
+        AND transactionType = 'Sale' 
+        AND MONTH(datetime) = MONTH(CURRENT_DATE() - INTERVAL 1 MONTH) 
+        AND YEAR(datetime) = YEAR(CURRENT_DATE() - INTERVAL 1 MONTH)";
+    $stmtLastMonthRevenue = $db->prepare($sqlLastMonthRevenue);
+    $stmtLastMonthRevenue->bindParam(':seller_id', $seller_id, PDO::PARAM_STR);
+    $stmtLastMonthRevenue->execute();
+    $lastMonthRevenue = $stmtLastMonthRevenue->fetch(PDO::FETCH_ASSOC)['last_month_revenue'] ?? 0.00;
+
+    // Calculate percentage change
+    if ($lastMonthRevenue > 0) {
+        $percentageChange = (($currentMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100;
+    } else {
+        $percentageChange = $currentMonthRevenue > 0 ? 100 : 0;
+    }
+
+    $revenueChangeClass = $percentageChange >= 0 ? 'bg-green' : 'bg-red';
+    $changeText = $percentageChange >= 0 ? '+' : '';
+
     // Calculate pending withdraw total
     $sqlPendingWithdraw = "SELECT SUM(amount) as pending_withdraw FROM transaction WHERE seller_id = :seller_id AND transactionType = 'Withdraw' AND status = 'Pending'";
     $stmtPendingWithdraw = $db->prepare($sqlPendingWithdraw);
@@ -38,6 +75,49 @@ try {
 } catch (PDOException $e) {
     echo "Error fetching wallet data: " . $e->getMessage();
     exit;
+}
+
+
+
+// Chart data: Fetch monthly income data for the chart
+if (!empty($seller_id)) {
+    // Get the year from GET parameter or default to current year
+    $year = isset($_GET['year']) ? $_GET['year'] : date('Y');
+
+    // SQL to fetch monthly income
+    $sqlMonthlyIncome = "
+        SELECT MONTH(payment.PaymentDate) AS month, SUM(payment.PaymentAmount) AS total_income
+        FROM payment
+        INNER JOIN order_cust ON payment.Order_ID = order_cust.Order_ID
+        INNER JOIN plan ON order_cust.Plan_ID = plan.id
+        WHERE plan.seller_id = :seller_id
+        AND YEAR(payment.PaymentDate) = :year
+        GROUP BY MONTH(payment.PaymentDate)";
+
+    $stmtMonthlyIncome = $db->prepare($sqlMonthlyIncome);
+    $stmtMonthlyIncome->bindParam(':seller_id', $seller_id, PDO::PARAM_STR);
+    $stmtMonthlyIncome->bindParam(':year', $year, PDO::PARAM_INT);
+    $stmtMonthlyIncome->execute();
+    $monthlyIncome = $stmtMonthlyIncome->fetchAll(PDO::FETCH_ASSOC);
+
+    // Prepare data for the chart, initialize with 0 for each month
+    $monthlyIncomeData = array_fill(1, 12, 0.00);
+    foreach ($monthlyIncome as $income) {
+        $month = (int)$income['month'];
+        $monthlyIncomeData[$month] = (float)$income['total_income'];
+    }
+
+    // Pass data to JavaScript
+    echo '<script>';
+    echo 'var monthlyIncomeData = ' . json_encode(array_values($monthlyIncomeData)) . ';';
+    echo 'console.log("monthlyIncomeData from PHP:", monthlyIncomeData);'; // Debug the data passed to JavaScript
+    echo 'var selectedYear = ' . json_encode($year) . ';';
+    echo '</script>';
+} else {
+    echo '<script>';
+    echo 'var monthlyIncomeData = [];';
+    echo 'var selectedYear = ' . json_encode(date('Y')) . ';';
+    echo '</script>';
 }
 ?>
 
@@ -90,6 +170,15 @@ try {
     .bg-green {
         background-color: #d4f8f2;
         color: #06e67a;
+        padding: 3px 0;
+        display: inline;
+        border-radius: 25px;
+        font-size: 11px
+    }
+
+    .bg-red {
+        background-color: #F9E7D4;
+        color: #ED4425;
         padding: 3px 0;
         display: inline;
         border-radius: 25px;
@@ -307,7 +396,9 @@ try {
                             <div class="col-md-8 ps-0 ">
                                 <p class="ps-3 textmuted fw-bold h6 mb-0" style="color: #333; font-weight:900; font-size:x-large;">TOTAL REVENUE</p>
                                 <p class="h1 fw-bold d-flex"> <span class=" fas fa-dollar-sign textmuted pe-1 h6 align-text-top mt-1"></span><?php echo number_format($revenue, 2); ?></p>
-                                <p class="ms-3 px-2 bg-green">+10% since last month</p>
+                                <p class="ms-3 px-2 <?php echo $revenueChangeClass; ?>">
+                                    <?php echo $changeText . number_format(abs($percentageChange), 2); ?>% since last month
+                                </p>
                             </div>
                             <div class="col-md-4">
                                 <p class="p-blue"> <span class="fas fa-circle pe-2"></span>Wallet Balance </p>
@@ -317,7 +408,6 @@ try {
                             </div>
                         </div>
                     </div>
-
                     <div class="col-12 px-0 mb-4">
                         <div class="box-right">
                             <p class="fw-bold h7">Overview Income</p>
@@ -330,7 +420,7 @@ try {
                                     <option value="2021">Monthly (2021)</option>
                                 </select>
                                 <div style="display: flex;">
-                                    <h2 style="color:#333; font-weight:bold">$12344</h2>
+                                    <h2 style="color:#333; font-weight:bold" id="totalIncomeText">RM 0</h2>
                                 </div>
                             </div>
                             <canvas id="myChart" width="400" height="200"></canvas>
@@ -339,11 +429,12 @@ try {
                 </div>
             </div>
             <div class="col-md-7 col-12 ps-md-5 p-0 box">
+                <!-- Withdraw Section -->
                 <div class="col-12 px-0">
                     <div class="box-left">
                         <p class="fw-bold h7">Withdraw</p>
                         <p class="textmuted h8">Request For Withdraw</p><br />
-                        <div class=" h8 mb-2">
+                        <div class="h8 mb-2">
                             <form action="request_withdraw.php" method="POST" id="withdrawForm">
                                 <div class="label-input-container">
                                     <label for="withdraw-amount">Withdraw Amount:</label>
@@ -376,7 +467,8 @@ try {
                         </div>
                     </div>
                 </div>
-                <input type="hidden" id="max-balance" value="<?php echo $balance; ?>">
+
+                <!-- Wallet Activity Section -->
                 <div class="col-12 px-0" style="margin-top: 25px;">
                     <div class="box-left">
                         <p class="fw-bold h7">Wallet Activity</p>
@@ -427,8 +519,14 @@ try {
         </div>
     </div>
 </div>
-</div>
-</div>
+
+<script>
+    // The income data passed from PHP
+</script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
     function calculateWithdraw() {
         var withdrawAmount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
@@ -458,61 +556,63 @@ try {
 
     document.getElementById('withdraw-amount').addEventListener('input', calculateWithdraw);
 </script>
+
 <script>
-    var ctx = document.getElementById('myChart').getContext('2d');
+    // Log the data passed from PHP to check its correctness
+    console.log("monthlyIncomeData from PHP:", monthlyIncomeData);
 
-    var chartData = {
-        '2024': [12, 19, 3, 5, 2, 3, 10],
-        '2023': [15, 13, 8, 4, 5, 7, 9],
-        '2022': [8, 10, 5, 3, 6, 9, 12],
-        '2021': [20, 15, 10, 12, 14, 13, 16]
-    };
+    // Function to format number as currency
+    function formatCurrency(num) {
+        return 'RM ' + parseFloat(num).toFixed(2);
+    }
 
-    var sampleLabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-    var selectedYear = '2024'; // Default year
+    // Calculate total income from the monthly income data
+    var totalIncome = monthlyIncomeData.reduce(function(a, b) { return a + b; }, 0);
+    document.getElementById('totalIncomeText').innerText = formatCurrency(totalIncome);
 
-    var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: sampleLabels,
-            datasets: [{
-                label: 'Income for ' + selectedYear,
-                data: chartData[selectedYear],
-                backgroundColor: [
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                    'rgba(201, 203, 207, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(255, 159, 64, 1)',
-                    'rgba(201, 203, 207, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure the canvas element exists
+    let ctx = document.getElementById('myChart');
+    if (ctx) {
+        let chartContext = ctx.getContext('2d');
+
+        // Initialize the Chart.js chart
+        let myChart = new Chart(chartContext, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Monthly Income (RM)',
+                    data: monthlyIncomeData,
+                    backgroundColor: 'rgba(92, 103, 242, 0.5)',
+                    borderColor: 'rgba(92, 103, 242, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    barPercentage: 0.6,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: {
+                        label: function(context) {
+                            let value = context.dataset.data[context.dataIndex];
+                            return 'Income: RM ' + parseFloat(value).toFixed(2);
+                        }
+                    }}
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: function(value) { return 'RM ' + value; } }
+                    }
                 }
             }
-        }
-    });
-
-    document.getElementById('yearSelector').addEventListener('change', function() {
-        selectedYear = this.value;
-        myChart.data.datasets[0].data = chartData[selectedYear];
-        myChart.data.datasets[0].label = 'Income for ' + selectedYear;
-        myChart.update();
-    });
+        });
+    } else {
+        console.error('Canvas element not found.');
+    }
+});
 </script>
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+

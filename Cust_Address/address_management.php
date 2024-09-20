@@ -46,19 +46,16 @@
             ?>
         </div>
     </div>
-<<<<<<< HEAD
     <br/>
     <br/>
     <br/>
     <br/>
     <br/>
-=======
     <br>
     <br>
     <br>
     <br>
     <br>
->>>>>>> df432d2f1be4e5855c9be90188deef1af6ebc0c1
     <?php include '../partials/footer.php'; ?>
 </body>
 </html>

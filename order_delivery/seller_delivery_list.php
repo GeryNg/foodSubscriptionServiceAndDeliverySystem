@@ -582,7 +582,7 @@ $seller_status = $stmt->fetch(PDO::FETCH_ASSOC)['status'] ?? 'close';
                 })
                 .then(response => response.text())
                 .then(result => {
-                    console.log('Response from server:', result); // Log the server response
+                    console.log('Response from server:', result);
                     if (result !== 'success') {
                         alert('Failed to update location.');
                     }

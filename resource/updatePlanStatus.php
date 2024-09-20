@@ -7,6 +7,7 @@ function updatePlanStatuses($db)
     try {
         $today = date('Y-m-d');
 
+        // Update plan statuses based on the current date
         $sqlUpdateActive = "UPDATE plan SET status = 'active' WHERE date_from <= :today AND date_to >= :today";
         $stmtActive = $db->prepare($sqlUpdateActive);
         $stmtActive->execute([':today' => $today]);
@@ -15,9 +16,11 @@ function updatePlanStatuses($db)
         $stmtInactive = $db->prepare($sqlUpdateInactive);
         $stmtInactive->execute([':today' => $today]);
 
-        //echo "Plan statuses updated successfully.<br>";
-
+        // Call function to generate and insert delivery IDs
         generateAndInsertDeliveryIDs($db);
+
+        // Call function to create wallets for verified sellers
+        createWalletForVerifiedSellers($db);
 
     } catch (PDOException $e) {
         echo "Failed to update statuses: " . $e->getMessage();
@@ -62,10 +65,6 @@ function generateAndInsertDeliveryIDs($db)
                         ':address_id' => $order['delivery_address_id'],
                         ':cust_id' => $order['Cust_ID']
                     ]);
-
-                    //echo "New delivery ID generated and inserted: " . $newDeliveryId . "<br>";
-                } else {
-                    //echo "Duplicate delivery ID ignored: " . $newDeliveryId . "<br>";
                 }
             } else {
                 echo "Failed to find seller for plan_id: " . $order['Plan_ID'] . "<br>";
@@ -74,6 +73,37 @@ function generateAndInsertDeliveryIDs($db)
 
     } catch (PDOException $e) {
         echo "Failed to generate or insert delivery IDs: " . $e->getMessage();
+    }
+}
+
+function createWalletForVerifiedSellers($db)
+{
+    try {
+        $sellerQuery = "
+            SELECT s.id AS seller_id
+            FROM seller s
+            LEFT JOIN wallet w ON s.id = w.seller_id
+            WHERE s.access = 'verify' AND w.seller_id IS NULL
+        ";
+        $stmt = $db->prepare($sellerQuery);
+        $stmt->execute();
+        $sellersWithoutWallets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($sellersWithoutWallets as $seller) {
+            $sellerId = $seller['seller_id'];
+
+            $insertWalletQuery = "
+                INSERT INTO wallet (balance, revenue, seller_id) 
+                VALUES (0.00, 0.00, :seller_id)
+            ";
+            $stmtInsert = $db->prepare($insertWalletQuery);
+            $stmtInsert->execute([':seller_id' => $sellerId]);
+
+            //echo "Wallet created for seller: " . $sellerId . "<br>";
+        }
+
+    } catch (PDOException $e) {
+        //echo "Failed to create wallet: " . $e->getMessage();
     }
 }
 

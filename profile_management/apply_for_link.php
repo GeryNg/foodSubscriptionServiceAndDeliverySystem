@@ -12,20 +12,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $query = "SELECT id FROM seller WHERE id = :company_id AND requests_open = 1";
             $stmt = $db->prepare($query);
-            $stmt->bindParam(':company_id', $company_id, PDO::PARAM_INT);
+            $stmt->bindParam(':company_id', $company_id, PDO::PARAM_STR_CHAR);
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
                 // Insert a new link request
                 $insertQuery = "INSERT INTO link_requests (user_id, seller_id, status) VALUES (:user_id, :company_id, 'pending')";
                 $insertStmt = $db->prepare($insertQuery);
-                $insertStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-                $insertStmt->bindParam(':company_id', $company_id, PDO::PARAM_INT);
+                $insertStmt->bindParam(':user_id', $user_id, PDO::PARAM_STR_CHAR);
+                $insertStmt->bindParam(':company_id', $company_id, PDO::PARAM_STR_CHAR);
                 $insertStmt->execute();
 
                 $updateQuery = "UPDATE seller SET access = 'linked' WHERE user_id = :user_id";
                 $updateStmt = $db->prepare($updateQuery);
-                $updateStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $updateStmt->bindParam(':user_id', $user_id, PDO::PARAM_STR_CHAR);
                 $updateStmt->execute();
 
                 $_SESSION['access'] ='linked';

@@ -22,7 +22,7 @@ try {
         WHERE lr.seller_id = :seller_id AND lr.status = 'pending'
     ";
     $stmt = $db->prepare($query);
-    $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
+    $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_STR_CHAR);
     $stmt->execute();
     $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $ex) {

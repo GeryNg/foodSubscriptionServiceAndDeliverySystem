@@ -9,7 +9,7 @@ if (isset($_GET['seller_id'])) {
 
     $query = "SELECT * FROM seller WHERE id = :seller_id";
     $stmt = $db->prepare($query);
-    $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_INT);
+    $stmt->bindParam(':seller_id', $seller_id, PDO::PARAM_STR_CHAR);
     $stmt->execute();
     $seller = $stmt->fetch(PDO::FETCH_ASSOC);
 

@@ -3,6 +3,11 @@ Username: Darren goh
 Password: 12345678
 Name: Darren goh 
 email: gohdarren317@gmail.com
+Phone Num: 012-321 6728
+Security Question 1: What city were you born in? 
+Answer SQ1: Klang
+Security Question 2: What was your first pet's name?
+Answer SQ2: Coco
 Address Line 1: pv 16, jalan danau kota
 City: Setapak
 State: Kuala Lumpur
@@ -14,11 +19,11 @@ Username: Yeoh Yao Wen
 Password: 12345678
 email: yeohyw@gmail.com
 Name: Yeoh Yao Wen 
-Phone Num: 012-345678
+Phone Num: 012-625 8236
 Security Question 1: What city were you born in? 
-Answer SQ1: Klang
+Answer SQ1: Setapak
 Security Question 2: What was your first pet's name?
-Answer SQ2: Coco
+Answer SQ2: Ali
 Address Line 1: 70, jalan beruang, Kawasan rumah hijau
 City: Taiping
 State: Perak

@@ -138,7 +138,7 @@ if (empty($seller_access) || $seller_access !== 'verify') {
                     <label>Section:</label>
                     <input type="checkbox" name="sections[]" value="Lunch"> Lunch<br>
                     <input type="checkbox" name="sections[]" value="Dinner"> Dinner<br><br>
-                    <label>Images (up to 6, format: jpg/jpeg/png):</label><br>
+                    <label>Images (format: jpg/jpeg/png):</label><br>
                     <input type="file" name="images[]" accept=".jpg, .jpeg, .png" multiple class="form-control"><br><br>
                     <label>
                         <input type="checkbox" id="hasAddonsCheckbox" name="has_addons" value="1"> Add-ons (Optional)

@@ -6,7 +6,7 @@ include_once '../resource/session.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['company_id']) && !empty($_POST['company_id'])) {
-        $company_id = filter_var($_POST['company_id'], FILTER_SANITIZE_NUMBER_INT);
+        $company_id = filter_var($_POST['company_id']);
         $user_id = $_SESSION['id'];
 
         try {

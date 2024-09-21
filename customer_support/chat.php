@@ -113,4 +113,5 @@ try {
         });
     });
 </script>
+<?php include '../partials/footer.php'; ?>
 </html>

@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order History</title>
     <link rel="stylesheet" href="../css/order_history.css">
+    <link rel="icon" type="image/x-icon" href="../image/logo-circle.png">
 </head>
 <body>
     <?php include '../partials/headers.php'; ?>   
@@ -27,7 +28,7 @@
                     WHERE order_cust.Cust_ID = :cust_id 
                     ORDER BY order_cust.Order_ID ASC";
             $statement = $db->prepare($sql);
-            $statement->bindParam(':cust_id', $cust_id, PDO::PARAM_INT);
+            $statement->bindParam(':cust_id', $cust_id, PDO::PARAM_STR_CHAR);
             $statement->execute();
 
             if ($statement->rowCount() > 0) {

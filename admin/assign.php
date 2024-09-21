@@ -3,7 +3,7 @@ $page_title = "Assign list";
 include_once '../partials/admin_nav.php';
 include_once '../resource/Database.php';
 
-$query = "SELECT * FROM seller WHERE access != 'inactive'";
+$query = "SELECT * FROM seller WHERE access NOT IN ('inactive', 'unknown')";
 $stmt = $db->prepare($query);
 $stmt->execute();
 $sellers = $stmt->fetchAll(PDO::FETCH_ASSOC);

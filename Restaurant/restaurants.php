@@ -105,6 +105,8 @@ while ($row = $statement->fetch()) {
             <?php endforeach; ?>
         </section>
     </div>
+    <br/>
+    <br/>
     <?php include '../partials/footer.php'; ?>
 </body>
 

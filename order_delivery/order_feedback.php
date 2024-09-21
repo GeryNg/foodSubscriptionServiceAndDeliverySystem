@@ -36,7 +36,7 @@
             $sql = "SELECT Rating, Comment, FeedbackDate FROM feedback WHERE Order_ID = :order_id AND Cust_ID = :cust_id";
             $statement = $db->prepare($sql);
             $statement->bindParam(':order_id', $order_id, PDO::PARAM_INT);
-            $statement->bindParam(':cust_id', $_SESSION['Cust_ID'], PDO::PARAM_INT);
+            $statement->bindParam(':cust_id', $_SESSION['Cust_ID'], PDO::PARAM_STR_CHAR);
             $statement->execute();
             $feedback = $statement->fetch();
 
@@ -63,7 +63,7 @@
                     $sql = "INSERT INTO feedback (Cust_ID, Order_ID, Comment, Rating, FeedbackDate) 
                             VALUES (:cust_id, :order_id, :comment, :rating, :feedback_date)";
                     $statement = $db->prepare($sql);
-                    $statement->bindParam(':cust_id', $_SESSION['Cust_ID'], PDO::PARAM_INT);
+                    $statement->bindParam(':cust_id', $_SESSION['Cust_ID'], PDO::PARAM_STR_CHAR);
                     $statement->bindParam(':order_id', $order_id, PDO::PARAM_INT);
                     $statement->bindParam(':comment', $comment, PDO::PARAM_STR);
                     $statement->bindParam(':rating', $rating, PDO::PARAM_STR);

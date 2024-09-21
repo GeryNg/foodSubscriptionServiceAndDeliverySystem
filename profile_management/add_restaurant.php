@@ -169,7 +169,7 @@ include_once '../partials/parse_add_restaurant.php';
                 <input type="file" name="images[]" class="form-control" accept=".jpg, .jpeg, .png" multiple>
                 <br><br>
 
-                <button type="submit" name="activeAccountBtn" class="button1" value="Activate Account">Activate Account</button>
+                <button type="submit" name="activeAccountBtn" class="button1" value="Activate Account">Add Restaurant</button>
                 <br />
                 <br />
             </form>

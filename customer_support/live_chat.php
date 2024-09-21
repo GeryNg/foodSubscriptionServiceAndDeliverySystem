@@ -4,6 +4,11 @@ include_once '../partials/headers.php';
 include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
+if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'customer') {
+    header("Location: ../partials/error.php");
+    exit;
+}
+
 try {
     $stmt = $db->prepare("SELECT users.*, customer.Name FROM users 
                           JOIN customer ON users.id = customer.user_id 

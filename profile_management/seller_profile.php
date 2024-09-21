@@ -28,13 +28,48 @@ if (isset($_SESSION['id'])) {
     $statementFirstRestaurant->execute(array(':seller_id' => $current_seller_id, ':user_id' => $id));
     $first_restaurant = $statementFirstRestaurant->fetch(PDO::FETCH_ASSOC);
 
+// If no seller found, check link_requests for linked sellers
+if (!$first_restaurant) {
+    $sqlQueryLinkRequest = "SELECT seller_id FROM link_requests WHERE user_id = :user_id AND status = 'accepted'";
+    $statementLinkRequest = $db->prepare($sqlQueryLinkRequest);
+    $statementLinkRequest->execute(array(':user_id' => $id));
+    $link_request = $statementLinkRequest->fetch(PDO::FETCH_ASSOC);
+
+    if ($link_request) {
+        // Get the seller_id from the link request and fetch the seller details
+        $linked_seller_id = $link_request['seller_id'];
+        $sqlQueryLinkedSeller = "SELECT * FROM seller WHERE id = :seller_id";
+        $statementLinkedSeller = $db->prepare($sqlQueryLinkedSeller);
+        $statementLinkedSeller->execute(array(':seller_id' => $linked_seller_id));
+        $first_restaurant = $statementLinkedSeller->fetch(PDO::FETCH_ASSOC);
+    }
+}
+
     $profile_pic = !empty($first_restaurant['profile_pic']) ? $first_restaurant['profile_pic'] : "../uploads/default_seller.jpg";
 
+
+    
     // Fetch all restaurants for this user
     $sqlQueryRestaurants = "SELECT * FROM seller WHERE user_id = :user_id";
     $statementRestaurants = $db->prepare($sqlQueryRestaurants);
     $statementRestaurants->execute(array(':user_id' => $id));
     $restaurants = $statementRestaurants->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!$restaurants) {
+        $sqlQueryLinkRequest = "SELECT seller_id FROM link_requests WHERE user_id = :user_id AND status = 'accepted'";
+        $statementLinkRequest = $db->prepare($sqlQueryLinkRequest);
+        $statementLinkRequest->execute(array(':user_id' => $id));
+        $link_request = $statementLinkRequest->fetch(PDO::FETCH_ASSOC);
+    
+        if ($link_request) {
+            // Get the seller_id from the link request and fetch the seller details
+            $linked_seller_id = $link_request['seller_id'];
+            $sqlQueryLinkedSeller = "SELECT * FROM seller WHERE id = :seller_id";
+            $statementLinkedSeller = $db->prepare($sqlQueryLinkedSeller);
+            $statementLinkedSeller->execute(array(':seller_id' => $linked_seller_id));
+            $restaurants = $statementLinkedSeller->fetch(PDO::FETCH_ASSOC);
+        }
+    }
 } else {
     echo "<p>User not found.</p>";
 }

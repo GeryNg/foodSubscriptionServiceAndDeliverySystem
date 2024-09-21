@@ -511,91 +511,92 @@ $seller_status = $stmt->fetch(PDO::FETCH_ASSOC)['status'] ?? 'close';
         });
     </script>
     <script>
-        let trackingInterval;
+// Ensure trackingInterval is declared only once at the top level of your script
+let trackingInterval; // Move this declaration outside any function or block
 
-        // Automatically start tracking if status is 'open'
-        <?php if ($seller_status === 'open'): ?>
-            startLocationTracking();
-        <?php endif; ?>
+// Automatically start tracking if status is 'open'
+<?php if ($seller_status === 'open'): ?>
+    startLocationTracking();
+<?php endif; ?>
 
-        document.getElementById('toggleLocation').addEventListener('change', function() {
-            if (this.checked) {
-                startLocationTracking();
-            } else {
-                closeLocation();
-            }
-        });
+document.getElementById('toggleLocation').addEventListener('change', function() {
+    if (this.checked) {
+        startLocationTracking();
+    } else {
+        closeLocation();
+    }
+});
 
-        function startLocationTracking() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(startTracking, handleError);
-            } else {
-                alert("Geolocation is not supported by this browser.");
-            }
-        }
+function startLocationTracking() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(startTracking, handleError);
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+}
 
-        function startTracking(position) {
+function startTracking(position) {
+    const {
+        latitude,
+        longitude
+    } = position.coords;
+    const fingerprint = '<?php echo $_SESSION['fingerprint']; ?>'; // Add fingerprint to the request
+
+    updateSellerLocation(latitude, longitude, 'open', fingerprint);
+
+    // Update location every 15 seconds
+    trackingInterval = setInterval(function() {
+        navigator.geolocation.getCurrentPosition(function(position) {
             const {
                 latitude,
                 longitude
             } = position.coords;
-            const fingerprint = '<?php echo $_SESSION['fingerprint']; ?>'; // Add fingerprint to the request
-
             updateSellerLocation(latitude, longitude, 'open', fingerprint);
+        }, handleError);
+    }, 15000);
+}
 
-            // Update location every 15 seconds
-            trackingInterval = setInterval(function() {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const {
-                        latitude,
-                        longitude
-                    } = position.coords;
-                    updateSellerLocation(latitude, longitude, 'open', fingerprint);
-                }, handleError);
-            }, 15000);
-        }
+function closeLocation() {
+    if (trackingInterval) {
+        clearInterval(trackingInterval);
+    }
+    const fingerprint = '<?php echo $_SESSION['fingerprint']; ?>'; // Add fingerprint to the request
+    updateSellerLocation(null, null, 'close', fingerprint);
+}
 
-        function closeLocation() {
-            if (trackingInterval) {
-                clearInterval(trackingInterval);
+function updateSellerLocation(latitude, longitude, status, fingerprint) {
+    const data = {
+        latitude: latitude,
+        longitude: longitude,
+        status: status,
+        fingerprint: fingerprint
+    };
+
+    console.log('Sending data:', data); // Log the data being sent for debugging
+
+    fetch('update_seller_location.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.text())
+        .then(result => {
+            console.log('Response from server:', result);
+            if (result !== 'success') {
+                alert('Failed to update location.');
             }
-            const fingerprint = '<?php echo $_SESSION['fingerprint']; ?>'; // Add fingerprint to the request
-            updateSellerLocation(null, null, 'close', fingerprint);
-        }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the location.');
+        });
+}
 
-        function updateSellerLocation(latitude, longitude, status, fingerprint) {
-            const data = {
-                latitude: latitude,
-                longitude: longitude,
-                status: status,
-                fingerprint: fingerprint
-            };
-
-            console.log('Sending data:', data); // Log the data being sent for debugging
-
-            fetch('update_seller_location.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(response => response.text())
-                .then(result => {
-                    console.log('Response from server:', result);
-                    if (result !== 'success') {
-                        alert('Failed to update location.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating the location.');
-                });
-        }
-
-        function handleError(error) {
-            console.warn(`ERROR(${error.code}): ${error.message}`);
-        }
+function handleError(error) {
+    console.warn(`ERROR(${error.code}): ${error.message}`);
+}
     </script>
 
 </body>

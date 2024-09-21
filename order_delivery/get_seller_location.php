@@ -9,14 +9,4 @@ $query->execute();
 
 $location = $query->fetch(PDO::FETCH_ASSOC);
 
-if ($location) {
-    echo json_encode([
-        'latitude' => $location['latitude'],
-        'longitude' => $location['longitude']
-    ]);
-} else {
-    echo json_encode([
-        'error' => 'Location not found'
-    ]);
-}
 ?>

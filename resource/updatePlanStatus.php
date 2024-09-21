@@ -22,6 +22,9 @@ function updatePlanStatuses($db)
         // Call function to create wallets for verified sellers
         createWalletForVerifiedSellers($db);
 
+        // Call function to update delivery locations for 'on delivery' status
+        updateDeliveryLocation($db);
+
     } catch (PDOException $e) {
         echo "Failed to update statuses: " . $e->getMessage();
     }
@@ -107,5 +110,55 @@ function createWalletForVerifiedSellers($db)
     }
 }
 
+function updateDeliveryLocation($db)
+{
+    try {
+        // Fetch deliveries where status is 'on delivery'
+        $deliveryQuery = "
+            SELECT delivery_id, seller_id 
+            FROM delivery 
+            WHERE status = 'on delivery'
+        ";
+        $stmt = $db->prepare($deliveryQuery);
+        $stmt->execute();
+        $deliveries = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($deliveries as $delivery) {
+            // Get the seller's location from the seller_location table
+            $locationQuery = "
+                SELECT latitude, longitude 
+                FROM seller_location 
+                WHERE seller_id = :seller_id
+            ";
+            $stmtLocation = $db->prepare($locationQuery);
+            $stmtLocation->execute([':seller_id' => $delivery['seller_id']]);
+            $location = $stmtLocation->fetch(PDO::FETCH_ASSOC);
+
+            if ($location) {
+                // Update the delivery with the seller's latitude and longitude
+                $updateQuery = "
+                    UPDATE delivery 
+                    SET latitude = :latitude, longitude = :longitude 
+                    WHERE delivery_id = :delivery_id
+                ";
+                $stmtUpdate = $db->prepare($updateQuery);
+                $stmtUpdate->execute([
+                    ':latitude' => $location['latitude'],
+                    ':longitude' => $location['longitude'],
+                    ':delivery_id' => $delivery['delivery_id']
+                ]);
+
+                //echo "Updated delivery " . $delivery['delivery_id'] . " with latitude: " . $location['latitude'] . ", longitude: " . $location['longitude'] . "<br>";
+            } else {
+                echo "No location found for seller_id: " . $delivery['seller_id'] . "<br>";
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Failed to update delivery locations: " . $e->getMessage();
+    }
+}
+
+// Call the main function to update plan statuses and related tasks
 updatePlanStatuses($db);
 ?>

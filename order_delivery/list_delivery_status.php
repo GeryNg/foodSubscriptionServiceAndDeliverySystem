@@ -10,7 +10,7 @@ $today = date('Y-m-d');
 
 // Fetch delivery details for the given customer ID
 $query = $db->prepare("SELECT * FROM delivery WHERE cust_id = :cust_id AND delivery_date = :today");
-$query->bindParam(':cust_id', $cust_id, PDO::PARAM_INT);
+$query->bindParam(':cust_id', $cust_id, PDO::PARAM_STR_CHAR);
 $query->bindParam(':today', $today);
 $query->execute();
 $deliveries = $query->fetchAll(PDO::FETCH_ASSOC);
@@ -22,6 +22,24 @@ if ($delivery) {
     $status = $delivery['status'];
 } else {
     $order_id = $delivery_id = $delivery_date = $status = 'No delivery found';
+}
+
+$query = $db->prepare("SELECT latitude, longitude FROM delivery WHERE cust_id = :cust_id AND status = 'on delivery' LIMIT 1");
+$query->bindParam(':cust_id', $cust_id, PDO::PARAM_STR);
+$query->execute();
+
+$location = $query->fetch(PDO::FETCH_ASSOC);
+
+
+if ($location) {
+    echo json_encode([
+        'latitude' => $location['latitude'],
+        'longitude' => $location['longitude']
+    ]);
+} else {
+    echo json_encode([
+        'error' => 'Location not found'
+    ]);
 }
 ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -220,7 +238,11 @@ if ($delivery) {
                         </div>
                     </div>
                 </div>
-                <div class="map" id="map"></div>
+                <?php if ($delivery['status'] === 'on delivery'): ?>
+                    <div class="map" id="map"></div>
+                <?php else: ?>
+                    <p>The delivery is not currently "on delivery" status, so location tracking is not available.</p>
+                <?php endif; ?>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>

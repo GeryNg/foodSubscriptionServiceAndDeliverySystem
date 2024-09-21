@@ -301,58 +301,71 @@ function updateActiveThumbnail(index) {
 showSlides(currentIndex);
     </script>
     <script>
-        let currentIndex = 0;
-        const slides = document.querySelectorAll('.slide');
-        const totalSlides = slides.length;
+    window.onload = function() {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1); // Set minimum date to tomorrow
+        const minDate = tomorrow.toISOString().split('T')[0]; // Format date to YYYY-MM-DD
 
-        function showSlides(index) {
-            if (index >= totalSlides) {
-                currentIndex = 0;
-            } else if (index < 0) {
-                currentIndex = totalSlides - 1;
-            } else {
-                currentIndex = index;
-            }
+        // Set the min attribute for start_date and end_date inputs
+        document.getElementById('start_date').setAttribute('min', minDate);
+        document.getElementById('end_date').setAttribute('min', minDate);
+    };
 
-            const offset = -currentIndex * 100;
-            document.querySelector('.slider').style.transform = `translateX(${offset}%)`;
+    let currentIndex = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function showSlides(index) {
+        if (index >= totalSlides) {
+            currentIndex = 0;
+        } else if (index < 0) {
+            currentIndex = totalSlides - 1;
+        } else {
+            currentIndex = index;
         }
 
-        document.querySelector('.next').addEventListener('click', () => {
-            showSlides(currentIndex + 1);
-        });
+        const offset = -currentIndex * 100;
+        document.querySelector('.slider').style.transform = `translateX(${offset}%)`;
+    }
 
-        document.querySelector('.prev').addEventListener('click', () => {
-            showSlides(currentIndex - 1);
-        });
+    document.querySelector('.next').addEventListener('click', () => {
+        showSlides(currentIndex + 1);
+    });
 
-        showSlides(currentIndex);
+    document.querySelector('.prev').addEventListener('click', () => {
+        showSlides(currentIndex - 1);
+    });
 
-        // JavaScript for calculating totals
-        const startDateInput = document.getElementById('start_date');
-        const endDateInput = document.getElementById('end_date');
-        const quantityInput = document.getElementById('quantity');
-        const grandTotalInput = document.getElementById('grand_total');
-        const planPrice = parseFloat("<?php echo $planPrice; ?>");
+    showSlides(currentIndex);
 
-        function calculateDuration() {
-            const startDate = new Date(startDateInput.value);
-            const endDate = new Date(endDateInput.value);
-            const quantity = parseInt(quantityInput.value) || 1;
+    // JavaScript for calculating totals
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    const quantityInput = document.getElementById('quantity');
+    const grandTotalInput = document.getElementById('grand_total');
+    const planPrice = parseFloat("<?php echo $planPrice; ?>");
 
-            if (startDate && endDate && startDate <= endDate) {
-                const duration = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1;
-                document.getElementById('duration').value = duration;
-                const grandTotal = planPrice * duration * quantity;
-                grandTotalInput.value = "RM " + grandTotal.toFixed(2);
-            }
+    function calculateDuration() {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+        const quantity = parseInt(quantityInput.value) || 1;
+
+        if (startDate && endDate && startDate <= endDate) {
+            const duration = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1;
+            document.getElementById('duration').value = duration;
+            const grandTotal = planPrice * duration * quantity;
+            grandTotalInput.value = "RM " + grandTotal.toFixed(2);
         }
+    }
 
-        // Attach event listeners to calculate totals on change
-        startDateInput.addEventListener('change', calculateDuration);
-        endDateInput.addEventListener('change', calculateDuration);
-        quantityInput.addEventListener('input', calculateDuration);
+    // Attach event listeners to calculate totals on change
+    startDateInput.addEventListener('change', calculateDuration);
+    endDateInput.addEventListener('change', calculateDuration);
+    quantityInput.addEventListener('input', calculateDuration);
+</script>
     </script>
+    
 </body>
 
 </html>

@@ -14,10 +14,12 @@ if (isset($_POST['addAddressBtn'])) {
     $state = htmlspecialchars($_POST['state']);
     $postal_code = htmlspecialchars($_POST['postal_code']);
     $country = htmlspecialchars($_POST['country']);
+    $latitude = htmlspecialchars($_POST['latitude']);
+    $longitude = htmlspecialchars($_POST['longitude']);
     $cust_id = $_SESSION['Cust_ID'];
 
     // Required fields
-    $required_fields = array('line1', 'city', 'state', 'postal_code', 'country');
+    $required_fields = array('line1', 'line2', 'city', 'state', 'postal_code', 'country', 'latitude', 'longitude');
 
     // Check for empty fields
     $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
@@ -32,13 +34,23 @@ if (isset($_POST['addAddressBtn'])) {
         if ($stmtCheckPostcode->rowCount() == 0) {
             $result = "<p style='color: red;'>This area is not supported yet.</p>";
         } else {
-            // Proceed with inserting or updating the address
+            // Proceed with inserting the address along with latitude and longitude
             try {
-                $sqlInsert = "INSERT INTO address (Cust_ID, line1, line2, city, state, postal_code, country) 
-                              VALUES (:cust_id, :line1, :line2, :city, :state, :postal_code, :country)";
+                $sqlInsert = "INSERT INTO address (Cust_ID, line1, line2, city, state, postal_code, country, latitude, longitude) 
+                              VALUES (:cust_id, :line1, :line2, :city, :state, :postal_code, :country, :latitude, :longitude)";
 
                 $statement = $db->prepare($sqlInsert);
-                $statement->execute(array(':cust_id' => $cust_id, ':line1' => $line1, ':line2' => $line2, ':city' => $city, ':state' => $state, ':postal_code' => $postal_code, ':country' => $country));
+                $statement->execute(array(
+                    ':cust_id' => $cust_id, 
+                    ':line1' => $line1, 
+                    ':line2' => $line2, 
+                    ':city' => $city, 
+                    ':state' => $state, 
+                    ':postal_code' => $postal_code, 
+                    ':country' => $country, 
+                    ':latitude' => $latitude,
+                    ':longitude' => $longitude
+                ));
 
                 // If insertion is successful
                 if ($statement->rowCount() === 1) {
@@ -57,4 +69,3 @@ if (isset($_POST['addAddressBtn'])) {
         }
     }
 }
-?>

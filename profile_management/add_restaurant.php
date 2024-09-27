@@ -3,13 +3,13 @@ $page_title = "Add Other Restaurant";
 include_once '../partials/staff_nav.php';
 include_once '../partials/parse_add_restaurant.php';
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
-<head lang="en">
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><?php echo htmlspecialchars($page_title); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         .container-fluid {
@@ -84,6 +84,7 @@ include_once '../partials/parse_add_restaurant.php';
             overflow: auto;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -102,40 +103,48 @@ include_once '../partials/parse_add_restaurant.php';
                     </div>
                 <?php endif; ?>
                 <div class="clearfix" style="margin-bottom: 30px;"></div>
-                <label>Name: </label>
-                <input type="text" name="seller_name" class="form-control" value="<?php if (isset($_POST['seller_name'])) echo htmlspecialchars($_POST['seller_name']); ?>">
+
+                <label for="sellerName">Name:</label>
+                <input type="text" name="seller_name" class="form-control" id="sellerName" value="<?php if (isset($_POST['seller_name'])) echo htmlspecialchars($_POST['seller_name']); ?>" required>
                 <br>
 
-                <label>Restaurant Profile Picture: </label>
-                <input type="file" name="profile_pic" class="form-control" accept=".jpg, .jpeg, .png" multiple>
+                <label for="profilePic">Restaurant Profile Picture:</label>
+                <input type="file" name="profile_pic" class="form-control" id="profilePic" accept=".jpg, .jpeg, .png" required>
                 <br /><br />
 
-                <label>Describe your restaurant: </label>
-                <textarea name="description" class="form-control"><?php if (isset($_POST['description'])) echo htmlspecialchars($_POST['description']); ?></textarea>
-                <br>
-                <label>Contact Number: </label>
-                <input type="text" name="contact_num" class="form-control" value="<?php if (isset($_POST['contact_num'])) echo htmlspecialchars($_POST['contact_num']); ?>">
+                <label for="description">Describe your restaurant:</label>
+                <textarea name="description" class="form-control" id="description" required><?php if (isset($_POST['description'])) echo htmlspecialchars($_POST['description']); ?></textarea>
                 <br>
 
-                <label>Address: </label>
-                <input type="text" name="address" class="form-control"><?php if (isset($_POST['address'])) echo htmlspecialchars($_POST['address']); ?>
+                <label for="contactNum">Contact Number:</label>
+                <input type="text" name="contact_num" class="form-control" id="contactNum" value="<?php if (isset($_POST['contact_num'])) echo htmlspecialchars($_POST['contact_num']); ?>" required>
                 <br>
 
-                <label>Postcode: </label>
-                <input type="text" name="postcode" id="postcode" class="form-control" oninput="fetchCityState()">
-                <div id="postcodeError" style="color: red;"></div>
+                <label for="address">Address:</label>
+                <input type="text" name="address" id="address" class="form-control" required>
                 <br>
 
-                <label>City: </label>
-                <input type="text" name="city" id="city" class="form-control" readonly>
+                <label for="unitNumber">Unit Number / Block / Door Number:</label>
+                <input type="text" name="unit_number" id="unitNumber" class="form-control" required>
                 <br>
 
-                <label>State: </label>
-                <input type="text" name="state" id="state" class="form-control" readonly>
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+
+                <label for="postcode">Postcode:</label>
+                <input type="text" name="postcode" id="postcode" class="form-control" readonly required>
                 <br>
 
-                <label>Bank Company:
-                    <select name="bank" id="bank" class="form-control">
+                <label for="city">City:</label>
+                <input type="text" name="city" id="city" class="form-control" readonly required>
+                <br>
+
+                <label for="state">State:</label>
+                <input type="text" name="state" id="state" class="form-control" readonly required>
+                <br>
+
+                <label for="bank">Bank Company:
+                    <select name="bank" id="bank" class="form-control" required>
                         <option value="Affin Bank">Affin Bank</option>
                         <option value="Affin Islamic Bank">Affin Islamic Bank</option>
                         <option value="Alliance Bank Malaysia">Alliance Bank Malaysia</option>
@@ -161,63 +170,75 @@ include_once '../partials/parse_add_restaurant.php';
                 </label>
                 <br />
 
-                <label>Bank Account: </label>
-                <input type="number" name="bank_account_number" class="form-control" value="<?php if (isset($_POST['bank_account_number'])) echo htmlspecialchars($_POST['bank_account_number']); ?>">
+                <label for="bankAccount">Bank Account:</label>
+                <input type="number" name="bank_account_number" class="form-control" id="bankAccount" value="<?php if (isset($_POST['bank_account_number'])) echo htmlspecialchars($_POST['bank_account_number']); ?>" required>
                 <br>
 
-                <label>Document needed for approval (Business owner/Partner's NRIC, e-SSM Business Profile, Certificate of Registration of Business (Form D), Halal License, Liquor license, Business Premises License & other): </label>
-                <input type="file" name="images[]" class="form-control" accept=".jpg, .jpeg, .png" multiple>
-                <br><br>
+                <label for="documents">Document needed for approval (NRIC, SSM, etc.):</label>
+                <input type="file" name="images[]" class="form-control" id="documents" accept=".jpg, .jpeg, .png" multiple>
+                <br><br />
 
-                <button type="submit" name="activeAccountBtn" class="button1" value="Activate Account">Add Restaurant</button>
-                <br />
-                <br />
+                <button type="submit" name="activeAccountBtn" class="button1" id="activateBtn" value="Activate Account">Add Restaurant</button>
+                <br /><br />
             </form>
         </div>
     </div>
+
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="img01">
+        <div id="caption"></div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5sNxHZwLHZ4KigiYcQKGjbrEVhbKLNFo&libraries=places"></script>
     <script>
-        function fetchCityState() {
-            var postcode = document.getElementById('postcode').value;
-            var cityField = document.getElementById('city');
-            var stateField = document.getElementById('state');
-            var postcodeError = document.getElementById('postcodeError');
+        function initAutocomplete() {
+            const addressField = document.getElementById('address');
+            const autocomplete = new google.maps.places.Autocomplete(addressField);
 
-            if (postcode.length > 0) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "../partials/parse_add_restaurant.php", true);
-                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-                xhr.onreadystatechange = function() {
-                    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-                        try {
-                            var response = JSON.parse(this.responseText);
+            autocomplete.setFields(['address_component', 'geometry']);
 
-                            if (response.success) {
-                                cityField.value = response.city;
-                                stateField.value = response.state;
-                                postcodeError.textContent = "";
-                            } else {
-                                cityField.value = "";
-                                stateField.value = "";
-                                postcodeError.textContent = "This postcode area is not supported yet.";
-                            }
-                        } catch (e) {
-                            cityField.value = "";
-                            stateField.value = "";
-                            postcodeError.textContent = "Unable to process response.";
-                        }
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+
+                if (!place.geometry) {
+                    alert("No details available for input: '" + place.name + "'");
+                    return;
+                }
+
+                let postcode = '', city = '', state = '', country = '';
+
+                place.address_components.forEach(function(component) {
+                    const types = component.types;
+                    if (types.includes('postal_code')) {
+                        postcode = component.long_name;
                     }
-                };
-                xhr.send("postcode=" + encodeURIComponent(postcode));
-            } else {
-                cityField.value = "";
-                stateField.value = "";
-                postcodeError.textContent = "";
-            }
+                    if (types.includes('locality')) {
+                        city = component.long_name;
+                    } else if (types.includes('administrative_area_level_2')) {
+                        city = component.long_name;
+                    }
+                    if (types.includes('administrative_area_level_1')) {
+                        state = component.long_name;
+                    }
+                    if (types.includes('country')) {
+                        country = component.long_name;
+                    }
+                });
+
+                if (postcode) {
+                    document.getElementById('postal_code').value = postcode;
+                    document.getElementById('postal_code').readOnly = true;
+                } else {
+                    document.getElementById('postal_code').value = "";
+                    document.getElementById('postal_code').readOnly = false;
+                    alert('No postcode found for this address. Please enter manually.');
+                }
+            });
         }
+
+        google.maps.event.addDomListener(window, 'load', initAutocomplete);
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.js"></script>
 </body>
 
 </html>

@@ -15,7 +15,7 @@ Postal code: 53300
 Country: Malaysia
 
 //Customer 2
-Username: Yeoh Yao Wen 
+Username: Yeoh Yao Wen
 Password: 12345678
 email: yeohyw@gmail.com
 Name: Yeoh Yao Wen 
@@ -36,19 +36,19 @@ Password: 12345678
 email: songms@gmail.com
 Name: Song Mern Shen 
 Phone Num: 012-345678
-Security Question 1: What city were you born in? 
-Answer SQ1: Klang
-Security Question 2: What was your first pet's name?
-Answer SQ2: Coco
+Security Question 1: What is your favorite food?
+Answer SQ1: KFC
+Security Question 2: What is your mother's maiden name?
+Answer SQ2: Siti
 Address Line 1: 69, jalan beruang, Kawasan rumah hijau
 City: Taiping
 State: Perak
 Postal code: 34000
 Country: Malaysia
 
-//Seller1 (Active)
+//Seller1
 email: darrengey-wp20@student.tarc.edu.my
-Username: Gery Ng 
+Username: Gery Ng
 Password: 12345678
 Name: Gery Ng
 Security question1: What city were you born in? 
@@ -56,7 +56,7 @@ Answer: Narnia
 Security question2: What was your first pet's name?
 Answer: Bat
 
-//Seller 2 (inactive) (done)
+//Seller 2
 email: gohdarren238@gmail.com
 Username: Dora Goh
 Password: Darren123

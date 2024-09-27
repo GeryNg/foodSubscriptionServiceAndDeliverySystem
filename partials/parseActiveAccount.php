@@ -5,13 +5,11 @@ include_once '../resource/utilities.php';
 
 if (!empty($_POST['postcode']) && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
     $postcode = htmlspecialchars($_POST['postcode']);
-
-    $stmt = $db->prepare("SELECT city, state FROM address_book WHERE postcode = ?");
+    $stmt = $db->prepare("SELECT * FROM address_book WHERE postcode = ?");
     $stmt->execute([$postcode]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result) {
-        echo json_encode(['success' => true, 'city' => $result['city'], 'state' => $result['state']]);
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(['success' => true]);
     } else {
         echo json_encode(['success' => false]);
     }
@@ -22,7 +20,7 @@ if (isset($_POST['activeAccountBtn'])) {
     $form_errors = array();
 
     // Required fields
-    $required_fields = ['seller_name', 'description', 'contact_num', 'address', 'postcode', 'city', 'state', 'bank', 'bank_account_number'];
+    $required_fields = ['seller_name', 'description', 'contact_num', 'address', 'postcode', 'city', 'state', 'bank', 'bank_account_number', 'unit_number'];
     $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
 
     // Fields to check length
@@ -32,6 +30,9 @@ if (isset($_POST['activeAccountBtn'])) {
     // Validate numeric value for bank account number
     $numeric_fields = ['bank_account_number'];
     $form_errors = array_merge($form_errors, check_numeric($numeric_fields));
+
+    // Handle unit number field
+    $unit_number = htmlspecialchars($_POST['unit_number']);
 
     // Validate and process profile picture upload
     $profilePicUrl = '';
@@ -74,7 +75,6 @@ if (isset($_POST['activeAccountBtn'])) {
             $fileTmpName = $_FILES['images']['tmp_name'][$i];
             $fileSize = $_FILES['images']['size'][$i];
             $fileError = $_FILES['images']['error'][$i];
-            $fileType = $_FILES['images']['type'][$i];
 
             if ($fileError === 0) {
                 $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
@@ -102,18 +102,27 @@ if (isset($_POST['activeAccountBtn'])) {
         }
     }
 
+    $postcode = htmlspecialchars($_POST['postcode']);
+    $stmt = $db->prepare("SELECT * FROM address_book WHERE postcode = ?");
+    $stmt->execute([$postcode]);
+
+    if ($stmt->rowCount() === 0) {
+        $form_errors[] = "Your location is not supported yet.";
+    }
+
     if (empty($form_errors)) {
         try {
             $access = 'pending';
             $user_id = $_SESSION['id'];
 
-            $stmt = $db->prepare("UPDATE seller SET name = ?, profile_pic = ?, detail = ?, contact_number = ?, address = ?, postcode = ?, city = ?, state = ?, bank_company = ?, bank_account = ?, access = ?, image_urls = ? WHERE user_id = ?");
+            $stmt = $db->prepare("UPDATE seller SET name = ?, profile_pic = ?, detail = ?, contact_number = ?, unit_number = ?, address = ?, postcode = ?, city = ?, state = ?, bank_company = ?, bank_account = ?, access = ?, image_urls = ?, latitude = ?, longitude = ? WHERE user_id = ?");
 
             $stmt->execute([
                 htmlspecialchars($_POST['seller_name']),
                 htmlspecialchars($profilePicUrl),
                 htmlspecialchars($_POST['description']),
                 htmlspecialchars($_POST['contact_num']),
+                htmlspecialchars($_POST['unit_number']),
                 htmlspecialchars($_POST['address']),
                 htmlspecialchars($_POST['postcode']),
                 htmlspecialchars($_POST['city']),
@@ -122,10 +131,12 @@ if (isset($_POST['activeAccountBtn'])) {
                 htmlspecialchars($_POST['bank_account_number']),
                 $access,
                 implode(',', $imageUrls),
+                htmlspecialchars($_POST['latitude']),
+                htmlspecialchars($_POST['longitude']),
                 $user_id
             ]);
 
-            // Fetch updated seller row to getsta id and access
+            // Fetch updated seller row to get state id and access
             $stmt = $db->prepare("SELECT id, access FROM seller WHERE user_id = ?");
             $stmt->execute([$user_id]);
             $sellerRow = $stmt->fetch(PDO::FETCH_ASSOC);

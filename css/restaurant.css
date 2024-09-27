@@ -150,3 +150,57 @@ h2 {
     color: #777;
 }
 
+.selected-address-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    background-color: #fff;
+    border-radius: 50px;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+}
+
+.selected-address-container p {
+    flex-grow: 1;
+    font-size: 1rem;
+    color: #333;
+    margin: 0;
+}
+
+.change-address-form {
+    display: flex;
+    align-items: center;
+}
+
+.btn-change {
+    background-color: #007BFF;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    outline: none;
+    margin-left: 15px;
+}
+
+.btn-change:hover {
+    background-color: #0056b3;
+}
+
+/* Optional: Adjust 'Selected Address' section responsiveness */
+@media (max-width: 768px) {
+    .selected-address-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .btn-change {
+        margin-top: 10px;
+        margin-left: 0;
+    }
+}

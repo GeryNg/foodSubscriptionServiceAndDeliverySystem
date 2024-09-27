@@ -1,9 +1,51 @@
 <?php
 $page_title = "Restaurants";
 include '../resource/Database.php';
+include '../resource/session.php';
 include '../partials/headers.php';
 
-// Process the data
+$customer_id = $_SESSION['Cust_ID'];
+
+// Fetch customer addresses
+$sql_addresses = "SELECT address_id, CONCAT(line1, ', ', line2, ', ', city, ', ', state, ' ', postal_code, ', ', country) AS full_address 
+                  FROM address 
+                  WHERE Cust_ID = :customer_id";
+$statement_addresses = $db->prepare($sql_addresses);
+$statement_addresses->bindParam(':customer_id', $customer_id, PDO::PARAM_STR_CHAR);
+$statement_addresses->execute();
+$addresses = $statement_addresses->fetchAll(PDO::FETCH_ASSOC);
+
+// Set default selected address
+$selected_address_id = isset($_SESSION['selected_address_id']) ? $_SESSION['selected_address_id'] : null;
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['address_id'])) {
+    $selected_address_id = $_POST['address_id'];
+    $_SESSION['selected_address_id'] = $selected_address_id;
+    header("Location: ../Restaurant/restaurant.php");
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_address'])) {
+    unset($_SESSION['selected_address_id']);
+    echo "<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            clearAddress();
+        });
+    </script>";
+}
+
+$selected_address = null;
+if ($selected_address_id) {
+    $sql_selected_address = "SELECT CONCAT(line1, ', ', line2, ', ', city, ', ', state, ' ', postal_code, ', ', country) AS full_address 
+                             FROM address 
+                             WHERE address_id = :address_id";
+    $statement_selected_address = $db->prepare($sql_selected_address);
+    $statement_selected_address->bindParam(':address_id', $selected_address_id, PDO::PARAM_INT);
+    $statement_selected_address->execute();
+    $selected_address = $statement_selected_address->fetchColumn();
+}
+
+// Fetch restaurant data
 $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
 $sellers = [];
 
@@ -62,11 +104,86 @@ while ($row = $statement->fetch()) {
     <title>Restaurants</title>
     <link rel="stylesheet" href="../css/restaurant.css">
     <link rel="icon" type="image/x-icon" href="../image/logo-circle.png">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
     <div class="container" style="margin-top: 3%;">
         <h1>All Restaurants</h1>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                <?php if (!$selected_address_id): ?>
+                    clearAddress();
+                <?php endif; ?>
+            });
+
+            function clearAddress() {
+                const inputOptions = {
+                    <?php
+                    $addressCount = count($addresses);
+                    $counter = 0;
+                    foreach ($addresses as $address):
+                        $counter++;
+                        // Truncate the address to 100 characters
+                        $truncated_address = substr($address['full_address'], 0, 100) . (strlen($address['full_address']) > 100 ? '...' : '');
+                        echo "'{$address['address_id']}': '" . addslashes($truncated_address) . "'";
+                        if ($counter < $addressCount) {
+                            echo ',';
+                        }
+                    endforeach;
+                    ?>
+                };
+
+
+                // SweetAlert2 for selecting a new address
+                Swal.fire({
+                    title: 'Select Your Address',
+                    input: 'select',
+                    inputOptions: inputOptions,
+                    inputPlaceholder: 'Select your address',
+                    showCancelButton: true,
+                    inputValidator: (value) => {
+                        return new Promise((resolve) => {
+                            if (value) {
+                                resolve();
+                            } else {
+                                resolve('You need to select an address!');
+                            }
+                        });
+                    }
+                }).then((result) => {
+                    if (result.value) {
+                        const selectedAddress = result.value;
+                        // Submit the form using JavaScript
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '';
+
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'address_id';
+                        input.value = selectedAddress;
+
+                        form.appendChild(input);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            }
+        </script>
+
+        <!-- Display selected address and change button -->
+        <?php if ($selected_address): ?>
+            <div class="selected-address-container">
+                <p>Selected Address: <?php echo $selected_address; ?></p>
+                <form method="POST" action="" class="change-address-form">
+                    <input type="hidden" name="clear_address" value="true" />
+                    <button type="submit" class="btn-change">Change</button>
+                </form>
+            </div>
+        <?php endif; ?>
+
+        <!-- Search bar for restaurants -->
         <form method="GET" action="" class="search-bar">
             <input type="text" name="search" placeholder="Search for restaurants, cuisines, and dishes" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_QUOTES, 'UTF-8') : ''; ?>">
             <button type="submit">
@@ -76,6 +193,7 @@ while ($row = $statement->fetch()) {
             </button>
         </form>
 
+        <!-- List of restaurants -->
         <section class="articles">
             <?php foreach ($sellers as $seller): ?>
                 <article class='restaurant-card'>
@@ -105,8 +223,8 @@ while ($row = $statement->fetch()) {
             <?php endforeach; ?>
         </section>
     </div>
-    <br/>
-    <br/>
+    <br />
+    <br />
     <?php include '../partials/footer.php'; ?>
 </body>
 

@@ -5,19 +5,18 @@ include_once '../resource/utilities.php';
 
 if (!empty($_POST['postcode']) && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
     $postcode = htmlspecialchars($_POST['postcode']);
-
-    $stmt = $db->prepare("SELECT city, state FROM address_book WHERE postcode = ?");
+    $stmt = $db->prepare("SELECT * FROM address_book WHERE postcode = ?");
     $stmt->execute([$postcode]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result) {
-        echo json_encode(['success' => true, 'city' => $result['city'], 'state' => $result['state']]);
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(['success' => true]);
     } else {
         echo json_encode(['success' => false]);
     }
     exit();
 }
 
+// Function to generate a unique Seller ID
 function generateSellerId($db) {
     $query = "SELECT MAX(id) AS max_id FROM seller";
     $stmt = $db->prepare($query);
@@ -31,10 +30,10 @@ function generateSellerId($db) {
 }
 
 if (isset($_POST['activeAccountBtn'])) {
-    $form_errors = array();
+    $form_errors = [];
 
     // Required fields
-    $required_fields = ['seller_name', 'description', 'contact_num', 'address', 'postcode', 'city', 'state', 'bank', 'bank_account_number'];
+    $required_fields = ['seller_name', 'description', 'contact_num', 'address', 'postcode', 'city', 'state', 'bank', 'bank_account_number', 'unit_number'];
     $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
 
     // Fields to check length
@@ -44,6 +43,9 @@ if (isset($_POST['activeAccountBtn'])) {
     // Validate numeric value for bank account number
     $numeric_fields = ['bank_account_number'];
     $form_errors = array_merge($form_errors, check_numeric($numeric_fields));
+
+    // Handle unit number field
+    $unit_number = htmlspecialchars($_POST['unit_number']);
 
     // Validate and process profile picture upload
     $profilePicUrl = '';
@@ -55,7 +57,7 @@ if (isset($_POST['activeAccountBtn'])) {
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
         if (in_array($fileExtension, $allowedFormats)) {
-            if ($fileSize <= 2 * 1024 * 1024) { // Check for file size (e.g., 2MB limit)
+            if ($fileSize <= 2 * 1024 * 1024) { // Check for file size (2MB limit)
                 $newFileName = uniqid('', true) . "." . $fileExtension;
                 $targetDir = "../seller_profile_pic/";
                 $targetPath = $targetDir . $newFileName;
@@ -86,13 +88,12 @@ if (isset($_POST['activeAccountBtn'])) {
             $fileTmpName = $_FILES['images']['tmp_name'][$i];
             $fileSize = $_FILES['images']['size'][$i];
             $fileError = $_FILES['images']['error'][$i];
-            $fileType = $_FILES['images']['type'][$i];
 
             if ($fileError === 0) {
                 $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
                 if (in_array($fileExtension, $allowedFormats)) {
-                    if ($fileSize <= 2 * 1024 * 1024) { // Check for file size (e.g., 2MB limit)
+                    if ($fileSize <= 2 * 1024 * 1024) { // Check for file size (2MB limit)
                         $newFileName = uniqid('', true) . "." . $fileExtension;
                         $targetDir = "../document/";
                         $targetPath = $targetDir . $newFileName;
@@ -114,6 +115,14 @@ if (isset($_POST['activeAccountBtn'])) {
         }
     }
 
+    $postcode = htmlspecialchars($_POST['postcode']);
+    $stmt = $db->prepare("SELECT * FROM address_book WHERE postcode = ?");
+    $stmt->execute([$postcode]);
+
+    if ($stmt->rowCount() === 0) {
+        $form_errors[] = "Your location is not supported yet.";
+    }
+
     if (empty($form_errors)) {
         try {
             $access = 'pending';
@@ -121,9 +130,10 @@ if (isset($_POST['activeAccountBtn'])) {
 
             $newSellerId = generateSellerId($db);
 
+            // SQL logic remains unchanged here
             $stmt = $db->prepare("INSERT INTO seller 
-                (id, name, profile_pic, detail, contact_number, address, postcode, city, state, bank_company, bank_account, access, image_urls, user_id) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                (id, name, profile_pic, detail, contact_number, address, unit_number, postcode, city, state, bank_company, bank_account, access, image_urls, user_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             $stmt->execute([
                 $newSellerId,
@@ -132,6 +142,7 @@ if (isset($_POST['activeAccountBtn'])) {
                 htmlspecialchars($_POST['description']),
                 htmlspecialchars($_POST['contact_num']),
                 htmlspecialchars($_POST['address']),
+                htmlspecialchars($_POST['unit_number']),  // Include the unit number field
                 htmlspecialchars($_POST['postcode']),
                 htmlspecialchars($_POST['city']),
                 htmlspecialchars($_POST['state']),
@@ -142,12 +153,12 @@ if (isset($_POST['activeAccountBtn'])) {
                 $user_id
             ]);
 
+            // Fetch the last inserted seller ID
             $seller_id = $db->lastInsertId();
-
             echo "<script>
             swal({
-              title: \"Account Created!\",
-              text: \"Your new restaurant has been added successfully.\",
+              title: \"Restaurant Added!\",
+              text: \"Your restaurant has been added successfully.\",
               icon: 'success',
               button: \"OK\",
             });
@@ -157,10 +168,12 @@ if (isset($_POST['activeAccountBtn'])) {
             </script>";
             exit;
         } catch (PDOException $e) {
-            $form_errors[] = "Failed to create the account: " . $e->getMessage();
+            error_log("Database error: " . $e->getMessage());
+            $form_errors[] = "Failed to add the restaurant: " . $e->getMessage();
         }
     }
 
+    // Return errors, if any
     if (!empty($form_errors)) {
         $result = count($form_errors) == 1
             ? flashMessage("There was 1 error in the form<br>")

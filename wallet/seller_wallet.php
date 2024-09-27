@@ -528,24 +528,23 @@ if (!empty($seller_id)) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    function calculateWithdraw() {
-        var withdrawAmount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
-        var balance = parseFloat(document.getElementById('max-balance').value) || 0;
-        var platformFee = 0;
-        var totalWithdraw = 0;
-        var hint = document.getElementById('balance-hint');
-
-        if (withdrawAmount > balance) {
-            hint.style.display = 'block';
-        } else {
-            hint.style.display = 'none';
-        }
-
-        platformFee = withdrawAmount * 0.06;
-        totalWithdraw = withdrawAmount - platformFee;
+    document.getElementById('withdraw-amount').addEventListener('input', function() {
+        var withdrawAmount = parseFloat(this.value) || 0;
+        var platformFee = withdrawAmount * 0.06; // 6% fee
+        var totalWithdrawAmount = withdrawAmount - platformFee;
 
         document.getElementById('platform-fee').value = platformFee.toFixed(2);
-        document.getElementById('total-withdraw').value = totalWithdraw.toFixed(2);
+        document.getElementById('total-withdraw').value = totalWithdrawAmount.toFixed(2);
+    });
+
+    function setMaxWithdraw() {
+        var maxAmount = <?php echo $balance; ?>;
+        document.getElementById('withdraw-amount').value = maxAmount;
+        var platformFee = maxAmount * 0.06; // 6% fee
+        var totalWithdrawAmount = maxAmount - platformFee;
+
+        document.getElementById('platform-fee').value = platformFee.toFixed(2);
+        document.getElementById('total-withdraw').value = totalWithdrawAmount.toFixed(2);
     }
 
     function setMaxWithdraw() {
@@ -567,52 +566,61 @@ if (!empty($seller_id)) {
     }
 
     // Calculate total income from the monthly income data
-    var totalIncome = monthlyIncomeData.reduce(function(a, b) { return a + b; }, 0);
+    var totalIncome = monthlyIncomeData.reduce(function(a, b) {
+        return a + b;
+    }, 0);
     document.getElementById('totalIncomeText').innerText = formatCurrency(totalIncome);
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Ensure the canvas element exists
-    let ctx = document.getElementById('myChart');
-    if (ctx) {
-        let chartContext = ctx.getContext('2d');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ensure the canvas element exists
+        let ctx = document.getElementById('myChart');
+        if (ctx) {
+            let chartContext = ctx.getContext('2d');
 
-        // Initialize the Chart.js chart
-        let myChart = new Chart(chartContext, {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Monthly Income (RM)',
-                    data: monthlyIncomeData,
-                    backgroundColor: 'rgba(92, 103, 242, 0.5)',
-                    borderColor: 'rgba(92, 103, 242, 1)',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    barPercentage: 0.6,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { callbacks: {
-                        label: function(context) {
-                            let value = context.dataset.data[context.dataIndex];
-                            return 'Income: RM ' + parseFloat(value).toFixed(2);
-                        }
-                    }}
+            // Initialize the Chart.js chart
+            let myChart = new Chart(chartContext, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Monthly Income (RM)',
+                        data: monthlyIncomeData,
+                        backgroundColor: 'rgba(92, 103, 242, 0.5)',
+                        borderColor: 'rgba(92, 103, 242, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        barPercentage: 0.6,
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { callback: function(value) { return 'RM ' + value; } }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.dataset.data[context.dataIndex];
+                                    return 'Income: RM ' + parseFloat(value).toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'RM ' + value;
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        });
-    } else {
-        console.error('Canvas element not found.');
-    }
-});
+            });
+        } else {
+            console.error('Canvas element not found.');
+        }
+    });
 </script>
-

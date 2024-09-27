@@ -113,17 +113,24 @@ include_once '../partials/parseActiveAccount.php';
                 <label>Describe your restaurant: </label>
                 <textarea name="description" class="form-control"><?php if (isset($_POST['description'])) echo htmlspecialchars($_POST['description']); ?></textarea>
                 <br>
+                
                 <label>Contact Number: </label>
                 <input type="text" name="contact_num" class="form-control" value="<?php if (isset($_POST['contact_num'])) echo htmlspecialchars($_POST['contact_num']); ?>">
                 <br>
 
                 <label>Address: </label>
-                <input type="text" name="address" class="form-control"><?php if (isset($_POST['address'])) echo htmlspecialchars($_POST['address']); ?>
+                <input type="text" name="address" id="address" class="form-control" oninput="getCoordinates()">
                 <br>
 
+                <label>Unit Number / Block / Door Number: </label>
+                <input type="text" name="unit_number" id="unit_number" class="form-control">
+                <br>
+
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+
                 <label>Postcode: </label>
-                <input type="text" name="postcode" id="postcode" class="form-control" oninput="fetchCityState()">
-                <div id="postcodeError" style="color: red;"></div>
+                <input type="text" name="postcode" id="postcode" class="form-control" readonly>
                 <br>
 
                 <label>City: </label>
@@ -165,11 +172,11 @@ include_once '../partials/parseActiveAccount.php';
                 <input type="number" name="bank_account_number" class="form-control" value="<?php if (isset($_POST['bank_account_number'])) echo htmlspecialchars($_POST['bank_account_number']); ?>">
                 <br>
 
-                <label>Document needed for approval (Business owner/Partner's NRIC, e-SSM Business Profile, Certificate of Registration of Business (Form D), Halal License, Liquor license, Business Premises License & other): </label>
+                <label>Document needed for approval (NRIC, SSM, etc.): </label>
                 <input type="file" name="images[]" class="form-control" accept=".jpg, .jpeg, .png" multiple>
                 <br><br>
 
-                <button type="submit" name="activeAccountBtn" class="button1" value="Activate Account">Activate Account</button>
+                <button type="submit" name="activeAccountBtn" class="button1" id="activateBtn" value="Activate Account">Activate Account</button>
                 <br />
                 <br />
                 <br />
@@ -177,49 +184,59 @@ include_once '../partials/parseActiveAccount.php';
             </form>
         </div>
     </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5sNxHZwLHZ4KigiYcQKGjbrEVhbKLNFo&libraries=places"></script>
     <script>
-        function fetchCityState() {
-            var postcode = document.getElementById('postcode').value;
-            var cityField = document.getElementById('city');
-            var stateField = document.getElementById('state');
-            var postcodeError = document.getElementById('postcodeError');
+        function initAutocomplete() {
+            const addressField = document.getElementById('address');
+            const autocomplete = new google.maps.places.Autocomplete(addressField);
 
-            if (postcode.length > 0) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "../partials/parseActiveAccount.php", true);
-                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-                xhr.onreadystatechange = function() {
-                    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-                        try {
-                            var response = JSON.parse(this.responseText);
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    return;
+                }
 
-                            if (response.success) {
-                                cityField.value = response.city;
-                                stateField.value = response.state;
-                                postcodeError.textContent = "";
-                            } else {
-                                cityField.value = "";
-                                stateField.value = "";
-                                postcodeError.textContent = "This postcode area is not supported yet.";
-                            }
-                        } catch (e) {
-                            cityField.value = "";
-                            stateField.value = "";
-                            postcodeError.textContent = "Unable to process response.";
-                        }
+                const location = place.geometry.location;
+                document.getElementById('latitude').value = location.lat();
+                document.getElementById('longitude').value = location.lng();
+
+                let postcode = '',
+                    city = '',
+                    state = '';
+
+                place.address_components.forEach(function(component) {
+                    const types = component.types;
+
+                    if (types.includes('postal_code')) {
+                        postcode = component.long_name;
                     }
-                };
-                xhr.send("postcode=" + encodeURIComponent(postcode));
-            } else {
-                cityField.value = "";
-                stateField.value = "";
-                postcodeError.textContent = "";
-            }
+                    if (types.includes('locality')) {
+                        city = component.long_name;
+                    } else if (types.includes('administrative_area_level_2')) {
+                        city = component.long_name;
+                    }
+                    if (types.includes('administrative_area_level_1')) {
+                        state = component.long_name;
+                    }
+                });
+
+                document.getElementById('city').value = city;
+                document.getElementById('state').value = state;
+
+                if (postcode) {
+                    document.getElementById('postcode').value = postcode;
+                    document.getElementById('postcode').readOnly = true;
+                } else {
+                    document.getElementById('postcode').value = "";
+                    document.getElementById('postcode').readOnly = false;
+                    alert('No postcode found for this address. Please enter manually.');
+                }
+            });
         }
+
+        google.maps.event.addDomListener(window, 'load', initAutocomplete);
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.js"></script>
 </body>
 
 </html>

@@ -3,51 +3,65 @@ include_once '../resource/Database.php';
 include_once '../resource/utilities.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $seller_id = $_GET['seller_id'] ?? $_SESSION['seller_id'];
+    $seller_id = $_GET['seller_id'] ?? $_SESSION['seller_id'];
 
-        try {
-            $sqlQuery = "SELECT * FROM seller WHERE id = :seller_id";
-            $statement = $db->prepare($sqlQuery);
-            $statement->execute([':seller_id' => $seller_id]);
+    try {
+        $sqlQuery = "SELECT * FROM seller WHERE id = :seller_id";
+        $statement = $db->prepare($sqlQuery);
+        $statement->execute([':seller_id' => $seller_id]);
 
-            if ($seller = $statement->fetch(PDO::FETCH_ASSOC)) {
-                $name = $seller['name'];
-                $detail = $seller['detail'];
-                $contact_number = $seller['contact_number'];
-                $address = $seller['address'];
-                $bank_account = $seller['bank_account'];
-                $documents = $seller['image_urls'];
-                $profile_pic = $seller['profile_pic'];
-                $id = $seller['id'];
-            } else {
-                echo '<p>No seller data found.</p>';
-            }
-        } catch (PDOException $ex) {
-            echo "Error fetching seller data: " . $ex->getMessage();
+        if ($seller = $statement->fetch(PDO::FETCH_ASSOC)) {
+            // Populate variables with database values initially
+            $name = $seller['name'];
+            $detail = $seller['detail'];
+            $contact_number = $seller['contact_number'];
+            $address = $seller['address'];
+            $postcode = $seller['postcode'];
+            $city = $seller['city'];
+            $state = $seller['state'];
+            $unit_number = $seller['unit_number'];
+            $latitude = $seller['latitude'];
+            $longitude = $seller['longitude'];
+            $bank_account = $seller['bank_account'];
+            $documents = $seller['image_urls'];
+            $profile_pic = $seller['profile_pic'];
+            $id = $seller['id'];
+        } else {
+            echo '<p>No seller data found.</p>';
         }
+    } catch (PDOException $ex) {
+        echo "Error fetching seller data: " . $ex->getMessage();
+    }
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateSellerInformation'])) {
     $form_errors = array();
 
-    // Retrieve form data
-    $name = $_POST['name'];
-    $detail = $_POST['detail'];
-    $contact_number = $_POST['contact_number'];
-    $address = $_POST['address'];
-    $bank_account = $_POST['bank_account'];
-    $hidden_id = $_POST['hidden_id'];
-    $existing_documents = $_POST['existing_documents'];
-    $existing_profile_pic = $_POST['existing_profile_pic'];
+    // Retrieve form data from $_POST so user-corrected input can be retained after validation
+    $name = htmlspecialchars($_POST['name']);
+    $detail = htmlspecialchars($_POST['detail']);
+    $contact_number = htmlspecialchars($_POST['contact_number']);
+    $address = htmlspecialchars($_POST['address']);
+    $postcode = htmlspecialchars($_POST['postcode']);
+    $city = htmlspecialchars($_POST['city']);
+    $state = htmlspecialchars($_POST['state']);
+    $unit_number = htmlspecialchars($_POST['unit_number']);
+    $latitude = htmlspecialchars($_POST['latitude']);
+    $longitude = htmlspecialchars($_POST['longitude']);
+    $bank_account = htmlspecialchars($_POST['bank_account']);
+    $hidden_id = htmlspecialchars($_POST['hidden_id']);
+    $existing_documents = htmlspecialchars($_POST['existing_documents']);
+    $existing_profile_pic = htmlspecialchars($_POST['existing_profile_pic']);
 
     // Validation for contact number
     if (!preg_match('/^[\+\-\d\s]+$/', $contact_number)) {
-        $form_errors[] = "Contact number can only contain digits, and must be Phone Number Format";
+        $form_errors[] = "Contact number can only contain digits, and must be in Phone Number Format.";
     }
 
-    // Validate for bank account number
+    // Validate bank account number
     if (!preg_match('/^\d+$/', $bank_account)) {
         $form_errors[] = "Bank account number can only contain digits.";
     }
 
+    // Document handling (preserve existing documents)
     $documents = $existing_documents;
 
     // Handle uploaded document images
@@ -110,6 +124,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     }
 
+    // Check for postcode in the database
+    $stmt = $db->prepare("SELECT * FROM address_book WHERE postcode = ?");
+    $stmt->execute([$postcode]);
+
+    if ($stmt->rowCount() === 0) {
+        $form_errors[] = "Your location is not supported yet.";
+    }
+
     if (empty($form_errors)) {
         try {
             $sqlUpdate = "UPDATE seller SET 
@@ -117,7 +139,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                             detail = :detail, 
                             contact_number = :contact_number, 
                             address = :address, 
-                            bank_account = :bank_account, 
+                            postcode = :postcode,
+                            city = :city,
+                            state = :state,
+                            unit_number = :unit_number,    
+                            latitude = :latitude,          
+                            longitude = :longitude,        
+                            bank_account = :bank_account,  
                             image_urls = :documents, 
                             profile_pic = :profile_pic 
                           WHERE id = :id";
@@ -127,6 +155,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 ':detail' => $detail,
                 ':contact_number' => $contact_number,
                 ':address' => $address,
+                ':postcode' => $postcode,
+                ':city' => $city,
+                ':state' => $state,
+                ':unit_number' => $unit_number,
+                ':latitude' => $latitude,
+                ':longitude' => $longitude,
                 ':bank_account' => $bank_account,
                 ':documents' => $documents,
                 ':profile_pic' => $profile_pic,

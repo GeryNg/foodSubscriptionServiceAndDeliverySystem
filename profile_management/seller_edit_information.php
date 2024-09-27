@@ -4,13 +4,13 @@ include_once '../partials/staff_nav.php';
 include_once '../resource/utilities.php';
 include_once '../partials/parseSellerEditInformation.php';
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
-<head lang="en">
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><?php echo htmlspecialchars($page_title); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         .container-fluid {
@@ -66,7 +66,6 @@ include_once '../partials/parseSellerEditInformation.php';
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgb(0, 0, 0);
             background-color: rgba(0, 0, 0, 0.9);
         }
 
@@ -127,6 +126,8 @@ include_once '../partials/parseSellerEditInformation.php';
             }
         }
     </style>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -145,68 +146,93 @@ include_once '../partials/parseSellerEditInformation.php';
             <?php endif; ?>
             <div class="clearfix"></div>
 
-                <form method="post" action="" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="nameField">Name</label>
-                        <input type="text" name="name" class="form-control" id="nameField" value="<?php echo htmlspecialchars($name); ?>" />
-                    </div>
+            <form method="post" action="" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="nameField">Name</label>
+                    <input type="text" name="name" class="form-control" id="sellerName" value="<?php echo htmlspecialchars($name); ?>" required />
+                </div>
 
-                    <div class="form-group">
-                        <label for="profilePicField">Profile Picture</label>
-                        <?php if ($profile_pic): ?>
-                            <div class="mb-2">
-                                <img src="<?php echo htmlspecialchars($profile_pic); ?>" alt="Profile Picture" class="profile-picture" />
-                            </div>
-                        <?php endif; ?>
-                        <input type="file" name="profile_pic" class="form-control" id="profilePicField" />
-                        <input type="hidden" name="existing_profile_pic" value="<?php echo htmlspecialchars($profile_pic); ?>" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="detailField">Detail</label>
-                        <input type="text" name="detail" class="form-control" id="detailField" value="<?php echo htmlspecialchars($detail); ?>" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="contactNumberField">Contact Number</label>
-                        <input type="text" name="contact_number" class="form-control" id="contactNumberField" value="<?php echo htmlspecialchars($contact_number); ?>" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="addressField">Address</label>
-                        <input type="text" name="address" class="form-control" id="addressField" value="<?php echo htmlspecialchars($address); ?>" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="bankAccountField">Bank Account</label>
-                        <input type="text" name="bank_account" class="form-control" id="bankAccountField" value="<?php echo htmlspecialchars($bank_account); ?>" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="documentImagesField">Documents</label>
-                        <div id="documentImagesField" class="documents-container">
-                            <?php
-                            if (!empty($documents)) {
-                                $document_urls = explode(',', $documents);
-                                foreach ($document_urls as $document_url) {
-                                    echo '<div class="image-wrapper mb-2 position-relative">';
-                                    echo '<button type="button" class="btn btn-danger btn-sm position-absolute top-0 translate-middle" onclick="deleteImage(this, \'' . htmlspecialchars($document_url) . '\')">';
-                                    echo '<i class="far fa-trash-alt"></i>';
-                                    echo '</button>';
-                                    echo '<img src="' . htmlspecialchars($document_url) . '" alt="Document Image" class="document-image" onclick="openModal(this)" />';
-                                    echo '</div>';
-                                }
-                            }
-                            ?>
+                <div class="form-group">
+                    <label for="profilePicField">Profile Picture</label>
+                    <?php if ($profile_pic): ?>
+                        <div class="mb-2">
+                            <img src="<?php echo htmlspecialchars($profile_pic); ?>" alt="Profile Picture" class="profile-picture" />
                         </div>
-                        <input type="file" name="document_image[]" class="form-control" id="documentImagesField" multiple />
-                        <input type="hidden" name="existing_documents" value="<?php echo htmlspecialchars($documents); ?>" />
-                        <input type="hidden" id="deleted_images" name="deleted_images" value="" />
-                    </div>
+                    <?php endif; ?>
+                    <input type="file" name="profile_pic" class="form-control" id="profilePic" accept=".jpg, .jpeg, .png" />
+                    <input type="hidden" name="existing_profile_pic" value="<?php echo htmlspecialchars($profile_pic); ?>" />
+                </div>
 
-                    <input type="hidden" name="hidden_id" value="<?php if (isset($id)) echo $id; ?>" />
-                    <button type="submit" name="updateSellerInformation" class="btn btn-primary pull-right">Update Profile</button>
-                </form>
+                <div class="form-group">
+                    <label for="detailField">Detail</label>
+                    <input type="text" name="detail" class="form-control" id="description" value="<?php echo htmlspecialchars($detail); ?>" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="contactNumberField">Contact Number</label>
+                    <input type="text" name="contact_number" class="form-control" id="contactNum" value="<?php echo htmlspecialchars($contact_number); ?>" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="unitNumberField">Unit Number / Block / Door Number</label>
+                    <input type="text" name="unit_number" class="form-control" id="unitNumber" value="<?php echo htmlspecialchars($unit_number); ?>" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="addressField">Address</label>
+                    <input type="text" name="address" class="form-control" id="address" value="<?php echo htmlspecialchars($address); ?>" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="postcode">Postcode</label>
+                    <input type="text" name="postcode" class="form-control" id="postcode" value="<?php echo htmlspecialchars($postcode); ?>" readonly required />
+                </div>
+
+                <div class="form-group">
+                    <label for="cityField">City</label>
+                    <input type="text" name="city" class="form-control" id="city" value="<?php echo htmlspecialchars($city); ?>" readonly required />
+                </div>
+
+                <div class="form-group">
+                    <label for="stateField">State</label>
+                    <input type="text" name="state" class="form-control" id="state" value="<?php echo htmlspecialchars($state); ?>" readonly required />
+                </div>
+
+                <input type="hidden" name="latitude" id="latitude" value="<?php echo htmlspecialchars($latitude); ?>" required />
+                <input type="hidden" name="longitude" id="longitude" value="<?php echo htmlspecialchars($longitude); ?>"  required/>
+
+                <!-- Bank Account Field -->
+                <div class="form-group">
+                    <label for="bankAccountField">Bank Account</label>
+                    <input type="text" name="bank_account" class="form-control" id="bankAccount" value="<?php echo htmlspecialchars($bank_account); ?>" required />
+                </div>
+
+                <!-- Documents Field -->
+                <div class="form-group">
+                    <label for="documentImagesField">Documents</label>
+                    <div id="documentImagesField" class="documents-container">
+                        <?php
+                        if (!empty($documents)) {
+                            $document_urls = explode(',', $documents);
+                            foreach ($document_urls as $document_url) {
+                                echo '<div class="image-wrapper mb-2 position-relative">';
+                                echo '<button type="button" class="btn btn-danger btn-sm position-absolute top-0 translate-middle" onclick="deleteImage(this, \'' . htmlspecialchars($document_url) . '\')">';
+                                echo '<i class="far fa-trash-alt"></i>';
+                                echo '</button>';
+                                echo '<img src="' . htmlspecialchars($document_url) . '" alt="Document Image" class="document-image" onclick="openModal(this)" />';
+                                echo '</div>';
+                            }
+                        }
+                        ?>
+                    </div>
+                    <input type="file" name="document_image[]" class="form-control" id="documentImages" multiple accept=".jpg, .jpeg, .png" />
+                    <input type="hidden" name="existing_documents" value="<?php echo htmlspecialchars($documents); ?>" />
+                    <input type="hidden" id="deleted_images" name="deleted_images" value="" />
+                </div>
+
+                <input type="hidden" name="hidden_id" value="<?php if (isset($id)) echo htmlspecialchars($id); ?>" />
+                <button type="submit" name="updateSellerInformation" class="btn btn-primary pull-right">Update Profile</button>
+            </form>
         </section>
     </div>
 
@@ -216,7 +242,9 @@ include_once '../partials/parseSellerEditInformation.php';
         <div id="caption"></div>
     </div>
 
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5sNxHZwLHZ4KigiYcQKGjbrEVhbKLNFo&libraries=places"></script>
     <script>
+        // Function to delete images from the documents
         function deleteImage(button, imageUrl) {
             var imageWrapper = button.closest('.image-wrapper');
             imageWrapper.remove();
@@ -231,28 +259,76 @@ include_once '../partials/parseSellerEditInformation.php';
             deletedImagesInput.value = deletedImages.join(',');
         }
 
-        // Modal for viewing the image
-        var modal = document.getElementById("myModal");
-        var modalImg = document.getElementById("img01");
-        var captionText = document.getElementById("caption");
-
+        // Function to open modal for image viewing
         function openModal(element) {
+            var modal = document.getElementById("myModal");
+            var modalImg = document.getElementById("img01");
+            var captionText = document.getElementById("caption");
+
             modal.style.display = "block";
             modalImg.src = element.src;
             captionText.innerHTML = element.alt;
         }
 
+        // Close modal when the close button is clicked
         var span = document.getElementsByClassName("close")[0];
-
         span.onclick = function() {
+            var modal = document.getElementById("myModal");
             modal.style.display = "none";
         }
     </script>
+    <script>
+        function initAutocomplete() {
+            const addressField = document.getElementById('address');
+            const autocomplete = new google.maps.places.Autocomplete(addressField);
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.all.min.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    return;
+                }
+
+                const location = place.geometry.location;
+                document.getElementById('latitude').value = location.lat();
+                document.getElementById('longitude').value = location.lng();
+
+                let postcode = '',
+                    city = '',
+                    state = '';
+
+                place.address_components.forEach(function(component) {
+                    const types = component.types;
+
+                    if (types.includes('postal_code')) {
+                        postcode = component.long_name;
+                    }
+                    if (types.includes('locality')) {
+                        city = component.long_name;
+                    } else if (types.includes('administrative_area_level_2')) {
+                        city = component.long_name;
+                    }
+                    if (types.includes('administrative_area_level_1')) {
+                        state = component.long_name;
+                    }
+                });
+
+                document.getElementById('city').value = city;
+                document.getElementById('state').value = state;
+
+                if (postcode) {
+                    document.getElementById('postcode').value = postcode;
+                    document.getElementById('postcode').readOnly = true;
+                } else {
+                    document.getElementById('postcode').value = "";
+                    document.getElementById('postcode').readOnly = false;
+                    alert('No postcode found for this address. Please enter manually.');
+                }
+            });
+        }
+
+        google.maps.event.addDomListener(window, 'load', initAutocomplete);
+    </script>
+
 </body>
 
 </html>

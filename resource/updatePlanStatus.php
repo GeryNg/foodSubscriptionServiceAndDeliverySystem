@@ -7,22 +7,23 @@ function updatePlanStatuses($db)
     try {
         $today = date('Y-m-d');
 
-        // Update plan statuses based on the current date
-        $sqlUpdateActive = "UPDATE plan SET status = 'active' WHERE date_from <= :today AND date_to >= :today";
+        $sqlUpdateActive = "UPDATE plan SET status = 'active' 
+                            WHERE date_from <= :today 
+                              AND date_to >= :today 
+                              AND status != 'deleted'";
         $stmtActive = $db->prepare($sqlUpdateActive);
         $stmtActive->execute([':today' => $today]);
 
-        $sqlUpdateInactive = "UPDATE plan SET status = 'inactive' WHERE date_from > :today OR date_to < :today";
+        $sqlUpdateInactive = "UPDATE plan SET status = 'inactive' 
+                              WHERE (date_from > :today OR date_to < :today) 
+                                AND status != 'deleted'";
         $stmtInactive = $db->prepare($sqlUpdateInactive);
         $stmtInactive->execute([':today' => $today]);
 
-        // Call function to generate and insert delivery IDs
         generateAndInsertDeliveryIDs($db);
 
-        // Call function to create wallets for verified sellers
         createWalletForVerifiedSellers($db);
 
-        // Call function to update delivery locations for 'on delivery' status
         updateDeliveryLocation($db);
 
     } catch (PDOException $e) {

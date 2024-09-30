@@ -308,7 +308,7 @@ $seller_status = $stmt->fetch(PDO::FETCH_ASSOC)['status'] ?? 'close';
 
                 //Weather API
                 function fetchWeatherData(latitude, longitude) {
-                    const apiKey = '#'; // Replace with your OpenWeatherMap API key
+                    const apiKey = 'YOUR_API_KEY';
                     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
 
                     console.log("Fetching weather data from URL:", apiUrl);

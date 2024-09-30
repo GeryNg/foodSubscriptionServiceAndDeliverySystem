@@ -31,7 +31,7 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     <style>
-        .container-fluid{
+        .container-fluid {
             margin-bottom: 5%;
         }
 
@@ -43,8 +43,8 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
             line-height: 1.2;
         }
 
-        .breadcrumb{
-            background-color:transparent;
+        .breadcrumb {
+            background-color: transparent;
         }
 
         .card-header {
@@ -95,7 +95,8 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .meal-table.active {
             display: block;
         }
-        .btn{
+
+        .btn {
             font-weight: bold;
         }
     </style>
@@ -198,7 +199,7 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h4 class="m-0 font-weight-bold text-primary"><strong>All Orders</strong></h4>
-                <button id="toggleMonthOrders" class="btn btn-primary" style="margin-left: 20px;">This Month's Orders</button>
+                <button id="generateMonthReport" class="btn btn-primary" style="margin-left: 20px;">Generate This Month's Report</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -335,6 +336,28 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     },
                     error: function(xhr, status, error) {
                         alert('An error occurred while generating the receipt.');
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#generateMonthReport').on('click', function() {
+                $.ajax({
+                    url: '../order_delivery/generate_monthly_report.php',
+                    type: 'POST',
+                    data: {
+                        seller_id: '<?php echo $seller_id; ?>'
+                    },
+                    success: function(response) {
+                        var reportWindow = window.open('', '_blank');
+                        reportWindow.document.write(response);
+                        reportWindow.document.close();
+                        reportWindow.print();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('An error occurred while generating the report.');
                     }
                 });
             });

@@ -511,10 +511,8 @@ $seller_status = $stmt->fetch(PDO::FETCH_ASSOC)['status'] ?? 'close';
         });
     </script>
     <script>
-// Ensure trackingInterval is declared only once at the top level of your script
-let trackingInterval; // Move this declaration outside any function or block
+let trackingInterval;
 
-// Automatically start tracking if status is 'open'
 <?php if ($seller_status === 'open'): ?>
     startLocationTracking();
 <?php endif; ?>
@@ -540,7 +538,7 @@ function startTracking(position) {
         latitude,
         longitude
     } = position.coords;
-    const fingerprint = '<?php echo $_SESSION['fingerprint']; ?>'; // Add fingerprint to the request
+    const fingerprint = '<?php echo $_SESSION['fingerprint']; ?>';
 
     updateSellerLocation(latitude, longitude, 'open', fingerprint);
 
@@ -560,7 +558,7 @@ function closeLocation() {
     if (trackingInterval) {
         clearInterval(trackingInterval);
     }
-    const fingerprint = '<?php echo $_SESSION['fingerprint']; ?>'; // Add fingerprint to the request
+    const fingerprint = '<?php echo $_SESSION['fingerprint']; ?>';
     updateSellerLocation(null, null, 'close', fingerprint);
 }
 
@@ -572,7 +570,7 @@ function updateSellerLocation(latitude, longitude, status, fingerprint) {
         fingerprint: fingerprint
     };
 
-    console.log('Sending data:', data); // Log the data being sent for debugging
+    console.log('Sending data:', data);
 
     fetch('update_seller_location.php', {
             method: 'POST',

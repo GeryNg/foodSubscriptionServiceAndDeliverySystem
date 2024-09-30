@@ -7,7 +7,7 @@ include '../partials/headers.php';
 $customer_id = $_SESSION['Cust_ID'];
 
 // Fetch customer addresses
-$sql_addresses = "SELECT address_id, CONCAT(line1, ', ', line2, ', ', city, ', ', state, ' ', postal_code, ', ', country) AS full_address 
+$sql_addresses = "SELECT address_id, CONCAT(line1, ', ', line2) AS full_address 
                   FROM address 
                   WHERE Cust_ID = :customer_id";
 $statement_addresses = $db->prepare($sql_addresses);
@@ -17,7 +17,6 @@ $addresses = $statement_addresses->fetchAll(PDO::FETCH_ASSOC);
 
 // Set default selected address
 $selected_address_id = isset($_SESSION['selected_address_id']) ? $_SESSION['selected_address_id'] : null;
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['address_id'])) {
     $selected_address_id = $_POST['address_id'];
@@ -34,33 +33,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_address'])) {
     </script>";
 }
 
+// Retrieve selected customer address and its latitude/longitude
 $selected_address = null;
+$customer_lat = null;
+$customer_lng = null;
+
 if ($selected_address_id) {
-    $sql_selected_address = "SELECT CONCAT(line1, ', ', line2, ', ', city, ', ', state, ' ', postal_code, ', ', country) AS full_address 
+    $sql_selected_address = "SELECT CONCAT(line1, ', ', line2) AS full_address, latitude, longitude
                              FROM address 
                              WHERE address_id = :address_id";
     $statement_selected_address = $db->prepare($sql_selected_address);
     $statement_selected_address->bindParam(':address_id', $selected_address_id, PDO::PARAM_INT);
     $statement_selected_address->execute();
-    $selected_address = $statement_selected_address->fetchColumn();
+    $address_data = $statement_selected_address->fetch(PDO::FETCH_ASSOC);
+
+    $selected_address = $address_data['full_address'];
+    $customer_lat = $address_data['latitude'];
+    $customer_lng = $address_data['longitude'];
 }
 
-// Fetch restaurant data
+// Fetch restaurant data, calculate distance only if address is selected
 $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
 $sellers = [];
 
-$sql = "SELECT seller.profile_pic, seller.name, seller.detail, seller.address, seller.id 
-        FROM seller 
-        WHERE seller.access = 'verify'";
-if (!empty($searchTerm)) {
-    $sql .= " AND seller.name LIKE :searchTerm";
+if ($selected_address_id) {
+    // Query with distance calculation if the customer address is selected
+    $sql = "SELECT seller.profile_pic, seller.name, seller.detail, seller.address, seller.id,
+                   seller.latitude, seller.longitude,
+                   ( 6371 * acos( cos( radians(:customer_lat) ) * cos( radians( seller.latitude ) ) 
+                   * cos( radians( seller.longitude ) - radians(:customer_lng) ) 
+                   + sin( radians(:customer_lat) ) * sin( radians( seller.latitude ) ) ) ) AS distance
+            FROM seller 
+            WHERE seller.access = 'verify'";
+
+    if (!empty($searchTerm)) {
+        $sql .= " AND seller.name LIKE :searchTerm";
+    }
+
+    // Add ORDER BY distance ASC to sort by distance from near to far
+    $sql .= " HAVING distance <= 10 ORDER BY distance ASC";
+} else {
+    // Query without distance calculation if no customer address is selected
+    $sql = "SELECT seller.profile_pic, seller.name, seller.detail, seller.address, seller.id
+            FROM seller 
+            WHERE seller.access = 'verify'";
+
+    if (!empty($searchTerm)) {
+        $sql .= " AND seller.name LIKE :searchTerm";
+    }
+
+    $sql .= " ORDER BY seller.name ASC";
 }
-$sql .= " ORDER BY seller.name";
 
 $statement = $db->prepare($sql);
+
+if ($selected_address_id) {
+    // Bind customer latitude and longitude only if an address is selected
+    $statement->bindParam(':customer_lat', $customer_lat);
+    $statement->bindParam(':customer_lng', $customer_lng);
+}
+
 if (!empty($searchTerm)) {
     $statement->bindValue(':searchTerm', '%' . $searchTerm . '%');
 }
+
 $statement->execute();
 
 while ($row = $statement->fetch()) {
@@ -69,19 +105,8 @@ while ($row = $statement->fetch()) {
     $detail = htmlspecialchars($row["detail"], ENT_QUOTES, 'UTF-8');
     $address = htmlspecialchars($row["address"], ENT_QUOTES, 'UTF-8');
     $id = htmlspecialchars($row["id"], ENT_QUOTES, 'UTF-8');
-
-    // Fetch average rating for the current restaurant
-    $sql_avg_rating = "SELECT AVG(Rating) as avg_rating, COUNT(*) as review_count
-                       FROM feedback f 
-                       JOIN order_cust oc ON f.Order_ID = oc.Order_ID 
-                       WHERE oc.Plan_ID IN (SELECT id FROM plan WHERE seller_id = :seller_id)";
-    $statement_avg = $db->prepare($sql_avg_rating);
-    $statement_avg->bindParam(':seller_id', $id, PDO::PARAM_STR_CHAR);
-    $statement_avg->execute();
-    $rating_result = $statement_avg->fetch();
-
-    $avg_rating = round($rating_result['avg_rating'], 1);
-    $review_count = $rating_result['review_count'];
+    
+    $distance = isset($row['distance']) ? round($row['distance'], 2) : null;
 
     $sellers[] = [
         'profile_pic' => $profile_pic,
@@ -89,8 +114,7 @@ while ($row = $statement->fetch()) {
         'detail' => $detail,
         'address' => $address,
         'id' => $id,
-        'avg_rating' => $avg_rating,
-        'review_count' => $review_count
+        'distance' => $distance
     ];
 }
 ?>
@@ -124,7 +148,6 @@ while ($row = $statement->fetch()) {
                     $counter = 0;
                     foreach ($addresses as $address):
                         $counter++;
-                        // Truncate the address to 100 characters
                         $truncated_address = substr($address['full_address'], 0, 100) . (strlen($address['full_address']) > 100 ? '...' : '');
                         echo "'{$address['address_id']}': '" . addslashes($truncated_address) . "'";
                         if ($counter < $addressCount) {
@@ -134,8 +157,6 @@ while ($row = $statement->fetch()) {
                     ?>
                 };
 
-
-                // SweetAlert2 for selecting a new address
                 Swal.fire({
                     title: 'Select Your Address',
                     input: 'select',
@@ -154,7 +175,6 @@ while ($row = $statement->fetch()) {
                 }).then((result) => {
                     if (result.value) {
                         const selectedAddress = result.value;
-                        // Submit the form using JavaScript
                         const form = document.createElement('form');
                         form.method = 'POST';
                         form.action = '';
@@ -172,10 +192,9 @@ while ($row = $statement->fetch()) {
             }
         </script>
 
-        <!-- Display selected address and change button -->
         <?php if ($selected_address): ?>
             <div class="selected-address-container">
-                <p>Selected Address: <?php echo $selected_address; ?></p>
+                <p><b>Selected Address: </b><?php echo $selected_address; ?></p>
                 <form method="POST" action="" class="change-address-form">
                     <input type="hidden" name="clear_address" value="true" />
                     <button type="submit" class="btn-change">Change</button>
@@ -183,7 +202,6 @@ while ($row = $statement->fetch()) {
             </div>
         <?php endif; ?>
 
-        <!-- Search bar for restaurants -->
         <form method="GET" action="" class="search-bar">
             <input type="text" name="search" placeholder="Search for restaurants, cuisines, and dishes" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_QUOTES, 'UTF-8') : ''; ?>">
             <button type="submit">
@@ -193,7 +211,6 @@ while ($row = $statement->fetch()) {
             </button>
         </form>
 
-        <!-- List of restaurants -->
         <section class="articles">
             <?php foreach ($sellers as $seller): ?>
                 <article class='restaurant-card'>
@@ -205,11 +222,6 @@ while ($row = $statement->fetch()) {
                             <div class='restaurant-title'>
                                 <h2><?php echo $seller['name']; ?></h2>
                             </div>
-                            <div class='rating-display'>
-                                <span class='star'>&#9733;</span>
-                                <span class='rating-score'><?php echo $seller['avg_rating']; ?></span>
-                                <span class='rating-count'>/<?php echo ($seller['review_count'] > 100 ? '100+' : $seller['review_count']); ?></span>
-                            </div>
                             <p class='detail'><?php echo $seller['detail']; ?></p>
                             <a href='restaurant_plan.php?id=<?php echo $seller['id']; ?>' class='read-more'>
                                 Read more <span class='sr-only'>about <?php echo $seller['name']; ?></span>
@@ -217,6 +229,9 @@ while ($row = $statement->fetch()) {
                                     <path fill-rule='evenodd' d='M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z' clip-rule='evenodd' />
                                 </svg>
                             </a>
+                            <?php if ($selected_address_id): ?>
+                                <span class="distance"><?php echo $seller['distance']; ?> km away</span>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </article>

@@ -19,7 +19,6 @@ if (empty($incoming_id) || empty($message)) {
 }
 
 try {
-    // Insert the message into the database
     $sql = "INSERT INTO messages (incoming_msg_id, outgoing_msg_id, msg) VALUES (:incoming_id, :outgoing_id, :message)";
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':incoming_id', $incoming_id, PDO::PARAM_STR);

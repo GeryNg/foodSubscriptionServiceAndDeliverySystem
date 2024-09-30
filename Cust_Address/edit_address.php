@@ -107,7 +107,7 @@ if (isset($_GET['address_id']) && is_numeric($_GET['address_id'])) {
     <?php include '../partials/footer.php'; ?>
 </body>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5sNxHZwLHZ4KigiYcQKGjbrEVhbKLNFo&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
     <script>
         function initAutocomplete() {
             const addressField = document.getElementById('line2');

@@ -444,7 +444,9 @@ if (!empty($seller_id)) {
                                         <button type="button" class="max-btn" onclick="setMaxWithdraw()">Max</button>
                                     </div>
                                 </div>
+                                <input type="hidden" id="balance" value="<?php echo $balance; ?>">
                                 <p id="balance-hint">The amount cannot be greater than the available balance.</p>
+
                                 <div class="label-input-container">
                                     <label for="platform-fee">Platform fee (6%):</label>
                                     <div class="input-container">
@@ -459,7 +461,6 @@ if (!empty($seller_id)) {
                                         <input type="number" id="total-withdraw" readonly>
                                     </div>
                                 </div>
-                                <input type="hidden" name="balance" value="<?php echo $balance; ?>">
                                 <div class="button-container">
                                     <button type="submit" name="requestWithdrawBtn" value="RequestWithdraw" class="button1">Request</button>
                                 </div>
@@ -473,6 +474,7 @@ if (!empty($seller_id)) {
                     <div class="box-left">
                         <p class="fw-bold h7">Wallet Activity</p>
                         <p class="textmuted h8">Here will show all the Transactions.</p>
+                            <button class="btn btn-primary" id="generateStatementBtn">Generate Statement</button>
                         <div class="h8">
                             <div class="scrollable-container">
                                 <?php if (!empty($transactions)): ?>
@@ -521,7 +523,9 @@ if (!empty($seller_id)) {
 </div>
 
 <script>
-    // The income data passed from PHP
+    document.getElementById('generateStatementBtn').addEventListener('click', function() {
+        window.open('generate_statement.php', '_blank');
+    });
 </script>
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -538,22 +542,36 @@ if (!empty($seller_id)) {
     });
 
     function setMaxWithdraw() {
-        var maxAmount = <?php echo $balance; ?>;
-        document.getElementById('withdraw-amount').value = maxAmount;
-        var platformFee = maxAmount * 0.06; // 6% fee
-        var totalWithdrawAmount = maxAmount - platformFee;
+        var balance = parseFloat(document.getElementById('balance').value) || 0;
+
+        document.getElementById('withdraw-amount').value = balance.toFixed(2);
+
+        var platformFee = balance * 0.06; // 6% platform fee
+        var totalWithdrawAmount = balance - platformFee;
 
         document.getElementById('platform-fee').value = platformFee.toFixed(2);
         document.getElementById('total-withdraw').value = totalWithdrawAmount.toFixed(2);
     }
 
-    function setMaxWithdraw() {
-        var balance = parseFloat(document.getElementById('max-balance').value) || 0;
-        document.getElementById('withdraw-amount').value = balance.toFixed(2);
-        calculateWithdraw();
+    function calculateWithdraw() {
+        var withdrawAmount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
+        var platformFee = withdrawAmount * 0.06;
+        var totalWithdrawAmount = withdrawAmount - platformFee;
+
+        document.getElementById('platform-fee').value = platformFee.toFixed(2);
+        document.getElementById('total-withdraw').value = totalWithdrawAmount.toFixed(2);
+
+        var balance = parseFloat(document.getElementById('balance').value) || 0;
+        if (withdrawAmount > balance) {
+            document.getElementById('balance-hint').style.display = 'block';
+        } else {
+            document.getElementById('balance-hint').style.display = 'none';
+        }
     }
 
-    document.getElementById('withdraw-amount').addEventListener('input', calculateWithdraw);
+    document.getElementById('withdraw-amount').addEventListener('input', function() {
+        calculateWithdraw();
+    });
 </script>
 
 <script>

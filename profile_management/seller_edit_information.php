@@ -242,7 +242,7 @@ include_once '../partials/parseSellerEditInformation.php';
         <div id="caption"></div>
     </div>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5sNxHZwLHZ4KigiYcQKGjbrEVhbKLNFo&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
     <script>
         // Function to delete images from the documents
         function deleteImage(button, imageUrl) {

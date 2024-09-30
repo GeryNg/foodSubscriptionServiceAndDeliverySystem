@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $plan_id = intval($_POST['plan_id']);
     $quantity = intval($_POST['quantity']);
     $meal = $_POST['meal'];
-    $delivery_address_id = intval($_POST['delivery_address_id']);
+    $delivery_address_id = $_SESSION['selected_address_id'];
     $instructions = $_POST['instructions'];
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];

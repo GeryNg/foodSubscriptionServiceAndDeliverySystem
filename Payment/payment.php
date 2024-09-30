@@ -59,7 +59,7 @@
     <?php include '../partials/footer.php'; ?>
 
     <!-- Load the PayPal script -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AWoCql1Pfw6qP4TIhEYaUKHWap1HZScdub95cuQ1lSX370PjBWg9F4JvXMFThu57_6PV0KzmojqgQ7N7&currency=MYR"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_API_KEY&currency=MYR"></script>
     <script>
         paypal.Buttons({
             createOrder: function(data, actions) {

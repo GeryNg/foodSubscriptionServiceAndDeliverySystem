@@ -17,7 +17,8 @@ if (!empty($_POST['postcode']) && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && st
 }
 
 // Function to generate a unique Seller ID
-function generateSellerId($db) {
+function generateSellerId($db)
+{
     $query = "SELECT MAX(id) AS max_id FROM seller";
     $stmt = $db->prepare($query);
     $stmt->execute();
@@ -130,10 +131,9 @@ if (isset($_POST['activeAccountBtn'])) {
 
             $newSellerId = generateSellerId($db);
 
-            // SQL logic remains unchanged here
             $stmt = $db->prepare("INSERT INTO seller 
-                (id, name, profile_pic, detail, contact_number, address, unit_number, postcode, city, state, bank_company, bank_account, access, image_urls, user_id) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            (id, name, profile_pic, detail, contact_number, address, unit_number, postcode, city, state, bank_company, bank_account, access, image_urls, user_id, latitude, longitude) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             $stmt->execute([
                 $newSellerId,
@@ -142,7 +142,7 @@ if (isset($_POST['activeAccountBtn'])) {
                 htmlspecialchars($_POST['description']),
                 htmlspecialchars($_POST['contact_num']),
                 htmlspecialchars($_POST['address']),
-                htmlspecialchars($_POST['unit_number']),  // Include the unit number field
+                htmlspecialchars($_POST['unit_number']),
                 htmlspecialchars($_POST['postcode']),
                 htmlspecialchars($_POST['city']),
                 htmlspecialchars($_POST['state']),
@@ -150,7 +150,9 @@ if (isset($_POST['activeAccountBtn'])) {
                 htmlspecialchars($_POST['bank_account_number']),
                 $access,
                 implode(',', $imageUrls),
-                $user_id
+                $user_id,
+                htmlspecialchars($_POST['latitude']),
+                htmlspecialchars($_POST['longitude'])
             ]);
 
             // Fetch the last inserted seller ID

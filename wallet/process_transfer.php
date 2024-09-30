@@ -6,14 +6,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Validate the transaction ID and check that it's pending
-        $sql = "SELECT id, amountProcessed, seller_id FROM transaction WHERE id = :transaction_id AND transactionType = 'Withdraw' AND status = 'Pending'";
+        $sql = "SELECT id, amount, seller_id FROM transaction WHERE id = :transaction_id AND transactionType = 'Withdraw' AND status = 'Pending'";
         $stmt = $db->prepare($sql);
         $stmt->bindParam(':transaction_id', $transaction_id, PDO::PARAM_INT);
         $stmt->execute();
         $transaction = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($transaction) {
-            $amountProcessed = $transaction['amountProcessed'];
+            $amount = $transaction['amount'];  // Use 'amount' instead of 'amountProcessed'
             $seller_id = $transaction['seller_id'];
 
             // Update the transaction status to 'Successful'
@@ -30,8 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $wallet = $stmt_wallet->fetch(PDO::FETCH_ASSOC);
 
             if ($wallet) {
-                // Subtract the amountProcessed from the wallet balance
-                $new_balance = $wallet['balance'] - $amountProcessed;
+                // Subtract the 'amount' from the wallet balance
+                $new_balance = $wallet['balance'] - $amount;
 
                 // Update the wallet with the new balance
                 $sql_update_wallet = "UPDATE wallet SET balance = :new_balance WHERE seller_id = :seller_id";
@@ -53,3 +53,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Invalid request.']);
 }
+?>

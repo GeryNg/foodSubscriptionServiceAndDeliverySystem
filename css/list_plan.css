@@ -330,3 +330,20 @@ hr {
         padding: 8px;
     }
 }
+
+.gray-effect {
+    filter: grayscale(100%) brightness(95%);
+    opacity: 0.8;
+}
+
+.gray-effect:hover {
+    filter: grayscale(100%) brightness(95%);
+}
+
+.gray-effect .card_content {
+    pointer-events: none;
+}
+
+.card .card_price a, .card .card_price2 a {
+    pointer-events: auto;
+}

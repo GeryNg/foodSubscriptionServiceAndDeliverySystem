@@ -30,17 +30,6 @@ $query->execute();
 
 $location = $query->fetch(PDO::FETCH_ASSOC);
 
-
-if ($location) {
-    echo json_encode([
-        'latitude' => $location['latitude'],
-        'longitude' => $location['longitude']
-    ]);
-} else {
-    echo json_encode([
-        'error' => 'Location not found'
-    ]);
-}
 ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
@@ -53,16 +42,22 @@ if ($location) {
         border-radius: 10px;
     }
 
-    #map {
+
+    .map {
         height: 450px;
         width: 800px;
         margin-top: 20px;
+        margin-bottom: 20px;
         border: 2px solid #ddd;
         border-radius: 10px;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
         margin-left: auto;
         margin-right: auto;
     }
+
 
     .top {
         padding-top: 40px;
@@ -239,9 +234,9 @@ if ($location) {
                     </div>
                 </div>
                 <?php if ($delivery['status'] === 'on delivery'): ?>
-                    <div class="map" id="map"></div>
+                    <div class="map" id="map-<?php echo $delivery['delivery_id']; ?>" style="height: 450px; width: 800px;"></div>
                 <?php else: ?>
-                    <p>The delivery is not currently "on delivery" status, so location tracking is not available.</p>
+                    <p></p>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
@@ -253,55 +248,82 @@ if ($location) {
 <br />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
 <script>
-    var map;
-    var sellerMarker;
+var maps = {};
+var sellerMarkers = {};
 
-    // Initialize the map
-    navigator.geolocation.getCurrentPosition(function(position) {
-        var lat = position.coords.latitude;
-        var lng = position.coords.longitude;
+function initMap(deliveryId, lat, lng) {
+    var mapId = 'map-' + deliveryId;
 
-        map = L.map('map').setView([lat, lng], 14); // Set initial map position
+    if (!maps[deliveryId]) {
+        maps[deliveryId] = L.map(mapId).setView([lat, lng], 14);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18,
             attribution: '© OpenStreetMap'
-        }).addTo(map);
+        }).addTo(maps[deliveryId]);
 
-        // Add a marker for the seller's location (will be updated later)
         var sellerIcon = L.icon({
-            iconUrl: 'https://th.bing.com/th/id/R.67bff7b7c746d16a8dbb3ffce63c358c?rik=iw1FPo2fGLDHSA&riu=http%3a%2f%2ficons.iconarchive.com%2ficons%2fcustom-icon-design%2fflatastic-2%2f512%2ftruck-icon.png&ehk=RwUurgow9%2bdUoYMvgoHF6mq8RWXmxiAj%2bVs%2bqGvyPfc%3d&risl=&pid=ImgRaw&r=0', // Replace with the correct icon URL
+            iconUrl: 'https://icon-library.com/images/van-icon-png/van-icon-png-29.jpg',
             iconSize: [40, 40],
             iconAnchor: [20, 40],
             popupAnchor: [0, -30]
         });
 
-        sellerMarker = L.marker([lat, lng], {
-                icon: sellerIcon
-            }).addTo(map)
+        sellerMarkers[deliveryId] = L.marker([lat, lng], {
+            icon: sellerIcon
+        }).addTo(maps[deliveryId])
             .bindPopup("Seller is here");
-
-        // Fetch seller's location every 15 seconds
-        setInterval(fetchSellerLocation, 15000);
-    }, function() {
-        alert("Geolocation is not supported by this browser.");
-    });
-
-    // Fetch the seller's location from the server
-    function fetchSellerLocation() {
-        fetch('get_seller_location.php?cust_id=<?php echo $cust_id; ?>')
-            .then(response => response.json())
-            .then(data => {
-                var lat = data.latitude;
-                var lng = data.longitude;
-
-                // Update the seller's marker position
-                sellerMarker.setLatLng([lat, lng]).update();
-                map.setView([lat, lng], 14); // Recenter the map
-            })
-            .catch(error => console.error('Error fetching seller location:', error));
+    } else {
+        sellerMarkers[deliveryId].setLatLng([lat, lng]).update();
+        maps[deliveryId].setView([lat, lng], 14);
     }
+}
+
+function fetchSellerLocation(deliveryId) {
+    fetch('get_seller_location.php?cust_id=<?php echo $cust_id; ?>')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.latitude && data.longitude && data.latitude !== '0.00000000' && data.longitude !== '0.0000') {
+                var lat = parseFloat(data.latitude);
+                var lng = parseFloat(data.longitude);
+
+                initMap(deliveryId, lat, lng);
+            } else {
+                console.error('Invalid seller location data:', data);
+                showErrorMessage("Seller location is unavailable or invalid. Please try again later.", deliveryId);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching seller location:', error);
+            showErrorMessage("Unable to fetch seller location. Please try again later.", deliveryId);
+        });
+}
+
+function showErrorMessage(message, deliveryId) {
+    var mapContainer = document.getElementById('map-' + deliveryId);
+    mapContainer.innerHTML = `<div style="padding: 20px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; text-align: center;">
+        ${message}
+    </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    <?php foreach ($deliveries as $delivery): ?>
+        fetchSellerLocation('<?php echo $delivery['delivery_id']; ?>');
+    <?php endforeach; ?>
+
+    setInterval(function() {
+        <?php foreach ($deliveries as $delivery): ?>
+            fetchSellerLocation('<?php echo $delivery['delivery_id']; ?>');
+        <?php endforeach; ?>
+    }, 15000);
+});
 </script>
 
 <?php include_once '../partials/footer.php'; ?>

@@ -311,8 +311,8 @@ strong.link-email-footer {
         </div>
         <div class="column-center-mobile w-col w-col-4">
           <h3 class="footer-titles">Follow Us!</h3><a href="" target="_blank" class="footer-social-network-icons w-inline-block"><img src="https://uploads-ssl.webflow.com/5966ea9a9217ca534caf139f/5c8dbfe70fcf5a0514c5b1da_Instagram%20Icon.svg" width="20" alt="Instagram icon"></a>
-          <a href="" target="_blank" class="footer-social-network-icons w-inline-block"><img src="https://uploads-ssl.webflow.com/5966ea9a9217ca534caf139f/5c8dbe42e1e6034fdaba46f6_Facebook%20Icon.svg" width="20" alt="Facebook Icon"></a>
-          <p class="footer-description">Email me at: <a href="mailto:makanapa024@gmail.com"><strong class="link-email-footer">Makan Apa Customer Support</strong></a><br></p>
+          <a href="" target="_blank" class="footer-social-network-icons w-inline-block" style="color: #f4623a !important;"><img src="https://uploads-ssl.webflow.com/5966ea9a9217ca534caf139f/5c8dbe42e1e6034fdaba46f6_Facebook%20Icon.svg" width="20" alt="Facebook Icon"></a>
+          <p class="footer-description">Email me at: <a href="mailto:YOUR_EMAIL_ADDRESS"><strong class="link-email-footer">Makan Apa Customer Support</strong></a><br></p>
         </div>
       </div>
     </div>

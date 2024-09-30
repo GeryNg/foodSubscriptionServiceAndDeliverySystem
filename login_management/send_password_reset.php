@@ -28,7 +28,7 @@ $stmt->execute([$token_hash, $expiry, $email]);
 if ($stmt->rowCount() > 0) {
     $mail = require __DIR__ .  "/mailer.php";
 
-    $mail->setFrom("makanapa024@gmail.com");
+    $mail->setFrom("email_address");
     $mail->addAddress($email);
     $mail->Subject = "Password Reset";
     $mail->Body = <<<END

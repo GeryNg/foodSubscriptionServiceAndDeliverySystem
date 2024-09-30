@@ -20,7 +20,7 @@
 
             <?php
             // Fetch the user's addresses
-            $cust_id = $_SESSION['Cust_ID']; // Assuming the user ID is stored in session
+            $cust_id = $_SESSION['Cust_ID'];
             $sql = "SELECT * FROM address WHERE Cust_ID = :cust_id";
             $statement = $db->prepare($sql);
             $statement->bindParam(':cust_id', $cust_id, PDO::PARAM_STR_CHAR);

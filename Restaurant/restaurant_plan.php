@@ -44,8 +44,8 @@ if (isset($_GET['id'])) {
 
         // Fetch plans
         $sql_plans = "SELECT plan.id, plan.image_urls, plan.plan_name, plan.description, plan.price 
-                      FROM plan 
-                      WHERE plan.seller_id = :id;";
+        FROM plan 
+        WHERE plan.seller_id = :id AND plan.status = 'active'";
         $statement_plans = $db->prepare($sql_plans);
         $statement_plans->bindParam(':id', $id, PDO::PARAM_STR);
         $statement_plans->execute();
@@ -72,6 +72,8 @@ if (isset($_GET['id'])) {
     <title>Restaurant Plan</title>
     <link rel="stylesheet" href="../css/restaurant_plan.css">
     <link rel="icon" type="image/x-icon" href="../image/logo-circle.png">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
@@ -83,9 +85,58 @@ if (isset($_GET['id'])) {
                     <h1><?php echo $name; ?></h1>
                     <p><?php echo $detail; ?></p>
                     <p>Address: <?php echo $address; ?></p>
+                    <a id="generate-qr-btn" class="share-icon" href="javascript:void(0);" style="font-size: 24px;">
+                        <i class="fas fa-share-alt"></i>
+                    </a>
+                    <script>
+                        document.getElementById('generate-qr-btn').addEventListener('click', function() {
+                            const currentUrl = window.location.href;
+                            const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(currentUrl)}&size=200`;
+                            const description = "Check out this restaurant!";
+
+                            const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(description + ' ' + currentUrl)}`;
+                            const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
+                            const emailShareUrl = `mailto:?subject=${encodeURIComponent(description)}&body=${encodeURIComponent('Check this out: ' + currentUrl)}`;
+
+                            Swal.fire({
+                                title: 'Share this page',
+                                html: `
+                                    <div id="qrCodeContainer">
+                                        <img id="qrCodeImage" src="${qrCodeUrl}" alt="QR Code" style="width: 200px; height: 200px; margin-bottom: 10px;" />
+                                        <p>${description}</p>
+                                        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
+                                            <a href="${whatsappShareUrl}" target="_blank" style="font-size: 24px;">
+                                                <i class="fab fa-whatsapp"></i>
+                                            </a>
+                                            <a href="${facebookShareUrl}" target="_blank" style="font-size: 24px;">
+                                                <i class="fab fa-facebook"></i>
+                                            </a>
+                                            <a href="${emailShareUrl}" target="_blank" style="font-size: 24px;">
+                                                <i class="fas fa-envelope"></i>
+                                            </a>
+                                        </div>
+                                        <button id="downloadBtn" class="swal2-styled swal2-confirm" style="background-color: #5c67f2;">Download QR Code</button>
+                                    </div>
+                                `,
+                                showCloseButton: true,
+                                confirmButtonText: 'Close',
+                                didOpen: () => {
+                                    document.getElementById('downloadBtn').addEventListener('click', function() {
+                                        const qrCodeImage = document.getElementById('qrCodeImage').src;
+                                        const link = document.createElement('a');
+                                        link.href = qrCodeImage;
+                                        link.download = 'QR_Code.png';
+                                        link.style.display = 'none';
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                    });
+                                }
+                            });
+                        });
+                    </script>
                 </div>
 
-                <!-- Display average rating and review count -->
                 <div id='star-rating-container' class='star-rating' data-rating='<?php echo $avg_rating; ?>' data-count='<?php echo $review_count; ?>'></div>
             </div>
             <br />
@@ -132,26 +183,23 @@ if (isset($_GET['id'])) {
     </div>
     <?php include '../partials/footer.php'; ?>
 
-    <!-- JavaScript for Star Rating -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const starRatingContainer = document.getElementById('star-rating-container');
             const rating = parseFloat(starRatingContainer.getAttribute('data-rating'));
             const reviewCount = starRatingContainer.getAttribute('data-count');
 
-            // Build the star rating display
             let stars = '';
             for (let i = 1; i <= 5; i++) {
                 if (i <= rating) {
-                    stars += '&#9733;'; // Filled star
+                    stars += '&#9733;';
                 } else if (i - rating < 1) {
-                    stars += '&#9733;'; // Partially filled star (optional, can be a half star here)
+                    stars += '&#9733;';
                 } else {
-                    stars += '&#9734;'; // Empty star
+                    stars += '&#9734;';
                 }
             }
 
-            // Add the rating score and count display
             const ratingDisplay = `<span class='rating-score'>${rating}</span>/5 <span class='rating-count'>(${reviewCount}+)</span>`;
 
             starRatingContainer.innerHTML = `<span class="star">&#9733;</span> ${ratingDisplay}`;

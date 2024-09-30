@@ -27,7 +27,7 @@ try {
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-    <script src="https://www.paypal.com/sdk/js?client-id=AY4NRlDT-AI4IAwYqx0gs44KHJC1QZu5R8pUTpI7w9OXuzo8n8yUmcl-8uBnyKBNU-7nswpo0P8CXSE_"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_API_KEY&currency=MYR"></script>
     <style>
         .container-fluid {
             margin-bottom: 5%;
@@ -145,10 +145,10 @@ try {
                                     <td><?php echo htmlspecialchars(date("Y-m-d H:i:s", strtotime($transaction['datetime']))); ?></td>
                                     <td><?php echo htmlspecialchars($transaction['status']); ?></td>
                                     <td>
-                                        <button 
-                                            data-transaction-id="<?php echo htmlspecialchars($transaction['id']); ?>" 
-                                            data-amount="<?php echo htmlspecialchars($transaction['amountProcessed']); ?>" 
-                                            data-seller-id="<?php echo htmlspecialchars($transaction['seller_id']); ?>" 
+                                        <button
+                                            data-transaction-id="<?php echo htmlspecialchars($transaction['id']); ?>"
+                                            data-amount="<?php echo htmlspecialchars($transaction['amountProcessed']); ?>"
+                                            data-seller-id="<?php echo htmlspecialchars($transaction['seller_id']); ?>"
                                             class="btn btn-success btn-sm transfer-btn">
                                             Transfer
                                         </button>
@@ -161,7 +161,6 @@ try {
             </div>
         </div>
 
-        <!-- Transaction Details Section -->
         <div id="transaction-detail-container">
             <h3>Transaction Details</h3>
             <p><strong>Transaction ID:</strong> <span id="detail-transaction-id"></span></p>
@@ -169,7 +168,6 @@ try {
             <p><strong>Seller ID:</strong> <span id="detail-seller-id"></span></p>
         </div>
 
-        <!-- PayPal Button Container -->
         <div style="margin-top:20px;" id="paypal-button-container"></div>
     </div>
 
@@ -181,23 +179,25 @@ try {
     <script src="../js/demo/datatables-demo.js"></script>
 
     <script>
-        let isRendered = false; // To prevent multiple rendering
+        let isRendered = false;
 
         $(document).ready(function() {
             $('.transfer-btn').on('click', function() {
                 var transactionId = $(this).data('transaction-id');
-                var amount = $(this).data('amount');
+                var amount = parseFloat($(this).data('amount'));
                 var sellerId = $(this).data('seller-id');
 
-                // Populate transaction details
+                if (isNaN(amount)) {
+                    alert('Invalid amount.');
+                    return;
+                }
+
                 $('#detail-transaction-id').text(transactionId);
                 $('#detail-amount').text(amount.toFixed(2));
                 $('#detail-seller-id').text(sellerId);
 
-                // Show the transaction detail container
                 $('#transaction-detail-container').show();
 
-                // Render PayPal buttons once
                 if (!isRendered) {
                     paypal.Buttons({
                         createOrder: function(data, actions) {
@@ -238,10 +238,10 @@ try {
                         }
                     }).render('#paypal-button-container');
 
-                    isRendered = true; // Prevent re-rendering
+                    isRendered = true;
                 }
 
-                $('#paypal-button-container').show(); // Show the PayPal button container
+                $('#paypal-button-container').show();
             });
         });
     </script>

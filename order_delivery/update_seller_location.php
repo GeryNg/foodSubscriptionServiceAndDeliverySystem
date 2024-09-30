@@ -3,7 +3,7 @@ include_once '../resource/Database.php';
 include_once '../resource/session.php';
 
 $seller_id = $_SESSION['seller_id'];
-$fingerprint = $_SESSION['fingerprint']; // Get the fingerprint from the session
+$fingerprint = $_SESSION['fingerprint'];
 
 // Get the raw POST data
 $data = json_decode(file_get_contents("php://input"), true);

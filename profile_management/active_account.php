@@ -102,6 +102,7 @@ include_once '../partials/parseActiveAccount.php';
                     </div>
                 <?php endif; ?>
                 <div class="clearfix" style="margin-bottom: 30px;"></div>
+                
                 <label>Name: </label>
                 <input type="text" name="seller_name" class="form-control" value="<?php if (isset($_POST['seller_name'])) echo htmlspecialchars($_POST['seller_name']); ?>">
                 <br>
@@ -185,7 +186,7 @@ include_once '../partials/parseActiveAccount.php';
         </div>
     </div>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5sNxHZwLHZ4KigiYcQKGjbrEVhbKLNFo&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
     <script>
         function initAutocomplete() {
             const addressField = document.getElementById('address');

@@ -29,9 +29,10 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
     <title><?php echo $page_title; ?></title>
     <style>
-        .container-fluid{
+        .container-fluid {
             margin-bottom: 5%;
         }
+
         h1 {
             color: #333;
             font-size: 2.5rem;
@@ -39,8 +40,9 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 800;
             line-height: 1.2;
         }
-        .breadcrumb{
-            background-color:transparent;
+
+        .breadcrumb {
+            background-color: transparent;
         }
     </style>
 </head>
@@ -54,43 +56,53 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </ol>
         <hr />
         <div class="main">
-            <ul class="cards">
-                <?php foreach ($plans as $plan): $image_urls = explode(',', $plan['image_urls']); ?>
-                    <li class="cards_item">
-                        <div class="card">
-                            <div class="card_image">
-                                <div class="slideshow">
-                                    <?php foreach ($image_urls as $index => $url): ?>
-                                        <div class="slide">
-                                            <img src="<?php echo htmlspecialchars($url); ?>" />
-                                        </div>
-                                    <?php endforeach; ?>
-                                    <button class="arrow arrow-left">&#128896;</button>
-                                    <button class="arrow arrow-right">&#128898;</button>
-                                </div>
-                                <span class="card_price"><a href="edit_plan.php?id=<?php echo $plan['id']; ?>"><i class="bi bi-pencil-square"></i></a></span>
+        <ul class="cards">
+    <?php foreach ($plans as $plan): $image_urls = explode(',', $plan['image_urls']); ?>
+        <li class="cards_item">
+            <!-- Conditionally apply the class based on plan status -->
+            <div class="card <?php echo ($plan['status'] === 'active') ? 'active-plan' : 'gray-effect'; ?>">
+                <div class="card_image">
+                    <div class="slideshow">
+                        <?php foreach ($image_urls as $index => $url): ?>
+                            <div class="slide">
+                                <img src="<?php echo htmlspecialchars($url); ?>" />
                             </div>
-                            <div class="card_content">
-                                <h2 class="card_title"><?php echo htmlspecialchars($plan['plan_name']); ?></h2>
-                                <div class="card_text">
-                                    <p><?php echo htmlspecialchars($plan['description']); ?></p>
-                                    <hr />
-                                    <div class="card_text2">
-                                        <p><strong>Date From:</strong> <?php echo htmlspecialchars($plan['date_from']); ?></p>
-                                        <p><strong>Date To:</strong> <?php echo htmlspecialchars($plan['date_to']); ?></p>
-                                        <p><strong>Price:</strong> RM <?php echo htmlspecialchars($plan['price']); ?></p>
-                                        <p><strong>Sections:</strong> <?php echo htmlspecialchars($plan['section']); ?></p>
-                                        <p><strong>Status:</strong> <?php echo htmlspecialchars($plan['status']); ?></p>
-                                        <span class="card_price2"><a href="delete_plan.php?id=<?php echo $plan['id']; ?>" onclick="return confirm('Are you sure you want to delete this plan?');"><i class="bi bi-trash"></i></a></span>
-                                    </div>
-                                </div>
-                            </div>
+                        <?php endforeach; ?>
+                        <button class="arrow arrow-left">&#128896;</button>
+                        <button class="arrow arrow-right">&#128898;</button>
+                    </div>
+                    <span class="card_price"><a href="edit_plan.php?id=<?php echo $plan['id']; ?>"><i class="bi bi-pencil-square"></i></a></span>
+                </div>
+                <div class="card_content">
+                    <h2 class="card_title"><?php echo htmlspecialchars($plan['plan_name']); ?></h2>
+                    <div class="card_text">
+                        <p><?php echo htmlspecialchars($plan['description']); ?></p>
+                        <hr />
+                        <div class="card_text2">
+                            <p hidden><strong>Plan id: </strong> <?php echo htmlspecialchars($plan['id']); ?></p>
+                            <p><strong>Date From:</strong> <?php echo htmlspecialchars($plan['date_from']); ?></p>
+                            <p><strong>Date To:</strong> <?php echo htmlspecialchars($plan['date_to']); ?></p>
+                            <p><strong>Price:</strong> RM <?php echo htmlspecialchars($plan['price']); ?></p>
+                            <p><strong>Sections:</strong> <?php echo htmlspecialchars($plan['section']); ?></p>
+                            <p><strong>Status:</strong> <?php echo htmlspecialchars($plan['status']); ?></p>
+                            <span class="card_price2">
+                                <a href="javascript:void(0);" class="delete-plan" data-id="<?php echo $plan['id']; ?>">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </span>
                         </div>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+                    </div>
+                </div>
+            </div>
+        </li>
+    <?php endforeach; ?>
+</ul>
+
+
+
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.slideshow').forEach(function(slideshow) {
@@ -125,6 +137,29 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 slideshow.querySelector('.arrow-right').addEventListener('click', function() {
                     nextSlide();
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.delete-plan').forEach(function(deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    const planId = this.getAttribute('data-id');
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: `You are about to delete the plan with ID: ${planId}`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `delete_plan.php?id=${planId}`;
+                        }
+                    });
                 });
             });
         });

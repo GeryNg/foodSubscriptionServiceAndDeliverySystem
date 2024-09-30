@@ -1,0 +1,145 @@
+.container1 {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding-top: 40px ;
+}
+
+h1, h2 {
+    font-family: 'Merriweather Sans', sans-serif;
+    font-size: 2rem;
+    color: #333;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.restaurant-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.avatar_image {
+    max-width: 150px;
+    max-height: 150px;
+    width: auto;
+    height: auto;
+    border-radius: 10px;
+    margin-right: 20px;
+}
+
+.restaurant-details {
+    flex: 1;
+}
+
+.restaurant-details p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #666;
+}
+
+.articles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    font-family: 'Merriweather Sans', sans-serif;
+}
+
+.article-wrapper {
+    position: relative;
+    border-radius: 16px;
+    box-shadow: none;
+    background: #fff;
+    overflow: hidden;
+    transition: all 0.4s ease-in-out;
+    border: 1px solid #e7e7e7;
+}
+
+.article-wrapper:hover {
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+}
+
+figure {
+    margin: 0;
+    padding: 0;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+}
+
+.plan_image {
+    width: 100%;
+    height: auto;
+    transition: transform 0.4s ease-in-out;
+}
+
+.article-wrapper:hover .plan_image {
+    transform: scale(1.1);
+}
+
+.article-body {
+    padding: 16px;
+    text-align: left;
+}
+
+.article-body h2 {
+    font-family: 'Merriweather Sans', sans-serif;
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0 0 8px 0;
+}
+
+.article-body p {
+    margin: 0 0 16px 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.read-more {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #28666e;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
+.read-more .icon {
+    min-width: 24px;
+    width: 24px;
+    height: 24px;
+    margin-left: 5px;
+    transition: transform 0.3s;
+}
+
+.read-more:hover .icon {
+    transform: translateX(5px);
+}
+
+.star-rating {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-family: 'Arial', sans-serif;
+}
+
+.star {
+    color: #FFA500; /* Orange star color */
+    margin-right: 5px;
+    font-size: 20px; /* Slightly bigger star */
+}
+
+.rating-score {
+    font-weight: bold;
+    color: #333; /* Darker color for score */
+    margin-right: 5px;
+}
+
+.rating-count {
+    color: #777; /* Lighter color for count */
+}
+

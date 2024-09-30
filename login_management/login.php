@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@12.4.2/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="../image/logo-circle.png">
     <style>
         .main-container {
             margin-top: 100px;
@@ -38,7 +39,7 @@
     <div class="main-container">
         <main class="form-signin">
             <form method="post" action="">
-                <img class="mb-4" src="path/to/your/logo.png" alt="Logo" width="72" height="57">
+                <img class="mb-4" src="../image/logo-rounded.png" alt="Logo" width="80" height="80">
                 <h1 class="h3 mb-3 fw-normal">Login Form</h1>
 
                 <?php if (isset($result) || !empty($form_errors)): ?>
@@ -85,3 +86,5 @@
 
 
 </html>
+
+<?php include_once '../partials/footer.php';?>

@@ -1,0 +1,158 @@
+/* General Styles */
+body {
+    font-family: 'Merriweather Sans', sans-serif;
+    line-height: 1.6;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Hero Section Styles */
+.hero-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80vh; /* Full viewport height */
+    color: #000; /* Black text */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.hero-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+}
+
+.hero-text {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.hero-text h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #000; /* Black text */
+}
+
+.hero-text p {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: #000; /* Black text */
+}
+
+.hero-image {
+    flex: 1.5; /* More emphasis on the image */
+    display: flex;
+    justify-content: center;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* Button Styles */
+.btn-modern, .btn-signin, .btn-signup, .btn-order {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #28a745; /* Green button */
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.3s;
+    margin-right: 10px;
+}
+
+.btn-signup {
+    background-color: #007bff; /* Blue button for signup */
+}
+
+.btn-signin {
+    background-color: #6c757d; /* Grey button for signin */
+}
+
+.btn-modern:hover, .btn-signin:hover, .btn-signup:hover, .btn-order:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: scale(1.05);
+}
+
+.btn-modern:active, .btn-signin:active, .btn-signup:active, .btn-order:active {
+    background-color: #1e7e34; /* Even darker green on click */
+    transform: scale(1);
+}
+
+/* Secondary Section Styles */
+.secondary-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    background-color: #000; /* Black background for contrast */
+    color: #fff; /* White text */
+    padding: 50px 10%;
+    box-sizing: border-box;
+}
+
+.secondary-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.secondary-image {
+    flex: 1.5; /* More emphasis on the image */
+    display: flex;
+    justify-content: center;
+    height: 100%;
+}
+
+.secondary-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.secondary-text {
+    flex: 1;
+    padding-left: 20px;
+}
+
+.secondary-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #fff; /* White text */
+}
+
+.secondary-text p {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: #fff; /* White text */
+}
+
+/* Media Query for Responsiveness */
+@media (max-width: 768px) {
+    .hero-container, .secondary-container {
+        flex-direction: column;
+    }
+
+    .hero-text, .secondary-text {
+        padding: 0;
+        text-align: center;
+    }
+
+    .hero-image, .secondary-image {
+        margin-top: 20px;
+    }
+}

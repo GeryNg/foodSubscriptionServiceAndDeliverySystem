@@ -3,12 +3,35 @@ include_once '../resource/session.php';
 include_once '../resource/Database.php';
 include_once '../resource/utilities.php';
 
+function generateUserId($db) {
+    $query = "SELECT MAX(id) AS max_id FROM users";
+    $stmt = $db->prepare($query);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $maxId = $row['max_id'];
+
+    $newId = $maxId ? intval(substr($maxId, 1)) + 1 : 1;
+
+    return 'U' . str_pad($newId, 5, '0', STR_PAD_LEFT);
+}
+
+function generateSellerId($db) {
+    $query = "SELECT MAX(id) AS max_id FROM seller";
+    $stmt = $db->prepare($query);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $maxId = $row['max_id'];
+
+    $newId = $maxId ? intval(substr($maxId, 1)) + 1 : 1;
+
+    return 'S' . str_pad($newId, 5, '0', STR_PAD_LEFT);
+}
+
 if (isset($_POST['signupBtn'])) {
-    // Initialize error array
     $form_errors = array();
 
     // Required fields
-    $required_fields = array('email', 'username', 'password1', 'password2');
+    $required_fields = array('email', 'username', 'password1', 'password2', 'securityQuestion1', 'securityAnswer1', 'securityQuestion2', 'securityAnswer2');
     $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
 
     // Fields to check length
@@ -20,9 +43,20 @@ if (isset($_POST['signupBtn'])) {
 
     // Collect form data
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+    $username = filter_var($_POST['username']);
     $password1 = $_POST['password1'];
     $password2 = $_POST['password2'];
+    $securityQuestion1 = filter_var($_POST['securityQuestion1']);
+    $securityAnswer1 = filter_var($_POST['securityAnswer1']);
+    $securityQuestion2 = filter_var($_POST['securityQuestion2']);
+    $securityAnswer2 = filter_var($_POST['securityAnswer2']);
+    $securityQuestions = array(
+        "1" => "What was your first pet's name?",
+        "2" => "What is your mother's maiden name?",
+        "3" => "What was the name of your first school?",
+        "4" => "What is your favorite food?",
+        "5" => "What city were you born in?"
+    );
 
     // Check for duplicate entries
     if ($password1 != $password2) {
@@ -32,32 +66,40 @@ if (isset($_POST['signupBtn'])) {
     } elseif (checkDuplicateEntries("users", "username", $username, $db)) {
         $result = flashMessage("Username is already taken, please try another one");
     } elseif (empty($form_errors)) {
-        // Hashing the password
+        // Generate the custom user ID (U00001, U00002, etc.)
+        $user_id = generateUserId($db);
+
+        // Hash the password
         $hashed_password = password_hash($password1, PASSWORD_DEFAULT);
 
         try {
-            $sqlInsert = "INSERT INTO users (username, email, password, role, join_date) 
-                          VALUES (:username, :email, :password, :role, now())";
+            // Insert new user with custom user ID
+            $sqlInsert = "INSERT INTO users (id, username, email, password, role, join_date, security_question1, security_answer1, security_question2, security_answer2) 
+                          VALUES (:id, :username, :email, :password, :role, now(), :security_question1, :security_answer1, :security_question2, :security_answer2)";
             $statement = $db->prepare($sqlInsert);
-            $statement->execute(
-                array(
-                    ':username' => $username,
-                    ':email' => $email,
-                    ':password' => $hashed_password,
-                    ':role' => 'seller'
-                )
-            );
+            $statement->execute([
+                ':id' => $user_id,
+                ':username' => $username,
+                ':email' => $email,
+                ':password' => $hashed_password,
+                ':role' => 'seller',
+                ':security_question1' => $securityQuestions[$securityQuestion1],
+                ':security_answer1' => $securityAnswer1,
+                ':security_question2' => $securityQuestions[$securityQuestion2],
+                ':security_answer2' => $securityAnswer2
+            ]);
 
             if ($statement->rowCount() == 1) {
-                $user_id = $db->lastInsertId();
+                // Generate the custom seller ID (S00001, S00002, etc.)
+                $seller_id = generateSellerId($db);
 
-                $sqlInsertSeller = "INSERT INTO seller (user_id, status) VALUES (:user_id, 'inactive')";
+                // Insert new seller with custom seller ID
+                $sqlInsertSeller = "INSERT INTO seller (id, user_id, access) VALUES (:id, :user_id, 'unknown')";
                 $statementSeller = $db->prepare($sqlInsertSeller);
-                $statementSeller->execute(array(':user_id' => $user_id));
-
-                $_SESSION['id'] = $user_id;
-                $_SESSION['username'] = $username;
-                $_SESSION['status'] = 'inactive';
+                $statementSeller->execute([
+                    ':id' => $seller_id,
+                    ':user_id' => $user_id
+                ]);
 
                 echo "<script>
                 swal({
@@ -82,5 +124,3 @@ if (isset($_POST['signupBtn'])) {
         }
     }
 }
-?>
-

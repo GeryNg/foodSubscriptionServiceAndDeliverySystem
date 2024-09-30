@@ -70,7 +70,7 @@ function show_errors($form_errors_array)
 function flashMessage($message, $type = "error")
 {
     $class = ($type === "success") ? "alert-success" : "alert-danger";
-    return "<div class=' {$class}'>{$message}</div>";
+    return "<div class='{$class}'>{$message}</div>";
 }
 
 function show_combined_messages($flashMessage, $form_errors_array)
@@ -90,12 +90,6 @@ function show_combined_messages($flashMessage, $form_errors_array)
     return $messages;
 }
 
-function redirectTo($page)
-{
-    header("Location: {$page}.php");
-    exit();
-}
-
 function checkDuplicateEntries($table, $column_name, $value, $db)
 {
     try {
@@ -108,7 +102,6 @@ function checkDuplicateEntries($table, $column_name, $value, $db)
         }
         return false;
     } catch (PDOException $ex) {
-        // Handle exception
         return false;
     }
 }
@@ -116,7 +109,7 @@ function checkDuplicateEntries($table, $column_name, $value, $db)
 function rememberMe($user_id)
 {
     $encryptCookieData = base64_encode("UaQteh5i4y3dntstemYODEC{$user_id}");
-    // Cookie set to expire in about 5 days
+    // Make sure there is no output before this point
     setcookie('rememberUserCookie', $encryptCookieData, time() + 60 * 60 * 24 * 5, "/");
 }
 
@@ -153,12 +146,14 @@ function signout()
     unset($_SESSION['id']);
 
     if (isset($_COOKIE['rememberUserCookie'])) {
-        unset($_COOKIE['rememberUserCookie']);
-        setcookie('rememberUserCookie', null, -1, '/');
+        unset($_COOKIE['rememberUserCookie']); // Remove the cookie from the $_COOKIE superglobal
+        setcookie('rememberUserCookie', '', time() - 3600, '/'); // Expire the cookie
     }
+
     session_destroy();
     session_regenerate_id(true);
-    redirectTo('../index');
+    header("Location: ../index.php");
+    exit();
 }
 
 // Guard from users using many browsers to run the website
